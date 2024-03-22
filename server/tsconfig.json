@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "baseUrl": "src",
+    "outDir": "dist",
+    "sourceMap": false,
+    "noImplicitAny": true,
+    "typeRoots": ["./types"]
+  },
+  "include": ["src/**/*", "index.ts"]
+}
