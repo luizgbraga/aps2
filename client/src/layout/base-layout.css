@@ -1,0 +1,46 @@
+.base-layout {
+  height: 100vh;
+  overflow: hidden !important;
+}
+
+.base-sider {
+  height: 100vh;
+  max-width: 225px !important;
+  min-width: 225px !important;
+  width: 225px !important;
+}
+
+.base-menu {
+  width: 100%;
+  height: 100%;
+}
+
+.base-logo {
+  padding: 24px 20px;
+  pointer-events: none;
+  background-color: #fff;
+  border-right: 1px solid #f0f0f0;
+}
+
+.base-soon,
+.base-lock {
+  margin-left: 10px;
+}
+
+.base-header {
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.base-content {
+  padding: 40px 80px;
+  min-height: 280px;
+  background-color: #fafafa;
+  overflow: auto;
+}
+
+.base-title {
+  margin-bottom: 40px;
+}
