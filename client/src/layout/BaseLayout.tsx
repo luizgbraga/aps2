@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Logo } from './Logo';
@@ -11,18 +11,14 @@ import {
   Divider,
   Tag,
   Typography,
+  Modal,
 } from 'antd';
-import {
-  UserOutlined,
-  LogoutOutlined,
-  LockOutlined,
-} from '@ant-design/icons';
+import { UserOutlined, LogoutOutlined, LockOutlined } from '@ant-design/icons';
 import MenuDivider from 'antd/es/menu/MenuDivider';
 import { Storage } from '../utils/storage';
 import { AuthContext } from '../Wrappers';
 
 import './base-layout.css';
-import { Notifications } from './Notifications';
 
 type Props = {
   children: React.ReactNode;
@@ -51,6 +47,7 @@ export type SidebarSection = {
 export const BaseLayout: React.FC<Props> = (props: Props) => {
   const nav = useNavigate();
   const { result: me } = useContext(AuthContext);
+  const [modal, setModal] = useState(false);
 
   const logout = () => {
     Storage.remove('token');
@@ -61,7 +58,7 @@ export const BaseLayout: React.FC<Props> = (props: Props) => {
     <Layout className="base-layout">
       <Layout.Sider width={250} className="base-sider">
         <div className="base-logo">
-          <Logo />
+          <Logo width={50} />
         </div>
         <Menu
           mode="inline"
@@ -116,13 +113,17 @@ export const BaseLayout: React.FC<Props> = (props: Props) => {
       </Layout.Sider>
       <Layout>
         <Layout.Header className="base-header">
-          <Flex gap="20px" align="center">
-            <Notifications />
-            <Divider type="vertical" />
-            <Divider type="vertical" />
-            <Button icon={<UserOutlined />} onClick={() => nav('/profile')}>
-              {me?.username}
-            </Button>
+          <Flex
+            justify="space-between"
+            align="center"
+            style={{ width: '100%' }}
+          >
+            <Button onClick={() => setModal(true)}>Add occ</Button>
+            <Flex gap="20px" align="center">
+              <Button icon={<UserOutlined />} onClick={() => nav('/profile')}>
+                {me?.username}
+              </Button>
+            </Flex>
           </Flex>
         </Layout.Header>
         <Divider style={{ margin: 0 }} />
@@ -136,6 +137,7 @@ export const BaseLayout: React.FC<Props> = (props: Props) => {
           {props.children}
         </Layout.Content>
       </Layout>
+      <Modal open={modal} onCancel={() => setModal(false)}></Modal>
     </Layout>
   );
 };
