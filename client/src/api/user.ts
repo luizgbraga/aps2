@@ -4,9 +4,11 @@ import { API, Model } from '../utils/model';
 import { API_URL } from '../config';
 
 export type UserDTO = {
-  id: string;
-  username: string;
   cpf: string;
+  password: string;
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 class UserAPI extends API {
@@ -17,7 +19,6 @@ class UserAPI extends API {
   async me(token: string): Promise<Response<UserDTO>> {
     return this.request('GET', 'me', token, null, null);
   }
-
 }
 
 const api = new UserAPI();

@@ -15,6 +15,20 @@
       "when": 1715261456127,
       "tag": "0001_jittery_eternity",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1715346094808,
+      "tag": "0002_curly_rictor",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1715346522521,
+      "tag": "0003_graceful_garia",
+      "breakpoints": true
     }
   ]
 }

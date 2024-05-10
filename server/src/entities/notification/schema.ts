@@ -14,7 +14,7 @@ export const notifications = pgTable('notifications', {
   neighborhoodId: uuid('bairro_id')
     .references(() => neighborhood.id)
     .notNull(),
-  confirmed: boolean('confirmed').default(false),
+  confirmed: boolean('confirmed').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

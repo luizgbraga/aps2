@@ -1,0 +1,1 @@
+ALTER TABLE "notifications" ALTER COLUMN "confirmed" SET NOT NULL;
