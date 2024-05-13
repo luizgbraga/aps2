@@ -43,14 +43,6 @@ export class UserModel extends Model<UserDTO> {
     return this.record.get('id');
   }
 
-  get username() {
-    return this.record.get('username');
-  }
-
-  set username(value: string) {
-    this.record.set('username', value);
-  }
-
   get cpf() {
     return this.record.get('cpf');
   }

@@ -11,7 +11,7 @@ export class FindError extends Error {
   }
 }
 
-type loginErrorCause = 'FAILED_TO_LOGIN';
+type loginErrorCause = 'USER_NOT_REGISTERD' | 'WRONG_PASSWORD' | 'INVALID_CPF';
 
 export class LoginError extends Error {
   type: 'ERROR';
@@ -21,5 +21,21 @@ export class LoginError extends Error {
     this.cause = cause;
     this.type = 'ERROR';
     Object.setPrototypeOf(this, LoginError.prototype);
+  }
+}
+
+type RegisterErrorCause =
+  | 'USER_ALREADY_EXISTS'
+  | 'INVALID_CPF'
+  | 'INVALID_PASSWORD';
+
+export class RegisterError extends Error {
+  type: 'ERROR';
+  cause: RegisterErrorCause;
+  constructor(cause: RegisterErrorCause) {
+    super();
+    this.cause = cause;
+    this.type = 'ERROR';
+    Object.setPrototypeOf(this, RegisterError.prototype);
   }
 }

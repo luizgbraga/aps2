@@ -1,6 +1,6 @@
 {
-  "id": "4542bc40-6dbb-450a-aae9-912427cdb865",
-  "prevId": "9f637ae1-043b-458d-9b22-e70bb5658de5",
+  "id": "d7c187bb-0856-4294-83da-6d1a4c65e39c",
+  "prevId": "0f67e5f7-17c7-4a73-ae7b-6979a15bab2d",
   "version": "5",
   "dialect": "pg",
   "tables": {
@@ -15,9 +15,9 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "email": {
-          "name": "email",
-          "type": "varchar(255)",
+        "cpf": {
+          "name": "cpf",
+          "type": "varchar(11)",
           "primaryKey": false,
           "notNull": true
         },
@@ -46,11 +46,11 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "users_email_unique": {
-          "name": "users_email_unique",
+        "users_cpf_unique": {
+          "name": "users_cpf_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "email"
+            "cpf"
           ]
         }
       }
@@ -101,12 +101,12 @@
           "primaryKey": false,
           "notNull": true
         },
-        "status": {
-          "name": "status",
-          "type": "varchar(255)",
+        "confirmed": {
+          "name": "confirmed",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'pending'"
+          "notNull": true,
+          "default": false
         },
         "created_at": {
           "name": "created_at",
@@ -128,6 +128,82 @@
         "notifications_bairro_id_neighborhood_id_fk": {
           "name": "notifications_bairro_id_neighborhood_id_fk",
           "tableFrom": "notifications",
+          "tableTo": "neighborhood",
+          "columnsFrom": [
+            "bairro_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "occurences": {
+      "name": "occurences",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bairro_id": {
+          "name": "bairro_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "confirmed": {
+          "name": "confirmed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "occurences_bairro_id_neighborhood_id_fk": {
+          "name": "occurences_bairro_id_neighborhood_id_fk",
+          "tableFrom": "occurences",
           "tableTo": "neighborhood",
           "columnsFrom": [
             "bairro_id"

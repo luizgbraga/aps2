@@ -1,14 +1,18 @@
 import { Request, Response } from 'express';
-import { NotificationRepository } from './repository';
+import { OccurrenceRepository } from './repository';
 
-export class NotificationController {
+export class OccurrenceController {
   static async add(req: Request, res: Response) {
     try {
       const description = req.body.description;
       const neighborhoodId = req.body.neighborhoodId;
-      const result = await NotificationRepository.add(
+      const latitude = req.body.latitude;
+      const longitude = req.body.longitude;
+      const result = await OccurrenceRepository.add(
         description,
         neighborhoodId,
+        latitude,
+        longitude,
       );
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {

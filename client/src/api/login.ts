@@ -1,19 +1,20 @@
 import { API_URL } from '../config';
 import { API } from '../utils/model';
 import { Response } from './types';
-import { UserDTO } from './user';
+
+type Token = string;
 
 class LoginAPI extends API {
   constructor() {
     super(`${API_URL}/user`);
   }
 
-  async login(cpf: string, password: string): Promise<Response<UserDTO>> {
+  async login(cpf: string, password: string): Promise<Response<Token>> {
     const body = JSON.stringify({ cpf, password });
     return this.request('POST', 'login', null, body, null);
   }
 
-  async register(cpf: string, password: string): Promise<Response<UserDTO>> {
+  async register(cpf: string, password: string): Promise<Response<Token>> {
     const body = JSON.stringify({ cpf, password });
     return this.request('POST', 'register', null, body, null);
   }

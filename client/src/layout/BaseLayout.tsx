@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Logo } from './Logo';
@@ -16,7 +16,6 @@ import {
 import { UserOutlined, LogoutOutlined, LockOutlined } from '@ant-design/icons';
 import MenuDivider from 'antd/es/menu/MenuDivider';
 import { Storage } from '../utils/storage';
-import { AuthContext } from '../Wrappers';
 
 import './base-layout.css';
 
@@ -46,7 +45,7 @@ export type SidebarSection = {
 
 export const BaseLayout: React.FC<Props> = (props: Props) => {
   const nav = useNavigate();
-  const { result: me } = useContext(AuthContext);
+  // const { result: me } = useContext(AuthContext);
   const [modal, setModal] = useState(false);
 
   const logout = () => {
@@ -121,7 +120,7 @@ export const BaseLayout: React.FC<Props> = (props: Props) => {
             <Button onClick={() => setModal(true)}>Add occ</Button>
             <Flex gap="20px" align="center">
               <Button icon={<UserOutlined />} onClick={() => nav('/profile')}>
-                {me?.username}
+                username?
               </Button>
             </Flex>
           </Flex>
