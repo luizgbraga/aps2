@@ -11,11 +11,16 @@ import {
   Segmented,
 } from 'antd';
 import { LoginModel } from '../../api/login';
+import { toCpf } from '../../utils/string';
+
+type Login = 'Cidadão' | 'Ônibus';
 
 export const LoginForm: React.FC = () => {
   const nav = useNavigate();
+
   const [cpf, setCpf] = useState('');
   const [password, setPassword] = useState('');
+  const [login, setLogin] = useState<Login>('Cidadão');
 
   const onSubmit = () => {
     LoginModel.register(cpf, password)
@@ -50,6 +55,8 @@ export const LoginForm: React.FC = () => {
           {' '}
           <Segmented
             options={['Cidadão', 'Ônibus']}
+            value={login}
+            onChange={setLogin}
             size="large"
             style={{ marginBottom: '20px' }}
           />
@@ -66,14 +73,16 @@ export const LoginForm: React.FC = () => {
             </Typography.Link>
           </Typography.Paragraph>
         </Flex>
-        <Form.Item label="CPF" name="cpf">
+        <Form.Item label="CPF">
           <Input
+            maxLength={14}
+            value={cpf}
             size="large"
-            onChange={(e) => setCpf(e.target.value)}
+            onChange={(e) => setCpf(toCpf(e.target.value))}
             placeholder="XXX.XXX.XXX-XX"
           />
         </Form.Item>
-        <Form.Item label="password" name="password">
+        <Form.Item label="Senha" name="password">
           <Input.Password
             size="large"
             onChange={(e) => setPassword(e.target.value)}
