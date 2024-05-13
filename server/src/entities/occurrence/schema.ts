@@ -8,9 +8,11 @@ import {
 import { InferSelectModel } from 'drizzle-orm';
 import { neighborhood } from '../../entities/neighborhood/schema';
 
-export const notifications = pgTable('notifications', {
+export const occurences = pgTable('occurences', {
   id: uuid('id').primaryKey().defaultRandom(),
   description: varchar('description', { length: 255 }).notNull(),
+  latitude: varchar('latitude', { length: 255 }).notNull(),
+  longitude: varchar('longitude', { length: 255 }).notNull(),
   neighborhoodId: uuid('bairro_id')
     .references(() => neighborhood.id)
     .notNull(),
@@ -19,4 +21,4 @@ export const notifications = pgTable('notifications', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export type Notifications = InferSelectModel<typeof notifications>;
+export type Occurences = InferSelectModel<typeof occurences>;

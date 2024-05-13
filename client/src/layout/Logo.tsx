@@ -1,6 +1,6 @@
 import React from 'react';
 
-import logo from '../assets/images/vite.svg';
+import logo from '../assets/images/logo-bus.jpg';
 
 type Props = {
   width?: number;

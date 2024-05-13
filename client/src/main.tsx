@@ -8,7 +8,7 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <ConfigProvider theme={{ token: { colorPrimary: '#000000' } }}>
+  <ConfigProvider theme={{ token: { colorPrimary: '#1560BD' } }}>
     <AntApp>
       <App />
     </AntApp>

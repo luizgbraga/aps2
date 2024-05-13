@@ -9,20 +9,13 @@ class LoginAPI extends API {
     super(`${API_URL}/user`);
   }
 
-  async loginWithCpf(
-    cpf: string,
-    password: string
-  ): Promise<Response<Token>> {
+  async login(cpf: string, password: string): Promise<Response<Token>> {
     const body = JSON.stringify({ cpf, password });
-    return this.request('POST', 'login-with-cpf', null, body, null);
+    return this.request('POST', 'login', null, body, null);
   }
 
-  async register(
-    username: string,
-    cpf: string,
-    password: string
-  ): Promise<Response<Token>> {
-    const body = JSON.stringify({ username, cpf, password });
+  async register(cpf: string, password: string): Promise<Response<Token>> {
+    const body = JSON.stringify({ cpf, password });
     return this.request('POST', 'register', null, body, null);
   }
 }
@@ -30,14 +23,14 @@ class LoginAPI extends API {
 const api = new LoginAPI();
 
 export class LoginModel {
-  static async loginWithCpf(cpf: string, password: string) {
-    const res = await api.loginWithCpf(cpf, password);
+  static async login(cpf: string, password: string) {
+    const res = await api.login(cpf, password);
     if (res.type === 'ERROR') throw new Error(res.cause);
     return res.result;
   }
 
-  static async register(username: string, cpf: string, password: string) {
-    const res = await api.register(username, cpf, password);
+  static async register(cpf: string, password: string) {
+    const res = await api.register(cpf, password);
     if (res.type === 'ERROR') throw new Error(res.cause);
     return res.result;
   }

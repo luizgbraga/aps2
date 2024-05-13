@@ -20,7 +20,7 @@ export const Unlogged: React.FC<Props> = ({ children }) => {
     <Layout className="unlogged-layout">
       <Layout.Header className="unlogged-header">
         <Logo width={40} onClick={() => nav('/')} />
-        <Button type="primary" size="large" onClick={() => nav('/signup')}>
+        <Button type="primary" size="large" onClick={() => nav('/register')}>
           Sign Up
         </Button>
       </Layout.Header>
