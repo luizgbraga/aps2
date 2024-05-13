@@ -1,16 +1,21 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button, Flex, Form, Input, Typography, notification } from 'antd';
 import { LoginModel } from '../../api/login';
+import { toCpf } from '../../utils/string';
+import { AuthContext } from '../../Wrappers';
 
 export const RegisterForm: React.FC = () => {
   const nav = useNavigate();
+  const me = useContext(AuthContext);
 
+  const [loading, setLoading] = useState(false);
   const [cpf, setCpf] = useState('');
   const [password, setPassword] = useState('');
 
   const onSubmit = () => {
+    setLoading(true);
     LoginModel.register(cpf, password)
       .then((res) => {
         notification.success({
@@ -19,13 +24,15 @@ export const RegisterForm: React.FC = () => {
         });
         localStorage.setItem('token', res);
         nav('/home');
+        me.refetch();
       })
       .catch((e) => {
         notification.error({
           message: 'Error',
           description: e.message,
         });
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -54,11 +61,13 @@ export const RegisterForm: React.FC = () => {
             </Typography.Link>
           </Typography.Paragraph>
         </Flex>
-        <Form.Item label="CPF" name="cpf">
+        <Form.Item label="CPF">
           <Input
+            maxLength={14}
+            value={cpf}
             placeholder="XXX.XXX.XXX-XX"
             size="large"
-            onChange={(e) => setCpf(e.target.value)}
+            onChange={(e) => setCpf(toCpf(e.target.value))}
           />
         </Form.Item>
         <Form.Item label="Senha" name="password">
@@ -69,7 +78,13 @@ export const RegisterForm: React.FC = () => {
           />
         </Form.Item>
         <Form.Item style={{ marginTop: '36px' }}>
-          <Button type="primary" htmlType="submit" block size="large">
+          <Button
+            type="primary"
+            htmlType="submit"
+            block
+            size="large"
+            loading={loading}
+          >
             Cadastrar
           </Button>
         </Form.Item>

@@ -28,6 +28,7 @@ export class UserController {
       const cpf = req.body.cpf;
       const password = req.body.password;
       const result = await UserRepository.login(cpf, password);
+      console.log(result);
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);
