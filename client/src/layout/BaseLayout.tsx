@@ -1,23 +1,16 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Logo } from './Logo';
 
-import {
-  Layout,
-  Menu,
-  Button,
-  Flex,
-  Divider,
-  Tag,
-  Typography,
-  Modal,
-} from 'antd';
+import { Layout, Menu, Button, Flex, Divider, Tag, Typography } from 'antd';
 import { UserOutlined, LogoutOutlined, LockOutlined } from '@ant-design/icons';
 import MenuDivider from 'antd/es/menu/MenuDivider';
 import { Storage } from '../utils/storage';
 
 import './base-layout.css';
+import { AddOccurrence } from '../components/AddOccurrence';
+import { AuthContext } from '../Wrappers';
 
 type Props = {
   children: React.ReactNode;
@@ -45,7 +38,7 @@ export type SidebarSection = {
 
 export const BaseLayout: React.FC<Props> = (props: Props) => {
   const nav = useNavigate();
-  // const { result: me } = useContext(AuthContext);
+  const { result: me } = useContext(AuthContext);
   const [modal, setModal] = useState(false);
 
   const logout = () => {
@@ -120,7 +113,7 @@ export const BaseLayout: React.FC<Props> = (props: Props) => {
             <Button onClick={() => setModal(true)}>Add occ</Button>
             <Flex gap="20px" align="center">
               <Button icon={<UserOutlined />} onClick={() => nav('/profile')}>
-                username?
+                {me?.cpf}
               </Button>
             </Flex>
           </Flex>
@@ -136,7 +129,7 @@ export const BaseLayout: React.FC<Props> = (props: Props) => {
           {props.children}
         </Layout.Content>
       </Layout>
-      <Modal open={modal} onCancel={() => setModal(false)}></Modal>
+      <AddOccurrence open={modal} onCancel={() => setModal(false)} />
     </Layout>
   );
 };

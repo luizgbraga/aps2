@@ -26,6 +26,7 @@ export class UserRepository {
 
   static register = async (cpf: string, password: string) => {
     try {
+      console.log(cpf);
       if (!validateCpf(cpf)) {
         throw new RegisterError('INVALID_CPF');
       }
@@ -52,14 +53,15 @@ export class UserRepository {
       if (!validateCpf(cpf)) {
         throw new LoginError('INVALID_CPF');
       }
-      if (!(await UserRepository.exists(cpf))) {
-        throw new LoginError('USER_NOT_REGISTERD');
-      }
       const result = await db
         .select()
         .from(users)
-        .where(and(eq(users.cpf, cpf), eq(users.password, password)));
+        .where(and(eq(users.cpf, cpf)));
       if (result.length === 0) {
+        throw new LoginError('USER_NOT_REGISTERD');
+      }
+      const correctPassword = await compare(password, result[0].password);
+      if (!correctPassword) {
         throw new LoginError('WRONG_PASSWORD');
       }
       const token = generate(result[0].id);

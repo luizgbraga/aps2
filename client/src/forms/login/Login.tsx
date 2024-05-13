@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -12,32 +12,34 @@ import {
 } from 'antd';
 import { LoginModel } from '../../api/login';
 import { toCpf } from '../../utils/string';
+import { AuthContext } from '../../Wrappers';
 
 type Login = 'Cidadão' | 'Ônibus';
 
 export const LoginForm: React.FC = () => {
   const nav = useNavigate();
+  const me = useContext(AuthContext);
 
+  const [loading, setLoading] = useState(false);
   const [cpf, setCpf] = useState('');
   const [password, setPassword] = useState('');
   const [login, setLogin] = useState<Login>('Cidadão');
 
   const onSubmit = () => {
-    LoginModel.register(cpf, password)
+    setLoading(true);
+    LoginModel.login(cpf, password)
       .then((res) => {
-        notification.success({
-          message: 'Success',
-          description: 'User registered',
-        });
         localStorage.setItem('token', res);
         nav('/home');
+        me.refetch();
       })
       .catch((e) => {
         notification.error({
           message: 'Error',
           description: e.message,
         });
-      });
+      })
+      .finally(() => setLoading(false));
   };
   return (
     <Flex
@@ -90,7 +92,13 @@ export const LoginForm: React.FC = () => {
           />
         </Form.Item>
         <Form.Item style={{ marginTop: '36px' }}>
-          <Button type="primary" htmlType="submit" block size="large">
+          <Button
+            type="primary"
+            htmlType="submit"
+            block
+            size="large"
+            loading={loading}
+          >
             Login
           </Button>
         </Form.Item>

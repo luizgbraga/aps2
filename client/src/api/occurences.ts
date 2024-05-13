@@ -6,38 +6,46 @@ import { Response } from './types';
 
 export type OccurenceDTO = {
   id: string;
+  latitude: string;
+  longitude: string;
   description: string;
 };
 
-class OccurenceAPI extends API {
+class OccurrenceAPI extends API {
   constructor() {
-    super(`${API_URL}/occurence`);
+    super(`${API_URL}/occurrence`);
   }
 
   async create(
     token: string,
+    latitude: string,
+    longitude: string,
     description: string
   ): Promise<Response<OccurenceDTO>> {
-    const body = JSON.stringify({ description });
+    const body = JSON.stringify({ latitude, longitude, description });
     return this.request('POST', '', token, body, null);
   }
 
   async list(token: string): Promise<Response<OccurenceDTO[]>> {
-    const query = queryfy({ });
+    const query = queryfy({});
     return this.request('GET', '', token, null, query);
   }
 }
 
-const api = new OccurenceAPI();
+const api = new OccurrenceAPI();
 
 export class OccurenceModel extends Model<OccurenceDTO> {
   private constructor(dto: OccurenceDTO) {
     super(dto);
   }
 
-  static async create(description: string) {
+  static async create(
+    latitude: string,
+    longitude: string,
+    description: string
+  ) {
     const token = getToken();
-    const res = await api.create(token, description);
+    const res = await api.create(token, latitude, longitude, description);
     if (res.type === 'ERROR') throw new Error(res.cause);
     return new OccurenceModel(res.result);
   }
