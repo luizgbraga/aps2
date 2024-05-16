@@ -1,4 +1,4 @@
-import { Foo } from './routes/Foo';
+import { ALogin, AHome } from './routes/admin';
 import { Login, Register } from './routes/login';
 import { Home } from './routes/user/Home';
 import { Notifications } from './routes/user/Notifications';
@@ -15,7 +15,10 @@ const userRoutes = [
   { path: 'notifications', element: <Notifications /> },
 ];
 
-const adminRoutes = [{ path: 'foo', element: <Foo /> }];
+const adminRoutes = [
+  { path: 'login', element: <ALogin /> },
+  { path: 'home', element: <AHome /> },
+];
 
 export const router = [
   { prefix: null, routes: loginRoutes },

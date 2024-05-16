@@ -18,6 +18,7 @@ type Props = {
   title?: string;
   extra?: React.ReactNode;
   sections: SidebarSection[];
+  admin?: boolean;
   refetch?: () => void;
 };
 
@@ -105,18 +106,22 @@ export const BaseLayout: React.FC<Props> = (props: Props) => {
       </Layout.Sider>
       <Layout>
         <Layout.Header className="base-header">
-          <Flex
-            justify="space-between"
-            align="center"
-            style={{ width: '100%' }}
-          >
-            <Button onClick={() => setModal(true)}>Add occ</Button>
-            <Flex gap="20px" align="center">
-              <Button icon={<UserOutlined />} onClick={() => nav('/profile')}>
-                {me?.cpf}
+          {!props.admin && (
+            <Flex
+              justify="space-between"
+              align="center"
+              style={{ width: '100%' }}
+            >
+              <Button onClick={() => setModal(true)}>
+                Adicionar ocorrência
               </Button>
+              <Flex gap="20px" align="center">
+                <Button icon={<UserOutlined />} onClick={() => nav('/profile')}>
+                  {me?.cpf}
+                </Button>
+              </Flex>
             </Flex>
-          </Flex>
+          )}
         </Layout.Header>
         <Divider style={{ margin: 0 }} />
         <Layout.Content className="base-content">
