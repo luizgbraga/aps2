@@ -1,35 +1,11 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
-import { BaseLayout } from '../../layout/BaseLayout';
+import { LoggedLayout } from '../../layout/logged/LoggedLayout';
 
 export const Home: React.FC = () => {
-  const nav = useNavigate();
   return (
-    <BaseLayout
-      selected="home"
-      title="Home"
-      sections={[
-        {
-          key: null,
-          items: [
-            {
-              key: 'home',
-              icon: <></>,
-              title: 'Home',
-              onClick: () => nav('/home'),
-            },
-            {
-              key: 'notifications',
-              icon: <></>,
-              title: 'Notificacoes',
-              onClick: () => nav('/notifications'),
-            },
-          ],
-        },
-      ]}
-    >
+    <LoggedLayout selected="home">
       <p>oi</p>
-    </BaseLayout>
+    </LoggedLayout>
   );
 };
