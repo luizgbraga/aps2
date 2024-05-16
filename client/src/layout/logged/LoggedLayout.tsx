@@ -1,13 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import {
-  HomeOutlined,
-  UserOutlined,
-  BulbOutlined,
-} from '@ant-design/icons';
+import { HomeOutlined, UserOutlined, BellOutlined } from '@ant-design/icons';
 import { BaseLayout, SidebarItem, SidebarSection } from '../BaseLayout';
-
 
 type Props = {
   children: React.ReactNode;
@@ -28,15 +23,11 @@ export const LoggedLayout: React.FC<Props> = (props: Props) => {
       title: 'Home',
       onClick: () => nav(`/home`),
     },
-  ];
-
-  const analyticsItems: SidebarItem[] = [
     {
-      key: 'insights',
-      icon: <BulbOutlined />,
-      title: "Insights",
-      onClick: () => nav('/insights'),
-      soon: true,
+      key: 'notifications',
+      icon: <BellOutlined />,
+      title: 'Notificações',
+      onClick: () => nav(`/notifications`),
     },
   ];
 
@@ -55,11 +46,7 @@ export const LoggedLayout: React.FC<Props> = (props: Props) => {
       title: null,
       items: baseItems,
     },
-    {
-      key: 'analytics',
-      title: 'Analytics',
-      items: analyticsItems,
-    },
+
     {
       key: 'me',
       title: 'Me',
