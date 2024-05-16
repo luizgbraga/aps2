@@ -19,19 +19,14 @@ export const AdminLayout: React.FC<Props> = (props: Props) => {
       key: 'home',
       items: [
         {
-          key: 'organizations',
+          key: 'home',
           icon: <HomeOutlined />,
           title: 'Home',
-          onClick: () => nav('/home'),
+          onClick: () => nav('/_admin/home'),
         },
       ],
     },
   ];
 
-  return (
-    <BaseLayout
-      {...props}
-      sections={sections}
-    />
-  );
+  return <BaseLayout {...props} sections={sections} admin />;
 };

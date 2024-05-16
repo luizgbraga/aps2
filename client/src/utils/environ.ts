@@ -1,5 +1,5 @@
 export const PREFIXES = {
-  admin: 'admin',
+  admin: '_admin',
 };
 
 type Environ = 'admin' | '';
