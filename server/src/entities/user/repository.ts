@@ -4,7 +4,7 @@ import { and, eq } from 'drizzle-orm';
 import { FindError, LoginError, RegisterError } from './errors';
 import { generate } from '../../utils/token';
 import { hash, compare } from '../../utils/hash';
-import { low, validatePassword, validateCpf } from '../../utils/string';
+import { validatePassword, validateCpf } from '../../utils/string';
 
 export class UserRepository {
   static me = async (userId: string) => {

@@ -3,7 +3,7 @@ import { db } from '../../database';
 import { and, eq } from 'drizzle-orm';
 import { LoginError } from './errors';
 import { generate } from '../../utils/token';
-import { compare } from '../../utils/hash';
+import { compare, hash } from '../../utils/hash';
 
 export class AdminRepository {
   static login = async (username: string, password: string) => {

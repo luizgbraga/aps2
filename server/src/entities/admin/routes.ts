@@ -3,7 +3,7 @@ import { AdminController } from './controller';
 import { validateBody } from '../../middlewares/validate';
 import { login } from './schemas';
 
-class UserRoutes {
+class AdminRoutes {
   router = Router();
 
   constructor() {
@@ -15,4 +15,4 @@ class UserRoutes {
   }
 }
 
-export default new UserRoutes().router;
+export default new AdminRoutes().router;

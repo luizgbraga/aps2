@@ -16,7 +16,7 @@ export const AdminLogin: React.FC = () => {
     AdminLoginModel.login(username, password)
       .then((res) => {
         localStorage.setItem('token', res);
-        nav('/admin/home');
+        nav('/_admin/home');
       })
       .catch((e) => {
         notification.error({
