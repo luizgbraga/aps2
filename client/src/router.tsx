@@ -1,4 +1,4 @@
-import { ALogin, AHome } from './routes/admin';
+import { ALogin, AHome, ABus, AOccurrences } from './routes/admin';
 import { Login, Register } from './routes/login';
 import { Home } from './routes/user/Home';
 import { Notifications } from './routes/user/Notifications';
@@ -18,6 +18,8 @@ const userRoutes = [
 const adminRoutes = [
   { path: 'login', element: <ALogin /> },
   { path: 'home', element: <AHome /> },
+  { path: 'bus', element: <ABus /> },
+  { path: 'occurrences', element: <AOccurrences /> },
 ];
 
 export const router = [
