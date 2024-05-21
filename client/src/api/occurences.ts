@@ -11,6 +11,8 @@ export type OccurenceDTO = {
   description: string;
 };
 
+export type OccurenceType = 'flooding' | 'landslide';
+
 class OccurrenceAPI extends API {
   constructor() {
     super(`${API_URL}/occurrence`);
@@ -18,11 +20,12 @@ class OccurrenceAPI extends API {
 
   async create(
     token: string,
+    type: OccurenceType,
     latitude: string,
     longitude: string,
     description: string
   ): Promise<Response<OccurenceDTO>> {
-    const body = JSON.stringify({ latitude, longitude, description });
+    const body = JSON.stringify({ type, latitude, longitude, description });
     return this.request('POST', '', token, body, null);
   }
 
@@ -40,12 +43,13 @@ export class OccurenceModel extends Model<OccurenceDTO> {
   }
 
   static async create(
+    type: OccurenceType,
     latitude: string,
     longitude: string,
     description: string
   ) {
     const token = getToken();
-    const res = await api.create(token, latitude, longitude, description);
+    const res = await api.create(token, type, latitude, longitude, description);
     if (res.type === 'ERROR') throw new Error(res.cause);
     return new OccurenceModel(res.result);
   }

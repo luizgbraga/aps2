@@ -13,6 +13,12 @@ class OccurenceRoutes {
 
   init() {
     this.router.post('/', logged, validateBody(add), OccurrenceController.add);
+    this.router.get('/', logged); // list all
+    this.router.put(
+      // update confirmed
+      '/confirm',
+      logged,
+    );
   }
 }
 

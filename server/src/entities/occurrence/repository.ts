@@ -1,8 +1,9 @@
-import { occurences } from './schema';
+import { OccurenceType, occurences } from './schema';
 import { db } from '../../database';
 
 export class OccurrenceRepository {
   static add = async (
+    type: OccurenceType,
     description: string,
     neighborhoodId: string,
     latitude: string,
@@ -11,7 +12,7 @@ export class OccurrenceRepository {
     try {
       return await db
         .insert(occurences)
-        .values({ description, neighborhoodId, latitude, longitude });
+        .values({ type, description, neighborhoodId, latitude, longitude });
     } catch (error) {
       throw error;
     }
