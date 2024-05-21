@@ -5,7 +5,8 @@
     "baseUrl": "src",
     "outDir": "dist",
     "sourceMap": false,
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "typeRoots": ["./types"]
   },
   "include": ["src/**/*", "index.ts"]
 }
