@@ -2,10 +2,10 @@ import React from 'react';
 
 import { AdminLayout } from '../../layout/admin/AdminLayout';
 
-export const AHome: React.FC = () => {
+export const AOccurrences: React.FC = () => {
   return (
-    <AdminLayout selected="home">
-      <p>home</p>
+    <AdminLayout selected="occurrences">
+      <p>occ</p>
     </AdminLayout>
   );
 };
