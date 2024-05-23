@@ -6,4 +6,4 @@ export const neighborhood = pgTable('neighborhood', {
   name: varchar('name', { length: 255 }).notNull(),
 });
 
-export type Neighborhood = InferSelectModel<typeof neighborhood>;
+export type NeighborhoodType = InferSelectModel<typeof neighborhood>;
