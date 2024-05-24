@@ -12,7 +12,7 @@ class SensorRoutes {
   }
 
   init() {
-    this.router.get('/', logged, validateBody(check), SensorController.check);
+    this.router.post('/status', validateBody(check), SensorController.check);
   }
 }
 
