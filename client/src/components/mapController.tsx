@@ -9,6 +9,18 @@ export const mapController = () => {
     const map = new window.google.maps.Map(ref, {
       center: DEFAULT_LOCATION,
       zoom: 16,
+      disableDefaultUI: true,
+      styles: [
+        {
+          featureType: 'poi',
+          stylers: [{ visibility: 'off' }],
+        },
+        {
+          featureType: 'transit',
+          elementType: 'labels.icon',
+          stylers: [{ visibility: 'off' }],
+        },
+      ],
     });
     return map;
   };
