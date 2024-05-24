@@ -1,5 +1,4 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-
 import { RecentralizeButton } from './RecentralizeButton';
 
 const DEFAULT_LOCATION = { lat: -22.9068, lng: -43.1729 };
@@ -44,9 +43,21 @@ export const mapController = () => {
     );
   };
 
+  const drawPath = (map: google.maps.Map, coordinates: google.maps.LatLngLiteral[]) => {
+    const path = new window.google.maps.Polyline({
+      path: coordinates,
+      geodesic: true,
+      strokeColor: '#FF0000',
+      strokeOpacity: 1.0,
+      strokeWeight: 2,
+    });
+    path.setMap(map);
+  };
+
   return {
     setup,
     setLocationToCurrent,
     addRecentralizeButton,
+    drawPath
   };
 };
