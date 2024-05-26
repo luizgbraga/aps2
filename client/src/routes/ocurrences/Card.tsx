@@ -7,6 +7,7 @@ const Cards: React.FC<OccurenceDTO> = ({
   id,
   latitude,
   longitude,
+  neighborhoodId,
   description,
 }) => {
   return (
@@ -19,6 +20,9 @@ const Cards: React.FC<OccurenceDTO> = ({
       }
     >
       <p>{description}</p>
+      <p>{latitude}</p>
+      <p>{longitude}</p>
+      <p>{neighborhoodId}</p>
     </Card>
   );
 };

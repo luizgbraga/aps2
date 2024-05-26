@@ -6,14 +6,20 @@ import { add } from './schemas';
 
 class OccurenceRoutes {
   router = Router();
+  baseRoute = '/occurrence';
 
   constructor() {
     this.init();
   }
 
   init() {
-    this.router.post('/', logged, validateBody(add), OccurrenceController.add);
-    this.router.get('/', logged); // list all
+    this.router.post(
+      '/add',
+      logged,
+      validateBody(add),
+      OccurrenceController.add,
+    );
+    this.router.get('/list', OccurrenceController.list); // list all
     this.router.put(
       // update confirmed
       '/confirm',

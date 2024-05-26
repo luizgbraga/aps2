@@ -1,42 +1,35 @@
-import React from 'react';
+import { Space } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { OccurenceModel } from '../../api/occurences';
 import { BaseLayout } from '../../layout/BaseLayout';
 import Cards from './Card';
-import { OccurenceDTO } from '../../api/occurences';
-import { Space } from 'antd';
 
 const Notifications: React.FC = () => {
-  const data: OccurenceDTO[] = [
-    {
-      id: '1',
-      latitude: '1',
-      longitude: '1',
-      description: 'test',
-    },
-    {
-      id: '2',
-      latitude: '1',
-      longitude: '1',
-      description: 'test',
-    },
-    {
-      id: '3',
-      latitude: '1',
-      longitude: '1',
-      description: 'test',
-    },
-    {
-      id: '4',
-      latitude: '1',
-      longitude: '1',
-      description: 'test',
-    },
-  ];
+  const [occurenceList, setOccurenceList] = useState<OccurenceModel[]>([]);
+
+  useEffect(() => {
+    const fetchOccurences = async () => {
+      const list = await OccurenceModel.list();
+      setOccurenceList(list);
+    };
+    fetchOccurences();
+  }, []);
 
   return (
     <BaseLayout selected="notifications" title="Notifications">
       <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-        {data.map((occ) => (
-          <Cards key={occ.id} {...occ} />
+        {occurenceList.map((occ) => (
+          <Cards
+            key={occ.id}
+            {...{
+              id: occ.id,
+              type: occ.type,
+              latitude: occ.latitude,
+              longitude: occ.longitude,
+              neighborhoodId: occ.neighborhoodId,
+              description: occ.description,
+            }}
+          />
         ))}
       </Space>
     </BaseLayout>

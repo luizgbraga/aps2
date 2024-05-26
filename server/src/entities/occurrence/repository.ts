@@ -17,4 +17,12 @@ export class OccurrenceRepository {
       throw error;
     }
   };
+
+  static list = async () => {
+    try {
+      return await db.select().from(occurences);
+    } catch (error) {
+      throw error;
+    }
+  };
 }

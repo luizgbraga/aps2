@@ -7,7 +7,7 @@ import { LockOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Divider, Flex, Layout, Menu, Tag, Typography } from 'antd';
 import MenuDivider from 'antd/es/menu/MenuDivider';
 import { AuthContext } from '../Wrappers';
-import { SidebarSection } from '../_nav';
+import sections from '../_nav';
 import { AddOccurrence } from '../components/AddOccurrence';
 import { Storage } from '../utils/storage';
 import './base-layout.css';
@@ -17,7 +17,7 @@ type Props = {
   selected: string;
   title?: string;
   extra?: React.ReactNode;
-  sections: SidebarSection[];
+  //  sections?: SidebarSection[];
   admin?: boolean;
   refetch?: () => void;
 };
@@ -43,7 +43,7 @@ export const BaseLayout: React.FC<Props> = (props: Props) => {
           selectedKeys={[props.selected]}
           className="base-menu"
         >
-          {props.sections.map((section) => {
+          {sections.map((section) => {
             if (section.key) {
               return (
                 <Menu.ItemGroup key={section.key} title={section.title}>

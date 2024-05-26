@@ -10,9 +10,17 @@ type Props = {
 export const AddOccurrence: React.FC<Props> = (props: Props) => {
   const [type, setType] = useState<OccurenceType>('flooding');
   const [description, setDescription] = useState('');
+  const [longitude, setLongitude] = useState('');
+  const [latitude, setLatitude] = useState('');
 
   const onSubmit = () => {
-    OccurenceModel.create(type, description, '0', '0').then((res) => {
+    OccurenceModel.create(
+      type,
+      latitude,
+      'daa23c12-ddaf-48ca-8760-cd7ce90c5268',
+      longitude,
+      description
+    ).then((res) => {
       console.log(res);
     });
     props.onCancel();
@@ -31,6 +39,18 @@ export const AddOccurrence: React.FC<Props> = (props: Props) => {
           <Input.TextArea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item label="Latitude" required>
+          <Input.TextArea
+            value={latitude}
+            onChange={(e) => setLatitude(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item label="Longitude" required>
+          <Input.TextArea
+            value={longitude}
+            onChange={(e) => setLongitude(e.target.value)}
           />
         </Form.Item>
       </Form>

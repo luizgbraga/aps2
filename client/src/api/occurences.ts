@@ -4,11 +4,18 @@ import { API, Model } from '../utils/model';
 import { queryfy } from '../utils/queryfy';
 import { Response } from './types';
 
+export type OccurrenceType = 'flooding' | 'landslide';
+
 export type OccurenceDTO = {
   id: string;
+  type: OccurenceType;
   latitude: string;
   longitude: string;
+  neighborhoodId: string;
   description: string;
+  confirmed?: boolean;
+  createdAt?: Date | string | null;
+  updatedAt?: Date | string | null;
 };
 
 export type OccurenceType = 'flooding' | 'landslide';
@@ -23,15 +30,22 @@ class OccurrenceAPI extends API {
     type: OccurenceType,
     latitude: string,
     longitude: string,
+    neighborhoodId: string,
     description: string
   ): Promise<Response<OccurenceDTO>> {
-    const body = JSON.stringify({ type, latitude, longitude, description });
-    return this.request('POST', '', token, body, null);
+    const body = JSON.stringify({
+      type,
+      latitude,
+      longitude,
+      description,
+      neighborhoodId,
+    });
+    return this.request('POST', 'add', token, body, null);
   }
 
   async list(token: string): Promise<Response<OccurenceDTO[]>> {
     const query = queryfy({});
-    return this.request('GET', '', token, null, query);
+    return this.request('GET', 'list', token, null, query);
   }
 }
 
@@ -46,10 +60,18 @@ export class OccurenceModel extends Model<OccurenceDTO> {
     type: OccurenceType,
     latitude: string,
     longitude: string,
+    neighborhoodId: string,
     description: string
   ) {
     const token = getToken();
-    const res = await api.create(token, type, latitude, longitude, description);
+    const res = await api.create(
+      token,
+      type,
+      latitude,
+      neighborhoodId,
+      longitude,
+      description
+    );
     if (res.type === 'ERROR') throw new Error(res.cause);
     return new OccurenceModel(res.result);
   }
@@ -71,6 +93,34 @@ export class OccurenceModel extends Model<OccurenceDTO> {
 
   get description() {
     return this.record.get('description');
+  }
+
+  get latitude() {
+    return this.record.get('latitude');
+  }
+
+  get longitude() {
+    return this.record.get('longitude');
+  }
+
+  get neighborhoodId() {
+    return this.record.get('neighborhoodId');
+  }
+
+  get confirmed() {
+    return this.record.get('confirmed');
+  }
+
+  get createdAi() {
+    return this.record.get('createdAt');
+  }
+
+  get updatedAt() {
+    return this.record.get('updatedAt');
+  }
+
+  get type() {
+    return this.record.get('type');
   }
 
   set description(description: string) {
