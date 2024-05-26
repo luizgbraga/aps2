@@ -19,7 +19,7 @@ export class RouteController {
       const result = dbResults.map((route: any) => ({
         short_name: route.short_name,
         long_name: route.long_name,
-        desc: route.desc ?? '',
+        desc_name: route.desc_name ?? '',
         type: routeTypeMap[route.type],
         color: colorFormatterMap[route.color],
         text_color: colorFormatterMap[route.text_color],
@@ -31,7 +31,22 @@ export class RouteController {
   }
   static async addNewRoute(req: Request, res: Response) {
     try {
-      const result = await RouteRepository.getAllRoutes();
+      const id = req.body.id;
+      const short_name = req.body.short_name;
+      const long_name = req.body.long_name;
+      const desc_name = req.body.desc_name;
+      const type = req.body.type;
+      const color = req.body.color;
+      const text_color = req.body.text_color;
+      const result = await RouteRepository.addNewRoute(
+        id,
+        short_name,
+        long_name,
+        desc_name,
+        type,
+        color,
+        text_color,
+      );
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);

@@ -11,8 +11,12 @@ class RouteRoutes {
   }
 
   init() {
-    this.router.get('/', RouteController.getAllRoutes);
-    this.router.post('/', validateBody(newRoute), RouteController.addNewRoute);
+    this.router.get('/allRoutes', RouteController.getAllRoutes);
+    this.router.post(
+      '/newRoute',
+      validateBody(newRoute),
+      RouteController.addNewRoute,
+    );
   }
 }
 

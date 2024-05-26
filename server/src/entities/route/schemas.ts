@@ -9,8 +9,3 @@ export const newRoute = z.object({
   color: z.string().max(255),
   text_color: z.string().max(255),
 });
-
-export const login = z.object({
-  cpf: z.string().max(255),
-  password: z.string().max(255),
-});
