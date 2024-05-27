@@ -1,4 +1,10 @@
-import { pgTable, uuid, timestamp, primaryKey } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  timestamp,
+  primaryKey,
+  integer,
+} from 'drizzle-orm/pg-core';
 import { InferSelectModel } from 'drizzle-orm';
 import { neighborhood } from '../../entities/neighborhood/schema';
 
@@ -9,6 +15,7 @@ export const subscriptions = pgTable(
     neighborhoodId: uuid('bairro_id')
       .references(() => neighborhood.id)
       .notNull(),
+    unread: integer('unread').default(0).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => ({
