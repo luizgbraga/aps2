@@ -11,6 +11,7 @@ class NeighborhoodRoutes {
 
   init() {
     this.router.post('/', NeighborhoodController.fill);
+    this.router.get('/', NeighborhoodController.list);
   }
 }
 

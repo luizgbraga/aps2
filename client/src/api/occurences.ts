@@ -8,7 +8,7 @@ export type OccurrenceType = 'flooding' | 'landslide';
 
 export type OccurenceDTO = {
   id: string;
-  type: OccurenceType;
+  type: OccurrenceType;
   latitude: string;
   longitude: string;
   neighborhoodId: string;
@@ -18,8 +18,6 @@ export type OccurenceDTO = {
   updatedAt?: Date | string | null;
 };
 
-export type OccurenceType = 'flooding' | 'landslide';
-
 class OccurrenceAPI extends API {
   constructor() {
     super(`${API_URL}/occurrence`);
@@ -27,7 +25,7 @@ class OccurrenceAPI extends API {
 
   async create(
     token: string,
-    type: OccurenceType,
+    type: OccurrenceType,
     latitude: string,
     longitude: string,
     neighborhoodId: string,
@@ -57,7 +55,7 @@ export class OccurenceModel extends Model<OccurenceDTO> {
   }
 
   static async create(
-    type: OccurenceType,
+    type: OccurrenceType,
     latitude: string,
     longitude: string,
     neighborhoodId: string,
@@ -111,7 +109,7 @@ export class OccurenceModel extends Model<OccurenceDTO> {
     return this.record.get('confirmed');
   }
 
-  get createdAi() {
+  get createdAt() {
     return this.record.get('createdAt');
   }
 

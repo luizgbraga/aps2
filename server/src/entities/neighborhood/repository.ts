@@ -15,4 +15,12 @@ export class NeighborhoodRepository {
       throw error;
     }
   };
+
+  static list = async () => {
+    try {
+      return await db.select().from(neighborhood);
+    } catch (error) {
+      throw error;
+    }
+  };
 }

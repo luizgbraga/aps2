@@ -1,6 +1,6 @@
 import { Form, Input, Modal, Radio } from 'antd';
 import React, { useState } from 'react';
-import { OccurenceModel, OccurenceType } from '../api/occurences';
+import { OccurrenceType } from '../api/occurences';
 
 type Props = {
   open: boolean;
@@ -8,21 +8,11 @@ type Props = {
 };
 
 export const AddOccurrence: React.FC<Props> = (props: Props) => {
-  const [type, setType] = useState<OccurenceType>('flooding');
+  const [type, setType] = useState<OccurrenceType>('flooding');
   const [description, setDescription] = useState('');
-  const [longitude, setLongitude] = useState('');
-  const [latitude, setLatitude] = useState('');
 
   const onSubmit = () => {
-    OccurenceModel.create(
-      type,
-      latitude,
-      'daa23c12-ddaf-48ca-8760-cd7ce90c5268',
-      longitude,
-      description
-    ).then((res) => {
-      console.log(res);
-    });
+    console.log('todo');
     props.onCancel();
   };
 
@@ -39,18 +29,6 @@ export const AddOccurrence: React.FC<Props> = (props: Props) => {
           <Input.TextArea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-          />
-        </Form.Item>
-        <Form.Item label="Latitude" required>
-          <Input.TextArea
-            value={latitude}
-            onChange={(e) => setLatitude(e.target.value)}
-          />
-        </Form.Item>
-        <Form.Item label="Longitude" required>
-          <Input.TextArea
-            value={longitude}
-            onChange={(e) => setLongitude(e.target.value)}
           />
         </Form.Item>
       </Form>
