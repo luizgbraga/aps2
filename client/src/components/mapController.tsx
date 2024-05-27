@@ -38,26 +38,36 @@ export const mapController = () => {
     });
     const staticElement = renderToStaticMarkup(<RecentralizeButton />);
     buttonContainer.innerHTML = staticElement;
-    map.controls[window.google.maps.ControlPosition.RIGHT_BOTTOM].push(
+    map.controls[window.google.maps.ControlPosition.RIGHT_BOTTOM].setAt(
+      0,
       buttonContainer
     );
   };
 
-  const drawPath = (map: google.maps.Map, coordinates: google.maps.LatLngLiteral[]) => {
-    const path = new window.google.maps.Polyline({
-      path: coordinates,
-      geodesic: true,
-      strokeColor: '#FF0000',
-      strokeOpacity: 1.0,
-      strokeWeight: 2,
+  const drawPaths = (
+    map: google.maps.Map,
+    paths: google.maps.LatLngLiteral[][],
+    onPathClick: (event: google.maps.MapMouseEvent) => void
+  ) => {
+    paths.forEach((coordinates) => {
+      const path = new window.google.maps.Polyline({
+        path: coordinates,
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.6,
+        strokeWeight: 4,
+      });
+      path.setMap(map);
+      path.addListener('click', (event: google.maps.MapMouseEvent) => {
+        onPathClick(event);
+      });
     });
-    path.setMap(map);
   };
 
   return {
     setup,
     setLocationToCurrent,
     addRecentralizeButton,
-    drawPath
+    drawPaths,
   };
 };
