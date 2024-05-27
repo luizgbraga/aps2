@@ -1,8 +1,9 @@
 import React from 'react';
 
+import MapFilter from '../../components/MapFilter'
+import MapComponent from '../../components/MapComponent';
 import { LoggedLayout } from '../../layout/logged/LoggedLayout';
 import { Status, Wrapper } from '@googlemaps/react-wrapper';
-import MapComponent from '../../components/MapComponent';
 import { MAPS_API_KEY } from '../../config';
 import { Flex, Spin } from 'antd';
 
@@ -24,6 +25,7 @@ export const Home: React.FC = () => {
   return (
     <LoggedLayout selected="home">
       <Wrapper apiKey={MAPS_API_KEY} render={render}>
+        <MapFilter />
         <MapComponent />
       </Wrapper>
     </LoggedLayout>

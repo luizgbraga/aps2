@@ -9,7 +9,7 @@ export default function MapComponent() {
     <div
       ref={ref}
       style={{
-        height: 'calc(100vh - 144px)',
+        height: 'calc(100vh - 186px)',
         width: '100%',
         display: map ? 'flex' : 'none',
       }}
