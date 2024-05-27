@@ -1,8 +1,13 @@
 import { Request, Response } from 'express';
-import { NeighborhoodType } from './schema';
+import { NeighborhoodRepository } from './repository';
 
 export class NeighborhoodController {
-  async getById(req: Request, res: Response) {
-    const id = req.body.id;
+  static async fill(req: Request, res: Response) {
+    try {
+      const result = await NeighborhoodRepository.fill();
+      res.status(200).json({ result, type: 'SUCCESS' });
+    } catch (error) {
+      res.status(500).json(error);
+    }
   }
 }

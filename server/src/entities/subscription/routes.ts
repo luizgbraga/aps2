@@ -6,7 +6,6 @@ import { subscribe } from './schemas';
 
 class SubscriptionRoutes {
   router = Router();
-  baseRoute = '/occurrence';
 
   constructor() {
     this.init();
