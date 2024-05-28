@@ -3,6 +3,7 @@ import { RouteDTO } from '../api/route';
 
 type Props = {
   routes: RouteDTO[] | null;
+  loading: boolean;
 };
 
 export const MapFilter: React.FC<Props> = (props: Props) => {
@@ -12,7 +13,7 @@ export const MapFilter: React.FC<Props> = (props: Props) => {
       busNumber = busRoute.desc_name;
     }
     return busNumber + ', ' + busRoute.long_name;
-  }
+  };
 
   const onSelect = (value: string[]) => {
     console.log(value);
@@ -21,16 +22,24 @@ export const MapFilter: React.FC<Props> = (props: Props) => {
   return (
     <Space style={{ width: '100%' }} direction="vertical">
       <Select
-        mode="multiple"
         allowClear
-        style={{ width: '100%', marginBottom: '10px' }}
+        autoFocus
+        mode="multiple"
         placeholder="Selecione as linhas"
+        style={{ width: '100%', marginBottom: '10px' }}
         defaultValue={[]}
         onChange={onSelect}
-        options={props.routes?.map((route) => ({
-          label: getLabelFromRoute(route),
-          value: route.id
-        })).sort((a, b) => a.label.localeCompare(b.label))}
+        loading={props.loading}
+        options={props.routes
+          ?.map((route) => ({
+            label: getLabelFromRoute(route),
+            value: route.id,
+          }))
+          .sort((a, b) => a.label.localeCompare(b.label))}
+        filterOption={(inputValue, option) => {
+          if (!option) return false;
+          return option.label.toLowerCase().includes(inputValue.toLowerCase());
+        }}
       />
     </Space>
   );

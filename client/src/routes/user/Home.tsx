@@ -29,7 +29,7 @@ export const Home: React.FC = () => {
   return (
     <LoggedLayout selected="home">
       <Wrapper apiKey={MAPS_API_KEY} render={render}>
-        <MapFilter routes={routes.result}/>
+        <MapFilter routes={routes.result} loading={routes.loading}/>
         <MapComponent />
       </Wrapper>
     </LoggedLayout>
