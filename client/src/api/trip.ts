@@ -2,14 +2,19 @@ import { API_URL } from '../config';
 import { API } from '../utils/model';
 import { Response } from './types';
 
-type Token = any[];
+export type TripDTO = {
+  id: string;
+  route_id: string;
+  headsign: string;
+  direction: string;
+}
 
 class TripsAPI extends API {
   constructor() {
     super(`${API_URL}/trip`);
   }
 
-  async getAllTrips(): Promise<Response<Token>> {
+  async getAllTrips(): Promise<Response<TripDTO[]>> {
     return this.request('GET', 'allTrips', null, null, null);
   }
 }

@@ -2,14 +2,19 @@ import { API_URL } from '../config';
 import { API } from '../utils/model';
 import { Response } from './types';
 
-type Token = any[];
+export type ShapeDTO = {
+  pt_sequence: bigint,
+  pt_lat: number,
+  pt_lon: number,
+  dist_traveled: number,
+}
 
 class ShapesAPI extends API {
   constructor() {
     super(`${API_URL}/shape`);
   }
 
-  async getShape(trip_id: string): Promise<Response<Token>> {
+  async getShape(trip_id: string): Promise<Response<ShapeDTO[]>> {
     const query = `trip_id=${trip_id}`;
     return this.request('GET', '/', null, null, query);
   }

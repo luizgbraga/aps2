@@ -46,14 +46,18 @@ export const mapController = () => {
 
   const drawPaths = (
     map: google.maps.Map,
-    paths: google.maps.LatLngLiteral[][],
+    paths: {
+      shape: google.maps.LatLngLiteral[];
+      color: string;
+      text_color: string;
+    }[],
     onPathClick: (event: google.maps.MapMouseEvent) => void
   ) => {
-    paths.forEach((coordinates) => {
+    paths.forEach((element) => {
       const path = new window.google.maps.Polyline({
-        path: coordinates,
+        path: element.shape,
         geodesic: true,
-        strokeColor: '#FF0000',
+        strokeColor: element.color,
         strokeOpacity: 0.6,
         strokeWeight: 4,
       });
