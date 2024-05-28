@@ -2,7 +2,7 @@ import { API_URL } from '../config';
 import { API } from '../utils/model';
 import { Response } from './types';
 
-type Token = string;
+type Token = any[];
 
 class RoutesAPI extends API {
   constructor() {
@@ -10,8 +10,7 @@ class RoutesAPI extends API {
   }
 
   async getAllRoutes(): Promise<Response<Token>> {
-    const body = '';
-    return this.request('GET', '/allRoutes', null, body, null);
+    return this.request('GET', '/allRoutes', null, null, null);
   }
 }
 

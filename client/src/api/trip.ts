@@ -2,16 +2,15 @@ import { API_URL } from '../config';
 import { API } from '../utils/model';
 import { Response } from './types';
 
-type Token = string;
+type Token = any[];
 
 class TripsAPI extends API {
   constructor() {
-    super(`${API_URL}/trips`);
+    super(`${API_URL}/trip`);
   }
 
   async getAllTrips(): Promise<Response<Token>> {
-    const body = '';
-    return this.request('GET', '/allTrips', null, body, null);
+    return this.request('GET', 'allTrips', null, null, null);
   }
 }
 
