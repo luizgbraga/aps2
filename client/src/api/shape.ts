@@ -2,7 +2,7 @@ import { API_URL } from '../config';
 import { API } from '../utils/model';
 import { Response } from './types';
 
-type Token = string;
+type Token = any[];
 
 class ShapesAPI extends API {
   constructor() {
@@ -10,9 +10,8 @@ class ShapesAPI extends API {
   }
 
   async getShape(trip_id: string): Promise<Response<Token>> {
-    const body = '';
     const query = `trip_id=${trip_id}`;
-    return this.request('GET', '/', null, body, query);
+    return this.request('GET', '/', null, null, query);
   }
 }
 
