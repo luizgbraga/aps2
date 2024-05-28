@@ -2,14 +2,22 @@ import { API_URL } from '../config';
 import { API } from '../utils/model';
 import { Response } from './types';
 
-type Token = any[];
+export type RouteDTO = {
+  id: string;
+  short_name: string;
+  long_name: string;
+  desc_name: string;
+  type: string;
+  color: string;
+  text_color?: string;
+};
 
 class RoutesAPI extends API {
   constructor() {
     super(`${API_URL}/route`);
   }
 
-  async getAllRoutes(): Promise<Response<Token>> {
+  async getAllRoutes(): Promise<Response<RouteDTO[]>> {
     return this.request('GET', '/allRoutes', null, null, null);
   }
 }

@@ -1,25 +1,23 @@
 import { Select, Space } from 'antd';
-import type { SelectProps } from 'antd';
+import { RouteDTO } from '../api/route';
 
-export default function MapFilter() {
-  const options: SelectProps['options'] = [
-    {
-      label: '636, Merck - Saens Peña',
-      value: 'O0636AAA0A',
-    },
-    {
-      label: '955, Maré - Terminal Alvorada',
-      value: 'O0803AAP0A',
-    },
-    {
-      label: 'SP803, Senador Camará - Terminal Sulacap',
-      value: 'O0955AAA0A',
-    },
-  ];
+type Props = {
+  routes: RouteDTO[] | null;
+};
 
-  const handleChange = (value: string[]) => {
+export const MapFilter: React.FC<Props> = (props: Props) => {
+  const getLabelFromRoute = (busRoute: RouteDTO) => {
+    let busNumber = busRoute.short_name;
+    if (busRoute.desc_name != '' && busRoute.short_name.includes('LECD')) {
+      busNumber = busRoute.desc_name;
+    }
+    return busNumber + ', ' + busRoute.long_name;
+  }
+
+  const onSelect = (value: string[]) => {
     console.log(value);
   };
+
   return (
     <Space style={{ width: '100%' }} direction="vertical">
       <Select
@@ -28,9 +26,12 @@ export default function MapFilter() {
         style={{ width: '100%', marginBottom: '10px' }}
         placeholder="Selecione as linhas"
         defaultValue={[]}
-        onChange={handleChange}
-        options={options}
+        onChange={onSelect}
+        options={props.routes?.map((route) => ({
+          label: getLabelFromRoute(route),
+          value: route.id
+        })).sort((a, b) => a.label.localeCompare(b.label))}
       />
     </Space>
   );
-}
+};
