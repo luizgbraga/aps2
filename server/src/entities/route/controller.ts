@@ -16,12 +16,13 @@ export class RouteController {
   static async getAllRoutes(req: Request, res: Response) {
     try {
       const dbResults = await RouteRepository.getAllRoutes();
-      const result = dbResults.map((route: any) => ({
+      const result = dbResults.map((route) => ({
+        id: route.id,
         short_name: route.short_name,
         long_name: route.long_name,
         desc_name: route.desc_name ?? '',
         type: routeTypeMap[route.type],
-        color: colorFormatterMap[route.color],
+        color: route.color,
         text_color: colorFormatterMap[route.text_color],
       }));
       res.status(200).json({ result, type: 'SUCCESS' });

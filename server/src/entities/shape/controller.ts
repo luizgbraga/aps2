@@ -9,7 +9,7 @@ export class RouteController {
         throw new GetShapeBadRequestError("MISSING 'trip_id' QUERY PARAMETER");
       const trip_id = req.query.trip_id.toString();
       const dbResults = await ShapeRepository.getShape(trip_id);
-      const result = dbResults.map((shape: any) => ({
+      const result = dbResults.map((shape) => ({
         pt_sequence: shape.pt_sequence,
         pt_lat: shape.pt_lat,
         pt_lon: shape.pt_lon,

@@ -5,7 +5,7 @@ export class TripController {
   static async getAllTrips(req: Request, res: Response) {
     try {
       const dbResults = await TripRepository.getAllTrips();
-      const result = dbResults.map((trip: any) => ({
+      const result = dbResults.map((trip) => ({
         id: trip.id,
         route_id: trip.route_id,
         headsign: trip.headsign,
