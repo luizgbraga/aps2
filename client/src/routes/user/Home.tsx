@@ -1,13 +1,17 @@
 import React from 'react';
-
-import MapFilter from '../../components/MapFilter'
-import MapComponent from '../../components/MapComponent';
-import { LoggedLayout } from '../../layout/logged/LoggedLayout';
-import { Status, Wrapper } from '@googlemaps/react-wrapper';
-import { MAPS_API_KEY } from '../../config';
 import { Flex, Spin } from 'antd';
+import { Status, Wrapper } from '@googlemaps/react-wrapper';
+
+import MapComponent from '../../components/MapComponent';
+import { MapFilter } from '../../components/MapFilter';
+import { LoggedLayout } from '../../layout/logged/LoggedLayout';
+import { MAPS_API_KEY } from '../../config';
+import { useAsync } from '../../utils/async';
+import { RoutesModel } from '../../api/route';
 
 export const Home: React.FC = () => {
+  const routes = useAsync(() => RoutesModel.getAllRoutes());
+
   const render = (status: Status) => {
     if (status === Status.LOADING) {
       return (
@@ -25,7 +29,7 @@ export const Home: React.FC = () => {
   return (
     <LoggedLayout selected="home">
       <Wrapper apiKey={MAPS_API_KEY} render={render}>
-        <MapFilter />
+        <MapFilter routes={routes.result}/>
         <MapComponent />
       </Wrapper>
     </LoggedLayout>

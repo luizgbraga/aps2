@@ -49,7 +49,6 @@ export const mapController = () => {
     paths: google.maps.LatLngLiteral[][],
     onPathClick: (event: google.maps.MapMouseEvent) => void
   ) => {
-    console.log(paths);
     paths.forEach((coordinates) => {
       const path = new window.google.maps.Polyline({
         path: coordinates,

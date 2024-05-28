@@ -11,6 +11,7 @@ async function fetchTrips(targetRouteId: string) {
   );
   return filteredTrips;
 }
+
 async function fetchTripsShapes(trips: any[]) {
   const shapePromises = trips.map((trip) => {
     return ShapesModel.getShape(trip.id);
@@ -46,6 +47,7 @@ export const useMap = (ref: RefObject<HTMLDivElement | null>) => {
       addRecentralizeButton(map);
     }
   }, [map]);
+
   useEffect(() => {
     const fetchTripsAndShapes = async () => {
       const trips = await fetchTrips('O0342AAA0A');
