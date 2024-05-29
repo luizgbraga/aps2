@@ -3,18 +3,18 @@ import { mapController } from './mapController';
 import { TripsModel } from '../api/trip';
 import { ShapesModel } from '../api/shape';
 import { TripDTO } from '../api/trip';
-import { ShapeDTO } from '../api/shape';
-import allRoutes from '../../dist/allRoutes.json';
+import { RoutesModel } from '../api/route';
 
 async function fetchTrips(targetRouteId: string[]) {
   const allTrips = await TripsModel.getAllTrips();
+  const allRoutes = await RoutesModel.getAllRoutes();
   const filteredTrips = allTrips.filter((trip) =>
     targetRouteId.includes(trip.route_id)
   );
   return filteredTrips.map((trip) => {
     let color = '';
     let text_color = '';
-    const route = allRoutes.result.find((x) => x.id === trip.route_id);
+    const route = allRoutes.find((x) => x.id === trip.route_id);
     if (route) {
       color = '#' + route.color;
       if (route.text_color) text_color = route.text_color;
@@ -47,14 +47,13 @@ async function fetchTripsShapes(
   return mappedShapes;
 }
 
-let routeids = [];
-routeids.push('O0342AAA0A');
-routeids.push('O0636AAA0A');
-
-export const useMap = (ref: RefObject<HTMLDivElement | null>) => {
+export const useMap = (
+  ref: RefObject<HTMLDivElement | null>,
+  pinnable: boolean
+) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const { setup, setLocationToCurrent, addRecentralizeButton, drawPaths } =
-    mapController();
+    mapController(pinnable);
   const [paths, setPaths] = useState<
     {
       shape: { lat: number; lng: number }[];
@@ -62,6 +61,7 @@ export const useMap = (ref: RefObject<HTMLDivElement | null>) => {
       text_color: string;
     }[]
   >([]);
+  const [routeIds, setRouteIds] = useState<string[]>([]);
 
   const handlePathClick = (event: google.maps.MapMouseEvent) => {
     if (event.latLng) {
@@ -78,20 +78,23 @@ export const useMap = (ref: RefObject<HTMLDivElement | null>) => {
       setLocationToCurrent(map);
       addRecentralizeButton(map);
     }
-  }, [map]);
+  }, [addRecentralizeButton, map, ref, setLocationToCurrent, setup]);
 
   useEffect(() => {
     const fetchTripsAndShapes = async () => {
-      const trips = await fetchTrips(routeids);
+      const trips = await fetchTrips(routeIds);
       const paths = await fetchTripsShapes(trips);
       setPaths(paths);
     };
     fetchTripsAndShapes();
-  }, [map]);
+  }, [map, routeIds]);
 
   useEffect(() => {
     if (map && paths) drawPaths(map, paths, handlePathClick);
-  }, [paths]);
+  }, [drawPaths, map, paths]);
 
-  return map;
+  return {
+    map,
+    setRouteIds,
+  };
 };

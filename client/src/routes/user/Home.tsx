@@ -1,16 +1,18 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Flex, Spin } from 'antd';
 import { Status, Wrapper } from '@googlemaps/react-wrapper';
 
-import MapComponent from '../../components/MapComponent';
 import { MapFilter } from '../../components/MapFilter';
 import { LoggedLayout } from '../../layout/logged/LoggedLayout';
 import { MAPS_API_KEY } from '../../config';
 import { useAsync } from '../../utils/async';
 import { RoutesModel } from '../../api/route';
+import { useMap } from '../../components/useMap';
 
 export const Home: React.FC = () => {
   const routes = useAsync(() => RoutesModel.getAllRoutes());
+  const ref = useRef<HTMLDivElement>(null);
+  const { map, setRouteIds } = useMap(ref, false);
 
   const render = (status: Status) => {
     if (status === Status.LOADING) {
@@ -29,8 +31,19 @@ export const Home: React.FC = () => {
   return (
     <LoggedLayout selected="home">
       <Wrapper apiKey={MAPS_API_KEY} render={render}>
-        <MapFilter routes={routes.result} loading={routes.loading}/>
-        <MapComponent />
+        <MapFilter
+          routes={routes.result}
+          loading={routes.loading}
+          onSelectRoutes={setRouteIds}
+        />
+        <div
+          ref={ref}
+          style={{
+            height: 'calc(100vh - 186px)',
+            width: '100%',
+            display: map ? 'flex' : 'none',
+          }}
+        />
       </Wrapper>
     </LoggedLayout>
   );

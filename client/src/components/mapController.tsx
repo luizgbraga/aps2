@@ -3,7 +3,7 @@ import { RecentralizeButton } from './RecentralizeButton';
 
 const DEFAULT_LOCATION = { lat: -22.9068, lng: -43.1729 };
 
-export const mapController = () => {
+export const mapController = (editable: boolean) => {
   const setup = (ref: HTMLDivElement) => {
     const map = new window.google.maps.Map(ref, {
       center: DEFAULT_LOCATION,

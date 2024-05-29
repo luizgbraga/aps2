@@ -4,6 +4,7 @@ import { RouteDTO } from '../api/route';
 type Props = {
   routes: RouteDTO[] | null;
   loading: boolean;
+  onSelectRoutes: (routes: string[]) => void;
 };
 
 export const MapFilter: React.FC<Props> = (props: Props) => {
@@ -15,10 +16,6 @@ export const MapFilter: React.FC<Props> = (props: Props) => {
     return busNumber + ', ' + busRoute.long_name;
   };
 
-  const onSelect = (value: string[]) => {
-    console.log(value);
-  };
-
   return (
     <Space style={{ width: '100%' }} direction="vertical">
       <Select
@@ -28,7 +25,7 @@ export const MapFilter: React.FC<Props> = (props: Props) => {
         placeholder="Selecione as linhas"
         style={{ width: '100%', marginBottom: '10px' }}
         defaultValue={[]}
-        onChange={onSelect}
+        onChange={props.onSelectRoutes}
         loading={props.loading}
         options={props.routes
           ?.map((route) => ({
