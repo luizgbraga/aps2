@@ -1,10 +1,10 @@
 import { Button, Drawer, Select, Space } from 'antd';
 import React, { useState } from 'react';
 import { OccurenceModel } from '../../api/occurences';
-import { BaseLayout } from '../../layout/BaseLayout';
 import Cards from './Card';
 import { useAsync } from '../../utils/async';
 import { NeighborhoodModel } from '../../api/neighborhood';
+import { LoggedLayout } from '../../layout/logged/LoggedLayout';
 
 const Notifications: React.FC = () => {
   const { result: occurenceList } = useAsync(() => OccurenceModel.list());
@@ -16,7 +16,7 @@ const Notifications: React.FC = () => {
   };
 
   return (
-    <BaseLayout
+    <LoggedLayout
       selected="notifications"
       title="Notifications"
       extra={
@@ -61,7 +61,7 @@ const Notifications: React.FC = () => {
           Bora
         </Button>
       </Drawer>
-    </BaseLayout>
+    </LoggedLayout>
   );
 };
 

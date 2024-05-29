@@ -1,8 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import { AlertOutlined, CarOutlined, HomeOutlined } from '@ant-design/icons';
-import { SidebarSection } from '../../_nav';
-import { BaseLayout } from '../BaseLayout';
+import { HomeOutlined, AlertOutlined, CarOutlined } from '@ant-design/icons';
+
+import { BaseLayout, type SidebarSection } from '../BaseLayout';
 
 type Props = {
   children: React.ReactNode;
@@ -11,6 +12,8 @@ type Props = {
 };
 
 export const AdminLayout: React.FC<Props> = (props: Props) => {
+  const nav = useNavigate();
+
   const sections: SidebarSection[] = [
     {
       key: 'home',
@@ -19,19 +22,19 @@ export const AdminLayout: React.FC<Props> = (props: Props) => {
           key: 'home',
           icon: <HomeOutlined />,
           title: 'Home',
-          to: '/_admin/home',
+          onClick: () => nav('/_admin/home'),
         },
         {
           key: 'bus',
           icon: <CarOutlined />,
           title: 'Ônibus',
-          to: '/_admin/bus',
+          onClick: () => nav('/_admin/bus'),
         },
         {
           key: 'occurrences',
           icon: <AlertOutlined />,
           title: 'Ocorrências',
-          to: '/_admin/occurrences',
+          onClick: () => nav('/_admin/occurrences'),
         },
       ],
     },

@@ -6,7 +6,6 @@ import { add } from './schemas';
 
 class OccurenceRoutes {
   router = Router();
-  baseRoute = '/occurrence';
 
   constructor() {
     this.init();

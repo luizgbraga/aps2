@@ -3,23 +3,38 @@ import { useNavigate } from 'react-router-dom';
 
 import { Logo } from './Logo';
 
-import { LockOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Divider, Flex, Layout, Menu, Tag, Typography } from 'antd';
+import { Layout, Menu, Button, Flex, Divider, Tag, Typography } from 'antd';
+import { UserOutlined, LogoutOutlined, LockOutlined } from '@ant-design/icons';
 import MenuDivider from 'antd/es/menu/MenuDivider';
-import { AuthContext } from '../Wrappers';
-import sections from '../_nav';
-import { AddOccurrence } from '../components/AddOccurrence';
 import { Storage } from '../utils/storage';
+
 import './base-layout.css';
+import { AddOccurrence } from '../components/AddOccurrence';
+import { AuthContext } from '../Wrappers';
 
 type Props = {
   children: React.ReactNode;
   selected: string;
   title?: string;
   extra?: React.ReactNode;
-  //  sections?: SidebarSection[];
+  sections: SidebarSection[];
   admin?: boolean;
   refetch?: () => void;
+};
+
+export type SidebarItem = {
+  key: string;
+  icon: React.ReactNode;
+  title: string;
+  onClick: () => void;
+  soon?: boolean;
+  disabled?: boolean;
+};
+
+export type SidebarSection = {
+  key: string | null;
+  title?: string | null;
+  items: SidebarItem[];
 };
 
 export const BaseLayout: React.FC<Props> = (props: Props) => {
@@ -43,14 +58,14 @@ export const BaseLayout: React.FC<Props> = (props: Props) => {
           selectedKeys={[props.selected]}
           className="base-menu"
         >
-          {sections.map((section) => {
+          {props.sections.map((section) => {
             if (section.key) {
               return (
                 <Menu.ItemGroup key={section.key} title={section.title}>
                   {section.items.map((item) => (
                     <Menu.Item
                       key={item.key}
-                      onClick={() => nav(item.to)}
+                      onClick={item.onClick}
                       disabled={item.soon || item.disabled}
                     >
                       {item.icon}
@@ -69,7 +84,7 @@ export const BaseLayout: React.FC<Props> = (props: Props) => {
             return section.items.map((item) => (
               <Menu.Item
                 key={item.key}
-                onClick={() => nav(item.to)}
+                onClick={item.onClick}
                 disabled={item.soon}
               >
                 {item.icon}

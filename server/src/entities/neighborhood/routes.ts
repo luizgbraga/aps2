@@ -3,7 +3,6 @@ import { NeighborhoodController } from './controller';
 
 class NeighborhoodRoutes {
   router = Router();
-  baseRoute = '/occurrence';
 
   constructor() {
     this.init();
