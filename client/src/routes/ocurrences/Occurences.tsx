@@ -5,14 +5,24 @@ import Cards from './Card';
 import { useAsync } from '../../utils/async';
 import { NeighborhoodModel } from '../../api/neighborhood';
 import { LoggedLayout } from '../../layout/logged/LoggedLayout';
+import { SubscriptionModel } from '../../api/subscription';
 
 const Notifications: React.FC = () => {
   const { result: occurenceList } = useAsync(() => OccurenceModel.list());
   const { result: neighborhoods } = useAsync(() => NeighborhoodModel.list());
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [neighborhoodToSubscribe, setNeighborhoodToSubscribe] = useState<
+    string[]
+  >([]);
 
   const subscribe = () => {
-    console.log('todo');
+    const promises = [] as Promise<SubscriptionModel>[];
+    neighborhoodToSubscribe.forEach((id) => {
+      promises.push(SubscriptionModel.subscribe(id));
+    });
+    Promise.all(promises).then(() => {
+      setOpenDrawer(false);
+    });
   };
 
   return (
@@ -53,9 +63,11 @@ const Notifications: React.FC = () => {
         width={500}
       >
         <Select
+          mode="multiple"
           placeholder="Select neighborhood"
           style={{ width: '100%' }}
           options={neighborhoods?.map((n) => ({ label: n.name, value: n.id }))}
+          onChange={(value) => setNeighborhoodToSubscribe(value)}
         />
         <Button type="primary" onClick={subscribe}>
           Bora
