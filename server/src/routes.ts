@@ -1,12 +1,16 @@
 import { Application } from 'express';
 import userRoutes from './entities/user/routes';
-import notificationRoutes from './entities/notification/routes';
 import adminRoutes from './entities/admin/routes';
+import occurrenceRoutes from './entities/occurrence/routes';
+import subscriptionRoutes from './entities/subscription/routes';
+import neighborhoodRoutes from './entities/neighborhood/routes';
 
 export class Routes {
   constructor(app: Application) {
     app.use('/api/user', userRoutes);
-    app.use('/api/notification', notificationRoutes);
     app.use('/api/admin', adminRoutes);
+    app.use('/api/occurrence', occurrenceRoutes);
+    app.use('/api/subscription', subscriptionRoutes);
+    app.use('/api/neighborhood', neighborhoodRoutes);
   }
 }
