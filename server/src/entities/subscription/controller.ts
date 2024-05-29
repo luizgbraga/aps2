@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import { NotificationRepository } from './repository';
+import { SubscriptionRepository } from './repository';
 
-export class NotificationController {
-  static async add(req: Request, res: Response) {
+export class SubscriptionController {
+  static async subscribe(req: Request, res: Response) {
     try {
-      const description = req.body.description;
+      const userId = req.userId;
       const neighborhoodId = req.body.neighborhoodId;
-      const result = await NotificationRepository.add(
-        description,
+      const result = await SubscriptionRepository.subscribe(
+        userId,
         neighborhoodId,
       );
       res.status(200).json({ result, type: 'SUCCESS' });
