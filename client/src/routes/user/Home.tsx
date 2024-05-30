@@ -31,10 +31,10 @@ export const Home: React.FC = () => {
   };
   useEffect(() => {
     const interval = setInterval(() => {
-      SensorModel.check(0, 0)
+      SensorModel.getAllStatuses()
         .then((result) => console.log(result))
         .catch((error) => console.error(error));
-    }, 500);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, []);

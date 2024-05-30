@@ -1,7 +1,5 @@
 import { Router } from 'express';
 import { SensorController } from './controller';
-import { validateQuery } from '../../middlewares/validate';
-import { coordinateSchema } from './schemas';
 
 class SensorRoutes {
   public router: Router;
@@ -12,7 +10,7 @@ class SensorRoutes {
   }
 
   private init() {
-    this.router.get('/status', validateQuery(coordinateSchema), SensorController.getStatus);
+    this.router.get('/', SensorController.getAllStatuses);
   }
 }
 
