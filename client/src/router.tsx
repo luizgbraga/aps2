@@ -1,7 +1,7 @@
 import { ALogin, AHome, ABus, AOccurrences } from './routes/admin';
 import { Login, Register } from './routes/login';
 import { Home } from './routes/user/Home';
-import { Notifications } from './routes/user/Notifications';
+import Ocurrences from './routes/ocurrences';
 
 import { PREFIXES } from './utils/environ';
 
@@ -12,7 +12,7 @@ const loginRoutes = [
 
 const userRoutes = [
   { path: 'home', element: <Home /> },
-  { path: 'notifications', element: <Notifications /> },
+  { path: 'notifications', element: <Ocurrences /> },
 ];
 
 const adminRoutes = [

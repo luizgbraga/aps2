@@ -12,7 +12,18 @@ class OccurenceRoutes {
   }
 
   init() {
-    this.router.post('/', logged, validateBody(add), OccurrenceController.add);
+    this.router.post(
+      '/add',
+      logged,
+      validateBody(add),
+      OccurrenceController.add,
+    );
+    this.router.get('/list', OccurrenceController.list); // list all
+    this.router.put(
+      // update confirmed
+      '/confirm',
+      logged,
+    );
   }
 }
 

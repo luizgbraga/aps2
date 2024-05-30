@@ -1,1 +1,0 @@
-ALTER TABLE "users" ALTER COLUMN "cpf" SET DATA TYPE varchar(14);

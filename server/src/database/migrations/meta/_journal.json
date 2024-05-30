@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1715556300247,
-      "tag": "0000_youthful_riptide",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1715564432903,
-      "tag": "0001_big_swordsman",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1715601638340,
-      "tag": "0002_shocking_tombstone",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1715862334761,
-      "tag": "0003_far_ender_wiggin",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1716296259053,
-      "tag": "0004_colossal_crusher_hogan",
+      "when": 1717034960195,
+      "tag": "0000_noisy_ben_grimm",
       "breakpoints": true
     }
   ]
