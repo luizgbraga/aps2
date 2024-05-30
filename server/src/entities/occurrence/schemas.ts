@@ -6,4 +6,10 @@ export const add = z.object({
   neighborhoodId: z.string().uuid(),
   latitude: z.string().max(255),
   longitude: z.string().max(255),
+  radius: z.number().optional(),
+  confirmed: z.boolean(),
+});
+
+export const confirm = z.object({
+  id: z.string().uuid(),
 });

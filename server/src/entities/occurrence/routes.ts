@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { OccurrenceController } from './controller';
 import { logged } from '../../middlewares/logged';
 import { validateBody } from '../../middlewares/validate';
-import { add } from './schemas';
+import { add, confirm } from './schemas';
 
 class OccurenceRoutes {
   router = Router();
@@ -12,17 +12,13 @@ class OccurenceRoutes {
   }
 
   init() {
-    this.router.post(
-      '/add',
-      logged,
-      validateBody(add),
-      OccurrenceController.add,
-    );
-    this.router.get('/list', OccurrenceController.list); // list all
+    this.router.post('/add', validateBody(add), OccurrenceController.add);
+    this.router.get('/list', OccurrenceController.list);
     this.router.put(
-      // update confirmed
       '/confirm',
       logged,
+      validateBody(confirm),
+      OccurrenceController.confirm,
     );
   }
 }

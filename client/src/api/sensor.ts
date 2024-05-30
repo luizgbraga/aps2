@@ -7,6 +7,7 @@ export type Sensor = {
   latitude: number;
   longitude: number;
   radius: number;
+  neighborhoodId: string;
 };
 
 export type SensorState = {

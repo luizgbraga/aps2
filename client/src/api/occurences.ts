@@ -4,7 +4,7 @@ import { API, Model } from '../utils/model';
 import { queryfy } from '../utils/queryfy';
 import { Response } from './types';
 
-export type OccurrenceType = 'flooding' | 'landslide';
+export type OccurrenceType = 'flooding' | 'landslide' | 'congestion';
 
 export type OccurenceDTO = {
   id: string;
@@ -24,6 +24,26 @@ class OccurrenceAPI extends API {
   }
 
   async create(
+    type: OccurrenceType,
+    latitude: string,
+    longitude: string,
+    neighborhoodId: string,
+    description: string,
+    radius: number
+  ): Promise<Response<OccurenceDTO>> {
+    const body = JSON.stringify({
+      type,
+      latitude,
+      longitude,
+      neighborhoodId,
+      description,
+      radius,
+      confirmed: true,
+    });
+    return this.request('POST', 'add', null, body, null);
+  }
+
+  async propose(
     token: string,
     type: OccurrenceType,
     latitude: string,
@@ -59,10 +79,30 @@ export class OccurenceModel extends Model<OccurenceDTO> {
     latitude: string,
     longitude: string,
     neighborhoodId: string,
+    description: string,
+    radius: number
+  ) {
+    const res = await api.create(
+      type,
+      latitude,
+      longitude,
+      neighborhoodId,
+      description,
+      radius
+    );
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return new OccurenceModel(res.result);
+  }
+
+  static async propose(
+    type: OccurrenceType,
+    latitude: string,
+    longitude: string,
+    neighborhoodId: string,
     description: string
   ) {
     const token = getToken();
-    const res = await api.create(
+    const res = await api.propose(
       token,
       type,
       latitude,

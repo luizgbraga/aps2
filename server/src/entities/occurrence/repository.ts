@@ -5,17 +5,48 @@ import { SubscriptionRepository } from '../../entities/subscription/repository';
 import { subscriptions } from '../../database/schemas';
 
 export class OccurrenceRepository {
+  static find = async (latitude: string, longitude: string) => {
+    try {
+      return await db
+        .select()
+        .from(occurences)
+        .where(
+          and(
+            eq(occurences.latitude, latitude),
+            eq(occurences.longitude, longitude),
+          ),
+        );
+    } catch (error) {
+      throw error;
+    }
+  };
   static add = async (
     type: OccurenceType,
     description: string,
     neighborhoodId: string,
     latitude: string,
     longitude: string,
+    radius: number,
+    confirmed: boolean,
   ) => {
     try {
-      return await db
-        .insert(occurences)
-        .values({ type, description, neighborhoodId, latitude, longitude });
+      const find = await OccurrenceRepository.find(latitude, longitude);
+      if (find.length > 0) {
+        return find[0];
+      }
+      const result = await db.insert(occurences).values({
+        type,
+        description,
+        neighborhoodId,
+        latitude,
+        longitude,
+        confirmed,
+        radius,
+      });
+      if (confirmed) {
+        SubscriptionRepository.incrementUnread(neighborhoodId);
+      }
+      return result;
     } catch (error) {
       throw error;
     }

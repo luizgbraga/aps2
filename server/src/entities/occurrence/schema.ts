@@ -7,6 +7,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { InferSelectModel } from 'drizzle-orm';
 import { neighborhood } from '../../entities/neighborhood/schema';
+import { doublePrecision } from 'drizzle-orm/pg-core';
 
 export type OccurenceType = 'flooding' | 'landslide';
 
@@ -16,6 +17,7 @@ export const occurences = pgTable('occurences', {
   description: varchar('description', { length: 255 }).notNull(),
   latitude: varchar('latitude', { length: 255 }).notNull(),
   longitude: varchar('longitude', { length: 255 }).notNull(),
+  radius: doublePrecision('radius').notNull(),
   neighborhoodId: uuid('bairro_id')
     .references(() => neighborhood.id)
     .notNull(),

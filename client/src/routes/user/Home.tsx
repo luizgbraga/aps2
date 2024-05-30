@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { Flex, Spin } from 'antd';
 import { Status, Wrapper } from '@googlemaps/react-wrapper';
 
@@ -8,7 +8,6 @@ import { MAPS_API_KEY } from '../../config';
 import { useAsync } from '../../utils/async';
 import { RoutesModel } from '../../api/route';
 import { useMap } from '../../components/useMap';
-import { SensorModel } from '../../api/sensor';
 
 export const Home: React.FC = () => {
   const routes = useAsync(() => RoutesModel.getAllRoutes());
@@ -29,15 +28,6 @@ export const Home: React.FC = () => {
     }
     return <span />;
   };
-  useEffect(() => {
-    const interval = setInterval(() => {
-      SensorModel.getAllStatuses()
-        .then((result) => console.log(result))
-        .catch((error) => console.error(error));
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, []);
   return (
     <LoggedLayout selected="home">
       <Wrapper apiKey={MAPS_API_KEY} render={render}>

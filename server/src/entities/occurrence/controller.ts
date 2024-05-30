@@ -10,12 +10,16 @@ export class OccurrenceController {
       const neighborhoodId = req.body.neighborhoodId;
       const latitude = req.body.latitude;
       const longitude = req.body.longitude;
+      const radius = req.body.radius as number;
+      const confirmed = req.body.confirmed as boolean;
       const result = await OccurrenceRepository.add(
         type,
         description,
         neighborhoodId,
         latitude,
         longitude,
+        radius,
+        confirmed,
       );
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
