@@ -24,7 +24,7 @@ export const AddOccurrence: React.FC<Props> = (props: Props) => {
       open={props.open}
       onCancel={props.onCancel}
       onOk={onSubmit}
-      style={{ width: '70vw' }}
+      width={800}
     >
       <Form layout="vertical">
         <Form.Item label="Tipo" required>
@@ -36,7 +36,7 @@ export const AddOccurrence: React.FC<Props> = (props: Props) => {
         <div
           ref={ref}
           style={{
-            height: 'calc(286px)',
+            height: 'calc(300px)',
             width: '100%',
             display: map ? 'flex' : 'none',
           }}

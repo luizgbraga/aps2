@@ -3,7 +3,7 @@ import { RecentralizeButton } from './RecentralizeButton';
 
 const DEFAULT_LOCATION = { lat: -22.9068, lng: -43.1729 };
 
-export const mapController = (editable: boolean) => {
+export const mapController = (pinnable: boolean) => {
   const setup = (ref: HTMLDivElement) => {
     const map = new window.google.maps.Map(ref, {
       center: DEFAULT_LOCATION,
@@ -31,7 +31,7 @@ export const mapController = (editable: boolean) => {
     });
   };
 
-  const addRecentralizeButton = (map: google.maps.Map) => {
+  const renderRecenterButton = (map: google.maps.Map) => {
     const buttonContainer = document.createElement('div');
     buttonContainer.addEventListener('click', () => {
       setLocationToCurrent(map);
@@ -50,8 +50,7 @@ export const mapController = (editable: boolean) => {
       shape: google.maps.LatLngLiteral[];
       color: string;
       text_color: string;
-    }[],
-    onPathClick: (event: google.maps.MapMouseEvent) => void
+    }[]
   ) => {
     paths.forEach((element) => {
       const path = new window.google.maps.Polyline({
@@ -62,8 +61,16 @@ export const mapController = (editable: boolean) => {
         strokeWeight: 4,
       });
       path.setMap(map);
-      path.addListener('click', (event: google.maps.MapMouseEvent) => {
-        onPathClick(event);
+    });
+  };
+
+  const initMarker = (map: google.maps.Map) => {
+    if (!pinnable) return;
+    navigator.geolocation.getCurrentPosition((position) => {
+      const { latitude, longitude } = position.coords;
+      new window.google.maps.Marker({
+        position: { lat: latitude, lng: longitude },
+        map,
       });
     });
   };
@@ -71,7 +78,8 @@ export const mapController = (editable: boolean) => {
   return {
     setup,
     setLocationToCurrent,
-    addRecentralizeButton,
+    addRecentralizeButton: renderRecenterButton,
     drawPaths,
+    initMarker,
   };
 };

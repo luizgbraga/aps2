@@ -12,7 +12,7 @@ import { useMap } from '../../components/useMap';
 export const Home: React.FC = () => {
   const routes = useAsync(() => RoutesModel.getAllRoutes());
   const ref = useRef<HTMLDivElement>(null);
-  const { map, setRouteIds } = useMap(ref, false);
+  const { map, changeRouteIds } = useMap(ref, false);
 
   const render = (status: Status) => {
     if (status === Status.LOADING) {
@@ -34,7 +34,7 @@ export const Home: React.FC = () => {
         <MapFilter
           routes={routes.result}
           loading={routes.loading}
-          onSelectRoutes={setRouteIds}
+          onSelectRoutes={changeRouteIds}
         />
         <div
           ref={ref}

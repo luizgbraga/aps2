@@ -52,8 +52,13 @@ export const useMap = (
   pinnable: boolean
 ) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const { setup, setLocationToCurrent, addRecentralizeButton, drawPaths } =
-    mapController(pinnable);
+  const {
+    setup,
+    setLocationToCurrent,
+    addRecentralizeButton,
+    drawPaths,
+    initMarker,
+  } = mapController(pinnable);
   const [paths, setPaths] = useState<
     {
       shape: { lat: number; lng: number }[];
@@ -63,13 +68,10 @@ export const useMap = (
   >([]);
   const [routeIds, setRouteIds] = useState<string[]>([]);
 
-  const handlePathClick = (event: google.maps.MapMouseEvent) => {
-    if (event.latLng) {
-      const clickedLatLng = event.latLng;
-      console.log('Coordinates:', clickedLatLng.toString());
-      // Run your custom code here with the clickedLatLng coordinates
-    }
+  const changeRouteIds = (newRouteIds: string[]) => {
+    setRouteIds(newRouteIds);
   };
+
   useEffect(() => {
     if (ref.current && !map) {
       setMap(setup(ref.current));
@@ -77,8 +79,16 @@ export const useMap = (
     if (map) {
       setLocationToCurrent(map);
       addRecentralizeButton(map);
+      initMarker(map);
     }
-  }, [addRecentralizeButton, map, ref, setLocationToCurrent, setup]);
+  }, [
+    addRecentralizeButton,
+    initMarker,
+    map,
+    ref,
+    setLocationToCurrent,
+    setup,
+  ]);
 
   useEffect(() => {
     const fetchTripsAndShapes = async () => {
@@ -90,11 +100,12 @@ export const useMap = (
   }, [map, routeIds]);
 
   useEffect(() => {
-    if (map && paths) drawPaths(map, paths, handlePathClick);
+    if (map && paths) drawPaths(map, paths);
   }, [drawPaths, map, paths]);
 
   return {
     map,
-    setRouteIds,
+    changeRouteIds,
+    routeIds,
   };
 };
