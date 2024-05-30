@@ -1,1 +1,0 @@
-ALTER TABLE "occurences" ADD COLUMN "type" varchar NOT NULL;
