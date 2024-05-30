@@ -8,8 +8,11 @@ import {
 import { InferSelectModel } from 'drizzle-orm';
 import { neighborhood } from '../../entities/neighborhood/schema';
 
+export type OccurenceType = 'flooding' | 'landslide';
+
 export const occurences = pgTable('occurences', {
   id: uuid('id').primaryKey().defaultRandom(),
+  type: varchar('type').$type<OccurenceType>().notNull(),
   description: varchar('description', { length: 255 }).notNull(),
   latitude: varchar('latitude', { length: 255 }).notNull(),
   longitude: varchar('longitude', { length: 255 }).notNull(),
