@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const check = z.object({
-  latitude: z.number(),
-  longitude: z.number(),
+export const coordinateSchema = z.object({
+  latitude: z.string().regex(/^(-?\d+(\.\d+)?)$/).transform(Number),
+  longitude: z.string().regex(/^(-?\d+(\.\d+)?)$/).transform(Number),
 });

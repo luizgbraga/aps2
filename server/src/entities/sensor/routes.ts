@@ -1,18 +1,18 @@
 import { Router } from 'express';
 import { SensorController } from './controller';
-import { logged } from '../../middlewares/logged';
-import { validateBody } from '../../middlewares/validate';
-import { check } from './schemas';
+import { validateQuery } from '../../middlewares/validate';
+import { coordinateSchema } from './schemas';
 
 class SensorRoutes {
-  router = Router();
+  public router: Router;
 
   constructor() {
+    this.router = Router();
     this.init();
   }
 
-  init() {
-    this.router.get('/', logged, validateBody(check), SensorController.check);
+  private init() {
+    this.router.get('/status', validateQuery(coordinateSchema), SensorController.getStatus);
   }
 }
 
