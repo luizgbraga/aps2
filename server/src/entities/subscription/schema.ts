@@ -12,7 +12,7 @@ export const subscriptions = pgTable(
   'subscriptions',
   {
     userId: uuid('user_id').notNull(),
-    neighborhoodId: uuid('bairro_id')
+    neighborhoodId: uuid('neighborhood_id')
       .references(() => neighborhood.id)
       .notNull(),
     unread: integer('unread').default(0).notNull(),

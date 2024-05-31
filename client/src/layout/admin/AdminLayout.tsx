@@ -1,7 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { HomeOutlined, AlertOutlined, CarOutlined } from '@ant-design/icons';
+import {
+  HomeOutlined,
+  AlertOutlined,
+  CarOutlined,
+  CheckOutlined,
+} from '@ant-design/icons';
 
 import { BaseLayout, type SidebarSection } from '../BaseLayout';
 
@@ -23,6 +28,12 @@ export const AdminLayout: React.FC<Props> = (props: Props) => {
           icon: <HomeOutlined />,
           title: 'Home',
           onClick: () => nav('/_admin/home'),
+        },
+        {
+          key: 'approve',
+          icon: <CheckOutlined />,
+          title: 'Aprovar',
+          onClick: () => nav('/_admin/approve'),
         },
         {
           key: 'bus',

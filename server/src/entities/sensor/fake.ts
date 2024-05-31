@@ -16,7 +16,7 @@ export const sensors = [
       end: 0,
     },
     congestionInterval: {
-      start: 18,
+      start: 12,
       end: 20,
     },
   },

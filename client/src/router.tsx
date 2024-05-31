@@ -4,6 +4,7 @@ import { Home } from './routes/user/Home';
 import Ocurrences from './routes/ocurrences';
 
 import { PREFIXES } from './utils/environ';
+import { AApproval } from './routes/admin/Approval';
 
 const loginRoutes = [
   { path: 'register', element: <Register /> },
@@ -20,6 +21,7 @@ const adminRoutes = [
   { path: 'home', element: <AHome /> },
   { path: 'bus', element: <ABus /> },
   { path: 'occurrences', element: <AOccurrences /> },
+  { path: 'approve', element: <AApproval /> },
 ];
 
 export const router = [

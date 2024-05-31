@@ -1,4 +1,4 @@
-import { Button, Drawer, Select, Space } from 'antd';
+import { Button, Drawer, Select, Space, Table } from 'antd';
 import React, { useState } from 'react';
 import { OccurenceModel } from '../../api/occurences';
 import Cards from './Card';
@@ -10,6 +10,7 @@ import { SubscriptionModel } from '../../api/subscription';
 const Notifications: React.FC = () => {
   const { result: occurenceList } = useAsync(() => OccurenceModel.list());
   const { result: neighborhoods } = useAsync(() => NeighborhoodModel.list());
+  const { result: subscriptions } = useAsync(() => SubscriptionModel.list());
   const [openDrawer, setOpenDrawer] = useState(false);
   const [neighborhoodToSubscribe, setNeighborhoodToSubscribe] = useState<
     string[]
@@ -42,14 +43,14 @@ const Notifications: React.FC = () => {
       <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
         {occurenceList?.map((occ) => (
           <Cards
-            key={occ.id}
+            key={occ.occurence.id}
             {...{
-              id: occ.id,
-              type: occ.type,
-              latitude: occ.latitude,
-              longitude: occ.longitude,
-              neighborhoodId: occ.neighborhoodId,
-              description: occ.description,
+              id: occ.occurence.id,
+              type: occ.occurence.type,
+              latitude: occ.occurence.latitude,
+              longitude: occ.occurence.longitude,
+              neighborhoodId: occ.occurence.neighborhoodId,
+              description: occ.occurence.description,
             }}
           />
         ))}
@@ -69,9 +70,26 @@ const Notifications: React.FC = () => {
           options={neighborhoods?.map((n) => ({ label: n.name, value: n.id }))}
           onChange={(value) => setNeighborhoodToSubscribe(value)}
         />
-        <Button type="primary" onClick={subscribe}>
+        <Button
+          type="primary"
+          onClick={subscribe}
+          style={{ marginTop: '20px' }}
+        >
           Bora
         </Button>
+        <Table
+          columns={[
+            {
+              title: 'Neighborhood',
+              dataIndex: 'neighborhood',
+              key: 'neighborhood',
+            },
+          ]}
+          dataSource={subscriptions?.map((s) => ({
+            key: s.id,
+            neighborhood: s.name,
+          }))}
+        />
       </Drawer>
     </LoggedLayout>
   );

@@ -2,12 +2,13 @@ import express, { Application } from 'express';
 import { Server } from './src/server';
 
 const app: Application = express();
-new Server(app);
+const server = new Server(app);
 const PORT: number = 3001;
 
 app
   .listen(PORT, 'localhost', () => {
     console.log(`Server is running on port ${PORT}.`);
+    // server.startPolling();
   })
   .on('error', (err: any) => {
     if (err.code === 'EADDRINUSE') {

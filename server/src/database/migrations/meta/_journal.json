@@ -15,6 +15,13 @@
       "when": 1717083114245,
       "tag": "0001_tan_mulholland_black",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1717122755302,
+      "tag": "0002_fresh_mad_thinker",
+      "breakpoints": true
     }
   ]
 }

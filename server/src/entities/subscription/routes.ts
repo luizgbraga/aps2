@@ -18,6 +18,7 @@ class SubscriptionRoutes {
       validateBody(subscribe),
       SubscriptionController.subscribe,
     );
+    this.router.get('/', logged, SubscriptionController.list);
   }
 }
 

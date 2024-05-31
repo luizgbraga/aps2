@@ -3,11 +3,11 @@ import { RecentralizeButton } from './RecentralizeButton';
 
 const DEFAULT_LOCATION = { lat: -22.9068, lng: -43.1729 };
 
-export const mapController = (pinnable: boolean) => {
+export const mapController = () => {
   const setup = (ref: HTMLDivElement) => {
     const map = new window.google.maps.Map(ref, {
       center: DEFAULT_LOCATION,
-      zoom: 16,
+      zoom: 12,
       disableDefaultUI: true,
       styles: [
         {
@@ -64,15 +64,15 @@ export const mapController = (pinnable: boolean) => {
     });
   };
 
-  const initMarker = (map: google.maps.Map) => {
-    if (!pinnable) return;
-    navigator.geolocation.getCurrentPosition((position) => {
-      const { latitude, longitude } = position.coords;
-      new window.google.maps.Marker({
-        position: { lat: latitude, lng: longitude },
-        map,
-      });
+  const addMarker = (
+    map: google.maps.Map,
+    position: google.maps.LatLngLiteral
+  ): google.maps.Marker => {
+    const marker = new window.google.maps.Marker({
+      position,
+      map,
     });
+    return marker;
   };
 
   return {
@@ -80,6 +80,6 @@ export const mapController = (pinnable: boolean) => {
     setLocationToCurrent,
     addRecentralizeButton: renderRecenterButton,
     drawPaths,
-    initMarker,
+    addMarker,
   };
 };

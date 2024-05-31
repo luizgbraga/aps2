@@ -1,9 +1,11 @@
-import { RefObject, useEffect, useState } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 import { mapController } from './mapController';
 import { TripsModel } from '../api/trip';
 import { ShapesModel } from '../api/shape';
 import { TripDTO } from '../api/trip';
 import { RoutesModel } from '../api/route';
+import { useAsync } from '../utils/async';
+import { OccurenceModel } from '../api/occurences';
 
 async function fetchTrips(targetRouteId: string[]) {
   const allTrips = await TripsModel.getAllTrips();
@@ -57,8 +59,8 @@ export const useMap = (
     setLocationToCurrent,
     addRecentralizeButton,
     drawPaths,
-    initMarker,
-  } = mapController(pinnable);
+    addMarker,
+  } = mapController();
   const [paths, setPaths] = useState<
     {
       shape: { lat: number; lng: number }[];
@@ -67,27 +69,51 @@ export const useMap = (
     }[]
   >([]);
   const [routeIds, setRouteIds] = useState<string[]>([]);
+  const prevMarkersRef = useRef([] as google.maps.Marker[]);
+  const { result: allOccurences } = useAsync(() => OccurenceModel.all());
 
   const changeRouteIds = (newRouteIds: string[]) => {
     setRouteIds(newRouteIds);
   };
+
+  map?.addListener('click', (e: any) => {
+    if (!pinnable) return;
+    const m = addMarker(map, { lat: e.latLng.lat(), lng: e.latLng.lng() });
+    clearMarkers(prevMarkersRef.current);
+    if (m) {
+      prevMarkersRef.current.push(m);
+    }
+  });
 
   useEffect(() => {
     if (ref.current && !map) {
       setMap(setup(ref.current));
     }
     if (map) {
+      if (prevMarkersRef.current.length && pinnable) return;
       setLocationToCurrent(map);
       addRecentralizeButton(map);
-      initMarker(map);
+      if (allOccurences) {
+        allOccurences.forEach((occurence) => {
+          const m = addMarker(map, {
+            lat: parseFloat(occurence.latitude),
+            lng: parseFloat(occurence.longitude),
+          });
+          if (m) {
+            prevMarkersRef.current.push(m);
+          }
+        });
+      }
     }
   }, [
     addRecentralizeButton,
-    initMarker,
     map,
     ref,
     setLocationToCurrent,
     setup,
+    pinnable,
+    allOccurences,
+    addMarker,
   ]);
 
   useEffect(() => {
@@ -103,9 +129,16 @@ export const useMap = (
     if (map && paths) drawPaths(map, paths);
   }, [drawPaths, map, paths]);
 
+  function clearMarkers(markers: google.maps.Marker[]) {
+    for (const m of markers) {
+      m.setMap(null);
+    }
+  }
+
   return {
     map,
     changeRouteIds,
     routeIds,
+    prevMarkersRef,
   };
 };
