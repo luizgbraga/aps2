@@ -2,7 +2,7 @@ import { OccurenceType, occurences } from './schema';
 import { db } from '../../database';
 import { and, eq } from 'drizzle-orm';
 import { SubscriptionRepository } from '../../entities/subscription/repository';
-import { subscriptions } from '../../database/schemas';
+import { neighborhood, subscriptions } from '../../database/schemas';
 import { SensorStatus } from '../../entities/sensor/schema';
 import { FakeSensorRepository } from '../../entities/sensor/repository';
 
@@ -93,6 +93,10 @@ export class OccurrenceRepository {
           occurences,
           eq(subscriptions.neighborhoodId, occurences.neighborhoodId),
         )
+        .innerJoin(
+          neighborhood,
+          eq(subscriptions.neighborhoodId, neighborhood.id),
+        )
         .where(
           and(eq(subscriptions.userId, userId), eq(occurences.confirmed, true)),
         )
@@ -109,6 +113,7 @@ export class OccurrenceRepository {
       return await db
         .select()
         .from(occurences)
+        .innerJoin(neighborhood, eq(occurences.neighborhoodId, neighborhood.id))
         .where(eq(occurences.confirmed, false));
     } catch (error) {
       throw error;

@@ -1,6 +1,7 @@
 import { API_URL } from '../config';
 import { getToken } from '../utils/api';
 import { API, Model } from '../utils/model';
+import { NeighborhoodDTO, NeighborhoodModel } from './neighborhood';
 import { SubscriptionDTO, SubscriptionModel } from './subscription';
 import { Response } from './types';
 
@@ -63,15 +64,21 @@ class OccurrenceAPI extends API {
     return res.result;
   }
 
-  async list(
-    token: string
-  ): Promise<
-    Response<{ occurences: OccurenceDTO; subscription: SubscriptionDTO }[]>
+  async list(token: string): Promise<
+    Response<
+      {
+        occurences: OccurenceDTO;
+        subscription: SubscriptionDTO;
+        neighborhood: NeighborhoodDTO;
+      }[]
+    >
   > {
     return this.request('GET', 'list', token, null, null);
   }
 
-  async listToApprove(): Promise<Response<OccurenceDTO[]>> {
+  async listToApprove(): Promise<
+    Response<{ occurences: OccurenceDTO; neighborhood: NeighborhoodDTO }[]>
+  > {
     return this.request('GET', 'to-approve', null, null, null);
   }
 
@@ -135,16 +142,24 @@ export class OccurenceModel extends Model<OccurenceDTO> {
     const token = getToken();
     const res = await api.list(token);
     if (res.type === 'ERROR') throw new Error(res.cause);
-    return res.result.map((dto) => ({
-      occurence: new OccurenceModel(dto.occurences),
-      subscription: SubscriptionModel.fromDTO(dto.subscription),
-    }));
+    console.log(res.result);
+    return {
+      occurences: res.result.map((dto) => ({
+        occurence: new OccurenceModel(dto.occurences),
+        subscription: SubscriptionModel.fromDTO(dto.subscription),
+        neighborhood: NeighborhoodModel.fromDTO(dto.neighborhood),
+      })),
+      unread: 1,
+    };
   }
 
   static async listToApprove() {
     const res = await api.listToApprove();
     if (res.type === 'ERROR') throw new Error(res.cause);
-    return res.result.map((dto) => new OccurenceModel(dto));
+    return res.result.map((dto) => ({
+      occurence: new OccurenceModel(dto.occurences),
+      neighborhood: NeighborhoodModel.fromDTO(dto.neighborhood),
+    }));
   }
 
   static async confirm(id: string) {

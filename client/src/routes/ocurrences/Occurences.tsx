@@ -1,11 +1,23 @@
-import { Button, Drawer, Select, Space, Table } from 'antd';
+import {
+  Button,
+  Card,
+  Descriptions,
+  Drawer,
+  Rate,
+  Select,
+  Space,
+  Table,
+  Tag,
+} from 'antd';
+import { PushpinOutlined, WarningOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
 import { OccurenceModel } from '../../api/occurences';
-import Cards from './Card';
 import { useAsync } from '../../utils/async';
 import { NeighborhoodModel } from '../../api/neighborhood';
 import { LoggedLayout } from '../../layout/logged/LoggedLayout';
 import { SubscriptionModel } from '../../api/subscription';
+import { dateDistance } from '../../utils/time';
+import { translateType } from '../../utils/translate';
 
 const Notifications: React.FC = () => {
   const { result: occurenceList } = useAsync(() => OccurenceModel.list());
@@ -29,7 +41,7 @@ const Notifications: React.FC = () => {
   return (
     <LoggedLayout
       selected="notifications"
-      title="Notifications"
+      title="Noficações"
       extra={
         <Button
           type="primary"
@@ -41,18 +53,52 @@ const Notifications: React.FC = () => {
       }
     >
       <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-        {occurenceList?.map((occ) => (
-          <Cards
-            key={occ.occurence.id}
-            {...{
-              id: occ.occurence.id,
-              type: occ.occurence.type,
-              latitude: occ.occurence.latitude,
-              longitude: occ.occurence.longitude,
-              neighborhoodId: occ.occurence.neighborhoodId,
-              description: occ.occurence.description,
-            }}
-          />
+        {occurenceList?.occurences.map((occ, i) => (
+          <Card
+            title={
+              <span>
+                {translateType(occ.occurence.type)}
+                <span style={{ fontWeight: '400' }}>
+                  {' - '}
+                  {dateDistance(occ.occurence.createdAt as Date, true)}
+                  {i < occurenceList.unread && (
+                    <Tag color="red" style={{ marginLeft: '10px' }}>
+                      Não lida
+                    </Tag>
+                  )}
+                </span>
+              </span>
+            }
+            extra={<Button icon={<PushpinOutlined />}>Ver no mapa</Button>}
+          >
+            <Descriptions
+              column={1}
+              layout="horizontal"
+              items={[
+                {
+                  key: '1',
+                  label: 'Bairro',
+                  children: occ.neighborhood.name,
+                },
+                {
+                  key: '2',
+                  label: 'Descrição',
+                  children: occ.occurence.description,
+                },
+                {
+                  key: '3',
+                  label: 'Gravidade',
+                  children: (
+                    <Rate
+                      defaultValue={3}
+                      character={<WarningOutlined />}
+                      disabled
+                    />
+                  ),
+                },
+              ]}
+            />
+          </Card>
         ))}
       </Space>
       <Drawer
