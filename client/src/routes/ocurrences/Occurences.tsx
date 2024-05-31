@@ -115,6 +115,12 @@ const Notifications: React.FC = () => {
           style={{ width: '100%' }}
           options={neighborhoods?.map((n) => ({ label: n.name, value: n.id }))}
           onChange={(value) => setNeighborhoodToSubscribe(value)}
+          filterOption={(inputValue, option) => {
+            if (!option) return false;
+            return option.label
+              .toLowerCase()
+              .includes(inputValue.toLowerCase());
+          }}
         />
         <Button
           type="primary"
