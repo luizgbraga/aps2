@@ -1,4 +1,4 @@
-import { Form, Input, Modal, Radio } from 'antd';
+import { Button, Flex, Form, Input, Modal, Radio, Steps } from 'antd';
 import React, { useRef, useState } from 'react';
 import { OccurenceModel, OccurrenceType } from '../api/occurences';
 import { useMap } from './useMap';
@@ -10,6 +10,7 @@ type Props = {
 };
 
 export const AddOccurrence: React.FC<Props> = (props: Props) => {
+  const [step, setStep] = useState(0);
   const [type, setType] = useState<OccurrenceType>('flooding');
   const [description, setDescription] = useState('');
   const ref = useRef<HTMLDivElement>(null);
@@ -55,29 +56,70 @@ export const AddOccurrence: React.FC<Props> = (props: Props) => {
       onCancel={props.onCancel}
       onOk={onSubmit}
       width={800}
+      title="Adicionar ocorrência"
+      footer={null}
     >
+      <Steps
+        style={{ marginBottom: 32 }}
+        current={step}
+        items={[
+          {
+            title: 'Selecionar localização',
+          },
+          {
+            title: 'Descrição',
+          },
+        ]}
+      />
       <Form layout="vertical">
-        <Form.Item label="Tipo" required>
-          <Radio.Group value={type} onChange={(e) => setType(e.target.value)}>
-            <Radio value="flooding">Alagamento</Radio>
-            <Radio value="landslide">Deslizamento</Radio>
-            <Radio value="congestion">Congestionamento</Radio>
-          </Radio.Group>
-        </Form.Item>
-        <div
-          ref={ref}
-          style={{
-            height: 'calc(300px)',
-            width: '100%',
-            display: map ? 'flex' : 'none',
-          }}
-        />
-        <Form.Item label="Descrição" required>
-          <Input.TextArea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </Form.Item>
+        {step === 0 && (
+          <>
+            <Form.Item label="Localização" required>
+              <div
+                ref={ref}
+                style={{
+                  height: '320px',
+                  width: '100%',
+                  display: map ? 'flex' : 'none',
+                }}
+              />
+            </Form.Item>
+            <Flex justify="end" gap="12px">
+              <Button onClick={props.onCancel}>Cancelar</Button>
+              <Button type="primary" onClick={() => setStep(1)}>
+                Próximo
+              </Button>
+            </Flex>
+          </>
+        )}
+        {step === 1 && (
+          <>
+            <Form.Item label="Tipo" required>
+              <Radio.Group
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+              >
+                <Radio value="flooding">Alagamento</Radio>
+                <Radio value="landslide">Deslizamento</Radio>
+                <Radio value="congestion">Congestionamento</Radio>
+              </Radio.Group>
+            </Form.Item>
+            <Form.Item label="Descrição" required>
+              <Input.TextArea
+                placeholder="Insira uma descrição para a sua ocorrência"
+                rows={5}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </Form.Item>
+            <Flex justify="end" gap="12px">
+              <Button onClick={props.onCancel}>Cancelar</Button>
+              <Button type="primary" onClick={onSubmit}>
+                Adicionar
+              </Button>
+            </Flex>
+          </>
+        )}
       </Form>
     </Modal>
   );

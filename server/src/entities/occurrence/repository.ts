@@ -4,6 +4,9 @@ import { and, eq } from 'drizzle-orm';
 import { SubscriptionRepository } from '../../entities/subscription/repository';
 import { subscriptions } from '../../database/schemas';
 import { SensorStatus } from '../../entities/sensor/schema';
+import { FakeSensorRepository } from '../../entities/sensor/repository';
+
+const sensorRepository = new FakeSensorRepository();
 
 export class OccurrenceRepository {
   static find = async (
@@ -36,9 +39,21 @@ export class OccurrenceRepository {
     confirmed: boolean,
   ) => {
     try {
+      let isConfirmed = false;
       const find = await OccurrenceRepository.find(type, latitude, longitude);
       if (find.length > 0) {
         return find[0];
+      }
+      if (!confirmed) {
+        const check = await sensorRepository.check(
+          Number(latitude),
+          Number(longitude),
+        );
+        if (check) {
+          isConfirmed = true;
+        }
+      } else {
+        isConfirmed = true;
       }
       const result = await db.insert(occurences).values({
         type,
@@ -46,7 +61,7 @@ export class OccurrenceRepository {
         neighborhoodId,
         latitude,
         longitude,
-        confirmed,
+        confirmed: isConfirmed,
         radius,
       });
       if (confirmed) {
@@ -80,7 +95,8 @@ export class OccurrenceRepository {
         )
         .where(
           and(eq(subscriptions.userId, userId), eq(occurences.confirmed, true)),
-        );
+        )
+        .orderBy(occurences.createdAt);
       SubscriptionRepository.setUnreadToZero(userId);
       return result;
     } catch (error) {

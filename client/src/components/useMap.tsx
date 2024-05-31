@@ -93,7 +93,7 @@ export const useMap = (
       if (prevMarkersRef.current.length && pinnable) return;
       setLocationToCurrent(map);
       addRecentralizeButton(map);
-      if (allOccurences) {
+      if (allOccurences && !pinnable) {
         allOccurences.forEach((occurence) => {
           const m = addMarker(map, {
             lat: parseFloat(occurence.latitude),
