@@ -2,8 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import {
-  HomeOutlined,
-  AlertOutlined,
+  BarChartOutlined,
   CarOutlined,
   CheckOutlined,
 } from '@ant-design/icons';
@@ -24,10 +23,10 @@ export const AdminLayout: React.FC<Props> = (props: Props) => {
       key: 'home',
       items: [
         {
-          key: 'home',
-          icon: <HomeOutlined />,
-          title: 'Home',
-          onClick: () => nav('/_admin/home'),
+          key: 'dashboard',
+          icon: <BarChartOutlined />,
+          title: 'Dashboard',
+          onClick: () => nav('/_admin/dashboard'),
         },
         {
           key: 'approve',
@@ -40,12 +39,6 @@ export const AdminLayout: React.FC<Props> = (props: Props) => {
           icon: <CarOutlined />,
           title: 'Ônibus',
           onClick: () => nav('/_admin/bus'),
-        },
-        {
-          key: 'occurrences',
-          icon: <AlertOutlined />,
-          title: 'Ocorrências',
-          onClick: () => nav('/_admin/occurrences'),
         },
       ],
     },

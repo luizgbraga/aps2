@@ -4,8 +4,8 @@ import { AdminLayout } from '../../layout/admin/AdminLayout';
 
 export const AHome: React.FC = () => {
   return (
-    <AdminLayout selected="home">
-      <p>home</p>
+    <AdminLayout selected="dashboard" title="Dashboard">
+      <p>yep</p>
     </AdminLayout>
   );
 };

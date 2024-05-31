@@ -135,6 +135,17 @@ export class OccurrenceRepository {
     }
   };
 
+  static delete = async (id: string) => {
+    try {
+      return await db
+        .delete(occurences)
+        .where(eq(occurences.id, id))
+        .returning();
+    } catch (error) {
+      throw error;
+    }
+  };
+
   static addOccurrencesFromSensorsStatuses = async (
     statuses: SensorStatus[],
   ) => {

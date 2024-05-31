@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { OccurrenceController } from './controller';
 import { logged } from '../../middlewares/logged';
 import { validateBody } from '../../middlewares/validate';
-import { confirm, propose } from './schemas';
+import { confirm, del, propose } from './schemas';
 
 class OccurenceRoutes {
   router = Router();
@@ -25,6 +25,7 @@ class OccurenceRoutes {
       validateBody(confirm),
       OccurrenceController.confirm,
     );
+    this.router.delete('/', validateBody(del), OccurrenceController.delete);
   }
 }
 

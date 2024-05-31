@@ -11,3 +11,7 @@ export const propose = z.object({
 export const confirm = z.object({
   id: z.string().uuid(),
 });
+
+export const del = z.object({
+  id: z.string().uuid(),
+});

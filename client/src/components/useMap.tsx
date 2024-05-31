@@ -78,7 +78,11 @@ export const useMap = (
 
   map?.addListener('click', (e: any) => {
     if (!pinnable) return;
-    const m = addMarker(map, { lat: e.latLng.lat(), lng: e.latLng.lng() });
+    const m = addMarker(
+      map,
+      { lat: e.latLng.lat(), lng: e.latLng.lng() },
+      true
+    );
     clearMarkers(prevMarkersRef.current);
     if (m) {
       prevMarkersRef.current.push(m);

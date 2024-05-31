@@ -18,7 +18,7 @@ const userRoutes = [
 
 const adminRoutes = [
   { path: 'login', element: <ALogin /> },
-  { path: 'home', element: <AHome /> },
+  { path: 'dashboard', element: <AHome /> },
   { path: 'bus', element: <ABus /> },
   { path: 'occurrences', element: <AOccurrences /> },
   { path: 'approve', element: <AApproval /> },

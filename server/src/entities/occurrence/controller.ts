@@ -62,4 +62,14 @@ export class OccurrenceController {
       res.status(500).json(error);
     }
   }
+
+  static async delete(req: Request, res: Response) {
+    try {
+      const id = req.body.id;
+      const result = await OccurrenceRepository.delete(id);
+      res.status(200).json({ result, type: 'SUCCESS' });
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
 }

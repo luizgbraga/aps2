@@ -15,6 +15,7 @@ export const AddOccurrence: React.FC<Props> = (props: Props) => {
   const [description, setDescription] = useState('');
   const ref = useRef<HTMLDivElement>(null);
   const { map, prevMarkersRef } = useMap(ref, true);
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async () => {
     const geocoder = new window.google.maps.Geocoder();
@@ -24,9 +25,12 @@ export const AddOccurrence: React.FC<Props> = (props: Props) => {
     const lat = lastMarker.getPosition()?.lat();
     const lng = lastMarker.getPosition()?.lng();
     if (!lat || !lng) return;
+    setLoading(true);
     geocoder.geocode({ location: { lat, lng } }, function (results, status) {
       if (status === window.google.maps.GeocoderStatus.OK) {
-        if (!results) return;
+        if (!results) {
+          return;
+        }
         if (results[0]) {
           for (const component of results[0].address_components) {
             if (component.types.includes('sublocality')) {
@@ -39,6 +43,7 @@ export const AddOccurrence: React.FC<Props> = (props: Props) => {
                     neighborhood.id,
                     description
                   ).then(() => {
+                    setLoading(false);
                     props.onCancel();
                   });
                 }
@@ -113,8 +118,15 @@ export const AddOccurrence: React.FC<Props> = (props: Props) => {
               />
             </Form.Item>
             <Flex justify="end" gap="12px">
-              <Button onClick={props.onCancel}>Cancelar</Button>
-              <Button type="primary" onClick={onSubmit}>
+              <Button
+                onClick={() => {
+                  setStep(0);
+                  props.onCancel();
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button type="primary" onClick={onSubmit} loading={loading}>
                 Adicionar
               </Button>
             </Flex>

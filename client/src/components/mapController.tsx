@@ -66,13 +66,27 @@ export const mapController = () => {
 
   const addMarker = (
     map: google.maps.Map,
-    position: google.maps.LatLngLiteral
+    position: google.maps.LatLngLiteral,
+    pin: boolean = false
   ): google.maps.Marker => {
-    const marker = new window.google.maps.Marker({
+    if (pin) {
+      return new window.google.maps.Marker({
+        position,
+        map,
+      });
+    }
+    return new window.google.maps.Marker({
       position,
       map,
+      icon: {
+        path: window.google.maps.SymbolPath.CIRCLE,
+        scale: 10,
+        fillColor: 'red',
+        fillOpacity: 1,
+        strokeColor: 'white',
+        strokeWeight: 1,
+      },
     });
-    return marker;
   };
 
   return {
