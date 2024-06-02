@@ -51,6 +51,7 @@ export class OccurrenceRepository {
         );
         if (check) {
           isConfirmed = true;
+          // call(lat, lng, rad)
         }
       } else {
         isConfirmed = true;
@@ -126,9 +127,15 @@ export class OccurrenceRepository {
         .update(occurences)
         .set({ confirmed: true })
         .where(eq(occurences.id, id))
-        .returning();
+        .returning({
+          lat: occurences.latitude,
+          lng: occurences.longitude,
+          rad: occurences.radius,
+          neigh_id: occurences.neighborhoodId
+        });
       updated.forEach((occurence) => {
-        SubscriptionRepository.incrementUnread(occurence.neighborhoodId);
+        SubscriptionRepository.incrementUnread(occurence.neigh_id);
+        // call(lat, lng, rad)
       });
     } catch (error) {
       throw error;
@@ -160,6 +167,7 @@ export class OccurrenceRepository {
           status.sensor.radius,
           true,
         );
+        // call(lat, lng, rad)
       }
       if (status.state.landslide > 0) {
         await OccurrenceRepository.create(
@@ -171,6 +179,7 @@ export class OccurrenceRepository {
           status.sensor.radius,
           true,
         );
+        // call(lat, lng, rad)
       }
       if (status.state.congestion > 0) {
         await OccurrenceRepository.create(
@@ -182,6 +191,7 @@ export class OccurrenceRepository {
           status.sensor.radius,
           true,
         );
+        // call(lat, lng, rad)
       }
     }
   };

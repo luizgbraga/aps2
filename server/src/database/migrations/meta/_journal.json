@@ -22,6 +22,13 @@
       "when": 1717122755302,
       "tag": "0002_fresh_mad_thinker",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1717366347814,
+      "tag": "0003_fat_paladin",
+      "breakpoints": true
     }
   ]
 }
