@@ -18,6 +18,12 @@ class SubscriptionRoutes {
       validateBody(subscribe),
       SubscriptionController.subscribe,
     );
+    this.router.delete(
+      '/',
+      logged,
+      validateBody(subscribe),
+      SubscriptionController.unsubscribe,
+    );
     this.router.get('/', logged, SubscriptionController.list);
   }
 }

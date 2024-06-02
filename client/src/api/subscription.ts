@@ -24,6 +24,14 @@ class SubscriptionAPI extends API {
     return this.request('POST', '', token, body, null);
   }
 
+  async unsubscribe(
+    token: string,
+    neighborhoodId: string
+  ): Promise<Response<SubscriptionDTO>> {
+    const body = JSON.stringify({ neighborhoodId });
+    return this.request('DELETE', '', token, body, null);
+  }
+
   async list(token: string): Promise<Response<NeighborhoodDTO[]>> {
     return this.request('GET', '', token, null, null);
   }
@@ -39,6 +47,13 @@ export class SubscriptionModel extends Model<SubscriptionDTO> {
   static async subscribe(neighborhoodId: string) {
     const token = getToken();
     const res = await api.subscribe(token, neighborhoodId);
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return new SubscriptionModel(res.result);
+  }
+
+  static async unsubscribe(neighborhoodId: string) {
+    const token = getToken();
+    const res = await api.unsubscribe(token, neighborhoodId);
     if (res.type === 'ERROR') throw new Error(res.cause);
     return new SubscriptionModel(res.result);
   }
