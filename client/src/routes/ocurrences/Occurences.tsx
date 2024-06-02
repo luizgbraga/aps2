@@ -27,7 +27,9 @@ import { translateType } from '../../utils/translate';
 const Notifications: React.FC = () => {
   const { result: occurenceList } = useAsync(() => OccurenceModel.list());
   const { result: neighborhoods } = useAsync(() => NeighborhoodModel.list());
-  const { result: subscriptions } = useAsync(() => SubscriptionModel.list());
+  const { result: subscriptions, refetch: refetchSubscriptions } = useAsync(
+    () => SubscriptionModel.list()
+  );
   const [openDrawer, setOpenDrawer] = useState(false);
   const [neighborhoodToSubscribe, setNeighborhoodToSubscribe] = useState<
     string[]
@@ -40,13 +42,14 @@ const Notifications: React.FC = () => {
     });
     Promise.all(promises).then(() => {
       setOpenDrawer(false);
+      refetchSubscriptions();
     });
   };
 
   const unsubscribe = (neighborhoodId: string) => {
-    const promise: Promise<SubscriptionModel> =
-      SubscriptionModel.unsubscribe(neighborhoodId);
-    Promise.resolve(promise);
+    SubscriptionModel.unsubscribe(neighborhoodId).then(() => {
+      refetchSubscriptions();
+    });
   };
 
   return (
