@@ -1,6 +1,6 @@
 import { OccurenceType, occurences } from './schema';
 import { db } from '../../database';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { SubscriptionRepository } from '../../entities/subscription/repository';
 import { neighborhood, subscriptions } from '../../database/schemas';
 import { SensorStatus } from '../../entities/sensor/schema';
@@ -122,11 +122,63 @@ export class OccurrenceRepository {
 
   static listApproved = async () => {
     try {
-      return await db
+      const result = await db
         .select()
         .from(occurences)
         .innerJoin(neighborhood, eq(occurences.neighborhoodId, neighborhood.id))
         .where(eq(occurences.confirmed, true));
+      return result.map((occ) => ({
+        occurence: occ,
+        neighborhood: occ.neighborhood,
+        sensor: sensorRepository.getSensorData(occ.neighborhood.id),
+      }));
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  static countPerZone = async () => {
+    try {
+      return await db
+        .select({
+          zone: neighborhood.zone,
+          count: sql<number>`cast(count(${occurences.id}) as int)`,
+        })
+        .from(occurences)
+        .innerJoin(neighborhood, eq(occurences.neighborhoodId, neighborhood.id))
+        .where(eq(occurences.confirmed, true))
+        .groupBy(neighborhood.zone);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  static countPerNeighborhood = async () => {
+    try {
+      return await db
+        .select({
+          neighborhood: neighborhood.name,
+          count: sql<number>`cast(count(${occurences.id}) as int)`,
+        })
+        .from(occurences)
+        .innerJoin(neighborhood, eq(occurences.neighborhoodId, neighborhood.id))
+        .where(eq(occurences.confirmed, true))
+        .groupBy(neighborhood.name);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  static countPerType = async () => {
+    try {
+      return await db
+        .select({
+          type: occurences.type,
+          count: sql<number>`cast(count(${occurences.id}) as int)`,
+        })
+        .from(occurences)
+        .where(eq(occurences.confirmed, true))
+        .groupBy(occurences.type);
     } catch (error) {
       throw error;
     }

@@ -3,11 +3,19 @@ import { FakeSensor, HourRange, SensorState, SensorStatus } from './schema';
 import { isInsideSensor } from './utils';
 
 export interface ISensorRepository {
+  //   list(): Promise<SensorStatus[]>;
   check(latitude: number, longitude: number): Promise<SensorState | null>;
   getAllStatuses(): Promise<SensorStatus[]>;
+  getSensorData(neighborhoodId: string): SensorState | null;
 }
 
 export class FakeSensorRepository implements ISensorRepository {
+  //   async list(): Promise<SensorStatus[]> {
+  //     return sensors.map((sensor) => ({
+  //       lat: sensor.latitude,
+  //       lng: sensor.longitude,
+  //     }));
+  //   }
   async getAllStatuses(): Promise<SensorStatus[]> {
     return sensors.map((sensor) => ({
       sensor,
@@ -27,8 +35,15 @@ export class FakeSensorRepository implements ISensorRepository {
     return null;
   }
 
+  getSensorData(neighborhoodId: string): SensorState | null {
+    const sensor = sensors.find(
+      (sensor) => sensor.neighborhoodId === neighborhoodId,
+    );
+    if (!sensor) return null;
+    return this.simulateSensorData(sensor);
+  }
+
   private simulateSensorData(sensor: FakeSensor): SensorState {
-    const currentHour = new Date().getHours();
     const flood = this.getIntensity(sensor.floodingInterval);
     const landslide = this.getIntensity(sensor.landslideInterval);
     const congestion = this.getIntensity(sensor.congestionInterval);

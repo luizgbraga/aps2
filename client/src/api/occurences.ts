@@ -2,6 +2,7 @@ import { API_URL } from '../config';
 import { getToken } from '../utils/api';
 import { API, Model } from '../utils/model';
 import { NeighborhoodDTO, NeighborhoodModel } from './neighborhood';
+import { SensorState } from './sensor';
 import { SubscriptionDTO, SubscriptionModel } from './subscription';
 import { Response } from './types';
 
@@ -83,9 +84,29 @@ class OccurrenceAPI extends API {
   }
 
   async listApproved(): Promise<
-    Response<{ occurences: OccurenceDTO; neighborhood: NeighborhoodDTO }[]>
+    Response<
+      {
+        occurences: OccurenceDTO;
+        neighborhood: NeighborhoodDTO;
+        sensor: SensorState | null;
+      }[]
+    >
   > {
     return this.request('GET', 'approved', null, null, null);
+  }
+
+  async countPerZone(): Promise<Response<{ zone: string; count: number }[]>> {
+    return this.request('GET', 'count-per-zone', null, null, null);
+  }
+
+  async countPerNeighborhood(): Promise<
+    Response<{ neighborhood: string; count: number }[]>
+  > {
+    return this.request('GET', 'count-per-neighborhood', null, null, null);
+  }
+
+  async countPerType(): Promise<Response<{ type: string; count: number }[]>> {
+    return this.request('GET', 'count-per-type', null, null, null);
   }
 
   async confirm(token: string, id: string): Promise<Response<OccurenceDTO>> {
@@ -174,7 +195,26 @@ export class OccurenceModel extends Model<OccurenceDTO> {
     return res.result.map((dto) => ({
       occurence: new OccurenceModel(dto.occurences),
       neighborhood: NeighborhoodModel.fromDTO(dto.neighborhood),
+      sensor: dto.sensor,
     }));
+  }
+
+  static async countPerZone() {
+    const res = await api.countPerZone();
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return res.result;
+  }
+
+  static async countPerNeighborhood() {
+    const res = await api.countPerNeighborhood();
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return res.result;
+  }
+
+  static async countPerType() {
+    const res = await api.countPerType();
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return res.result;
   }
 
   static async confirm(id: string) {
