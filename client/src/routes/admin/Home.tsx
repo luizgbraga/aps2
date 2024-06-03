@@ -57,16 +57,31 @@ export const AHome: React.FC = () => {
             <Descriptions title="Detalhes da ocorrência">
               <DescriptionsItem label="Descrição">{record.occurence.description}</DescriptionsItem>
               <DescriptionsItem label="Tipo de ocorrência">{occurenceType[record.occurence.type]}</DescriptionsItem>
-              <DescriptionsItem label="Última atualização">{record.occurence.updatedAt?.toLocaleString()}</DescriptionsItem>
+              <DescriptionsItem label="Índice pluviométrico">{record.occurence.updatedAt?.toLocaleString()}</DescriptionsItem>
+              <DescriptionsItem label="Índice pluviométrico">{record.occurence.description}</DescriptionsItem>
+              <DescriptionsItem label="Índice pluviométrico">{record.occurence.description}</DescriptionsItem>
+              <DescriptionsItem label="Índice pluviométrico">{record.occurence.description}</DescriptionsItem>
             </Descriptions>
           </div>),
           rowExpandable: (record) => record.occurence.description ? true : false,
           expandRowByClick: true
         }}
         dataSource={res.result!}
+        bordered
         loading={res.loading}
         rowKey={(record) => record.occurence.id}
-        pagination={{ pageSize: 20 }}
+        pagination={{ pageSize: 10, hideOnSinglePage: true }}
+        rowClassName={(record) => {
+          if (record.occurence.type === 'flooding') {
+            return 'blue-row';
+          } else if (record.occurence.type === 'landslide') {
+            return 'brown-row';
+          } else if (record.occurence.type === 'congestion') {
+            return 'red-row';
+          }else {
+            return '';
+          }
+        }}
       />
     </AdminLayout>
   );
