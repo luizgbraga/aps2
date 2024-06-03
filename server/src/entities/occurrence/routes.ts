@@ -20,6 +20,7 @@ class OccurenceRoutes {
     this.router.get('/all', OccurrenceController.all);
     this.router.get('/list', logged, OccurrenceController.list);
     this.router.get('/to-approve', OccurrenceController.listToApprove);
+    this.router.get('/approved', OccurrenceController.listApproved);
     this.router.put(
       '/confirm',
       validateBody(confirm),

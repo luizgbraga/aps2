@@ -82,6 +82,12 @@ class OccurrenceAPI extends API {
     return this.request('GET', 'to-approve', null, null, null);
   }
 
+  async listApproved(): Promise<
+    Response<{ occurences: OccurenceDTO; neighborhood: NeighborhoodDTO }[]>
+  > {
+    return this.request('GET', 'approved', null, null, null);
+  }
+
   async confirm(token: string, id: string): Promise<Response<OccurenceDTO>> {
     const body = JSON.stringify({ id });
     return this.request('PUT', 'confirm', null, body, null);
@@ -155,6 +161,15 @@ export class OccurenceModel extends Model<OccurenceDTO> {
 
   static async listToApprove() {
     const res = await api.listToApprove();
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return res.result.map((dto) => ({
+      occurence: new OccurenceModel(dto.occurences),
+      neighborhood: NeighborhoodModel.fromDTO(dto.neighborhood),
+    }));
+  }
+
+  static async listApproved() {
+    const res = await api.listApproved();
     if (res.type === 'ERROR') throw new Error(res.cause);
     return res.result.map((dto) => ({
       occurence: new OccurenceModel(dto.occurences),

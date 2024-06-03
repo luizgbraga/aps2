@@ -120,6 +120,18 @@ export class OccurrenceRepository {
     }
   };
 
+  static listApproved = async () => {
+    try {
+      return await db
+        .select()
+        .from(occurences)
+        .innerJoin(neighborhood, eq(occurences.neighborhoodId, neighborhood.id))
+        .where(eq(occurences.confirmed, true));
+    } catch (error) {
+      throw error;
+    }
+  };
+
   static confirm = async (id: string) => {
     try {
       const updated = await db
