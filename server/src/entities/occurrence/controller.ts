@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { OccurrenceRepository } from './repository';
 import { OccurenceType } from './schema';
 
+const repository = new OccurrenceRepository();
+
 export class OccurrenceController {
   static async add(req: Request, res: Response) {
     try {
@@ -10,7 +12,7 @@ export class OccurrenceController {
       const neighborhoodId = req.body.neighborhoodId;
       const latitude = req.body.latitude;
       const longitude = req.body.longitude;
-      const result = await OccurrenceRepository.add(
+      const result = await repository.add(
         type,
         description,
         neighborhoodId,
@@ -26,7 +28,7 @@ export class OccurrenceController {
   static async list(req: Request, res: Response) {
     try {
       const userId = req.userId;
-      const result = await OccurrenceRepository.list(userId);
+      const result = await repository.list(userId);
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);
@@ -36,7 +38,7 @@ export class OccurrenceController {
   static async confirm(req: Request, res: Response) {
     try {
       const id = req.body.id;
-      const result = await OccurrenceRepository.confirm(id);
+      const result = await repository.confirm(id);
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);
