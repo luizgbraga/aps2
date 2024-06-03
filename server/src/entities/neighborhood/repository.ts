@@ -1,6 +1,5 @@
 import { neighborhood } from './schema';
 import { db } from '../../database';
-import { eq, ne, sql } from 'drizzle-orm';
 import { neighborhoods } from './all';
 
 export class NeighborhoodRepository {

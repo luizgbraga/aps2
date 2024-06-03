@@ -3,14 +3,17 @@ import { db } from '../../database';
 import { eq, sql } from 'drizzle-orm';
 
 export interface ISubscriptionRepository {
-  subscribe(userId: string, neighborhoodId: string): Promise<Subscriptions[]>
-  incrementUnread(neighborhoodId: string): Promise<Subscriptions[]>
+  subscribe(userId: string, neighborhoodId: string): Promise<Subscriptions[]>;
+  incrementUnread(neighborhoodId: string): Promise<Subscriptions[]>;
 }
 
 export class SubscriptionRepository implements ISubscriptionRepository {
   subscribe = async (userId: string, neighborhoodId: string) => {
     try {
-      return await db.insert(subscriptions).values({ userId, neighborhoodId }).returning();
+      return await db
+        .insert(subscriptions)
+        .values({ userId, neighborhoodId })
+        .returning();
     } catch (error) {
       throw error;
     }
@@ -32,34 +35,31 @@ export class SubscriptionRepository implements ISubscriptionRepository {
 export class FakeSubscriptionRepository implements ISubscriptionRepository {
   fakeSubscriptions: Subscriptions[];
 
-  constructor (initialFakeSubscription: Subscriptions[]) {
+  constructor(initialFakeSubscription: Subscriptions[]) {
     this.fakeSubscriptions = initialFakeSubscription;
   }
 
   subscribe = async (userId: string, neighborhoodId: string) => {
-    try {
-      const subscription = { userId, neighborhoodId, unread: 0,  createdAt: new Date()}
-      await this.fakeSubscriptions.push(subscription);
-      return [subscription];
-    } catch (error) {
-      throw error;
-    }
+    const subscription = {
+      userId,
+      neighborhoodId,
+      unread: 0,
+      createdAt: new Date(),
+    };
+    this.fakeSubscriptions.push(subscription);
+    return [subscription];
   };
 
   incrementUnread = async (neighborhoodId: string) => {
-    try {
-      const updatedSubscriptionss = [] as Subscriptions[];
+    const updatedSubscriptionss = [] as Subscriptions[];
 
-      this.fakeSubscriptions.forEach(element => {
-        if (element.neighborhoodId === neighborhoodId) {
-          element.unread++;
-          updatedSubscriptionss.push(element);
-        }
-      });
+    this.fakeSubscriptions.forEach((element) => {
+      if (element.neighborhoodId === neighborhoodId) {
+        element.unread++;
+        updatedSubscriptionss.push(element);
+      }
+    });
 
-      return updatedSubscriptionss;
-    } catch (error) {
-      throw error;
-    }
+    return updatedSubscriptionss;
   };
 }

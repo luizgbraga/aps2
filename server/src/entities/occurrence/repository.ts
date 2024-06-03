@@ -1,15 +1,24 @@
 import { OccurenceType, Occurences, occurences } from './schema';
 import { db } from '../../database';
-import { InferSelectModel, and, eq } from 'drizzle-orm';
-import { FakeSubscriptionRepository, SubscriptionRepository } from '../../entities/subscription/repository';
+import { and, eq } from 'drizzle-orm';
+import {
+  FakeSubscriptionRepository,
+  SubscriptionRepository,
+} from '../../entities/subscription/repository';
 import { Subscriptions, subscriptions } from '../../database/schemas';
-import { join } from 'path';
-
 
 export interface IOccurrenceRepository {
-  add(type: OccurenceType, description: string, neighborhoodId: string, latitude: string, longitude: string): Promise<Occurences[]>
-  list(userId: string): Promise<{subscriptions: Subscriptions; occurences: Occurences}[]>
-  confirm(id: string): Promise<void>
+  add(
+    type: OccurenceType,
+    description: string,
+    neighborhoodId: string,
+    latitude: string,
+    longitude: string,
+  ): Promise<Occurences[]>;
+  list(
+    userId: string,
+  ): Promise<{ subscriptions: Subscriptions; occurences: Occurences }[]>;
+  confirm(id: string): Promise<void>;
 }
 
 export class OccurrenceRepository implements IOccurrenceRepository {
@@ -25,7 +34,8 @@ export class OccurrenceRepository implements IOccurrenceRepository {
     try {
       return await db
         .insert(occurences)
-        .values({ type, description, neighborhoodId, latitude, longitude }).returning();
+        .values({ type, description, neighborhoodId, latitude, longitude })
+        .returning();
     } catch (error) {
       throw error;
     }
@@ -68,6 +78,14 @@ export class FakeOccurrenceRepository implements IOccurrenceRepository {
   fakeOccurrences: Occurences[];
   fakeSubscriptions: Subscriptions[];
 
+  constructor(
+    initialFakeOccurrences: Occurences[],
+    initialFakeSubscriptions: Subscriptions[],
+  ) {
+    this.fakeOccurrences = initialFakeOccurrences;
+    this.fakeSubscriptions = initialFakeSubscriptions;
+  }
+
   add = async (
     type: OccurenceType,
     description: string,
@@ -77,15 +95,15 @@ export class FakeOccurrenceRepository implements IOccurrenceRepository {
   ) => {
     try {
       const occurrence = {
-        id: "1234",
+        id: '1234',
         neighborhoodId: neighborhoodId,
-        createdAt: new Date,
+        createdAt: new Date(),
         description: description,
         type: type,
         latitude: latitude,
         longitude: longitude,
         confirmed: false,
-        updatedAt: new Date
+        updatedAt: new Date(),
       };
       this.fakeOccurrences.push(occurrence);
       return [occurrence];
@@ -95,39 +113,40 @@ export class FakeOccurrenceRepository implements IOccurrenceRepository {
   };
 
   list = async (userId: string) => {
-    try {
-      const joinResult: { 
-        subscriptions: Subscriptions; 
-        occurences: Occurences; 
-      }[] = [];
-      this.fakeSubscriptions.forEach(subscriptionElement => {
-        this.fakeOccurrences.forEach(occurrenceElement => {
-          if(subscriptionElement.userId === userId && occurrenceElement.id === userId && occurrenceElement.confirmed === true) {
-            joinResult.push({subscriptions: subscriptionElement, occurences: occurrenceElement})
-          }
-        });
+    const joinResult: {
+      subscriptions: Subscriptions;
+      occurences: Occurences;
+    }[] = [];
+    this.fakeSubscriptions.forEach((subscriptionElement) => {
+      this.fakeOccurrences.forEach((occurrenceElement) => {
+        if (
+          subscriptionElement.userId === userId &&
+          occurrenceElement.id === userId &&
+          occurrenceElement.confirmed === true
+        ) {
+          joinResult.push({
+            subscriptions: subscriptionElement,
+            occurences: occurrenceElement,
+          });
+        }
       });
-      return joinResult;
-    } catch (error) {
-      throw error;
-    }
+    });
+    return joinResult;
   };
 
   confirm = async (id: string) => {
     const modifiedOccurrences = [] as Occurences[];
-    try {
-      this.fakeOccurrences.forEach(element => {
-        if(element.id === id) {
-          element.confirmed = true;
-          modifiedOccurrences.push(element);
-        }
-      });
-      const initialFakeSubscription = new FakeSubscriptionRepository(this.fakeSubscriptions);
-      modifiedOccurrences.forEach(element => {
-        initialFakeSubscription.incrementUnread(element.neighborhoodId);
-      })
-    } catch (error) {
-      throw error;
-    }
+    this.fakeOccurrences.forEach((element) => {
+      if (element.id === id) {
+        element.confirmed = true;
+        modifiedOccurrences.push(element);
+      }
+    });
+    const initialFakeSubscription = new FakeSubscriptionRepository(
+      this.fakeSubscriptions,
+    );
+    modifiedOccurrences.forEach((element) => {
+      initialFakeSubscription.incrementUnread(element.neighborhoodId);
+    });
   };
 }
