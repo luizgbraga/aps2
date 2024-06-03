@@ -11,7 +11,7 @@ export type Sensor = {
 };
 
 export type SensorState = {
-  flood: number;
+  flooding: number;
   landslide: number;
   congestion: number;
 };

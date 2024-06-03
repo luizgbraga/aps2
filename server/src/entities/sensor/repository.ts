@@ -44,10 +44,10 @@ export class FakeSensorRepository implements ISensorRepository {
   }
 
   private simulateSensorData(sensor: FakeSensor): SensorState {
-    const flood = this.getIntensity(sensor.floodingInterval);
+    const flooding = this.getIntensity(sensor.floodingInterval);
     const landslide = this.getIntensity(sensor.landslideInterval);
     const congestion = this.getIntensity(sensor.congestionInterval);
-    return { flood, landslide, congestion };
+    return { flooding, landslide, congestion };
   }
 
   private getIntensity(range: HourRange) {

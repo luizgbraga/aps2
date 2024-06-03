@@ -214,7 +214,7 @@ export class OccurrenceRepository {
     statuses: SensorStatus[],
   ) => {
     for (const status of statuses) {
-      if (status.state.flood > 0) {
+      if (status.state.flooding > 0) {
         await OccurrenceRepository.create(
           'flooding',
           `Alagamento detectado pelo sensor ${status.sensor.id}`,

@@ -96,13 +96,13 @@ export const AHome: React.FC = () => {
                   <DescriptionsItem label="Tipo de ocorrência">
                     {occurenceType[record.occurence.type]}
                   </DescriptionsItem>
-                  <DescriptionsItem label="Índice pluviométrico">
-                    {record.occurence.updatedAt?.toLocaleString()}
+                  <DescriptionsItem label="Localização">
+                    Lat: {record.occurence.latitude}  |  Long: {record.occurence.longitude}
+                  </DescriptionsItem> 
+                  <DescriptionsItem label={record.occurence.type==='flooding'?'Índice pluviométrico' : (record.occurence.type==='landslide'?'Índice de terra':'Congestionamento')}>
+                    {record.sensor ? record.sensor[record.occurence.type] : ' Não há sensores nesta área'}
                   </DescriptionsItem>
-                  <DescriptionsItem label="Índice pluviométrico">{record.occurence.description}</DescriptionsItem>
-              <DescriptionsItem label="Índice pluviométrico">{record.occurence.description}</DescriptionsItem>
-              <DescriptionsItem label="Índice pluviométrico">{record.occurence.description}</DescriptionsItem>
-            </Descriptions>
+                </Descriptions>
               </div>
             ),
             rowExpandable: (record) =>
