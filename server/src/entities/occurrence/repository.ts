@@ -122,11 +122,16 @@ export class OccurrenceRepository {
 
   static listApproved = async () => {
     try {
-      return await db
+      const result = await db
         .select()
         .from(occurences)
         .innerJoin(neighborhood, eq(occurences.neighborhoodId, neighborhood.id))
         .where(eq(occurences.confirmed, true));
+      return result.map((occ) => ({
+        occurence: occ,
+        neighborhood: occ.neighborhood,
+        sensor: sensorRepository.getSensorData(occ.neighborhood.id),
+      }));
     } catch (error) {
       throw error;
     }

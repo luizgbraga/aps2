@@ -2,6 +2,7 @@ import { API_URL } from '../config';
 import { getToken } from '../utils/api';
 import { API, Model } from '../utils/model';
 import { NeighborhoodDTO, NeighborhoodModel } from './neighborhood';
+import { SensorState } from './sensor';
 import { SubscriptionDTO, SubscriptionModel } from './subscription';
 import { Response } from './types';
 
@@ -83,7 +84,13 @@ class OccurrenceAPI extends API {
   }
 
   async listApproved(): Promise<
-    Response<{ occurences: OccurenceDTO; neighborhood: NeighborhoodDTO }[]>
+    Response<
+      {
+        occurences: OccurenceDTO;
+        neighborhood: NeighborhoodDTO;
+        sensor: SensorState | null;
+      }[]
+    >
   > {
     return this.request('GET', 'approved', null, null, null);
   }
@@ -188,6 +195,7 @@ export class OccurenceModel extends Model<OccurenceDTO> {
     return res.result.map((dto) => ({
       occurence: new OccurenceModel(dto.occurences),
       neighborhood: NeighborhoodModel.fromDTO(dto.neighborhood),
+      sensor: dto.sensor,
     }));
   }
 
