@@ -1,10 +1,11 @@
 import { API_URL } from '../config';
 import { getToken } from '../utils/api';
 import { API, Model } from '../utils/model';
-import { queryfy } from '../utils/queryfy';
+import { NeighborhoodDTO, NeighborhoodModel } from './neighborhood';
+import { SubscriptionDTO, SubscriptionModel } from './subscription';
 import { Response } from './types';
 
-export type OccurrenceType = 'flooding' | 'landslide';
+export type OccurrenceType = 'flooding' | 'landslide' | 'congestion';
 
 export type OccurenceDTO = {
   id: string;
@@ -24,6 +25,23 @@ class OccurrenceAPI extends API {
   }
 
   async create(
+    type: OccurrenceType,
+    latitude: string,
+    longitude: string,
+    neighborhoodId: string,
+    description: string
+  ): Promise<Response<OccurenceDTO>> {
+    const body = JSON.stringify({
+      type,
+      latitude,
+      longitude,
+      neighborhoodId,
+      description,
+    });
+    return this.request('POST', 'add', null, body, null);
+  }
+
+  async propose(
     token: string,
     type: OccurrenceType,
     latitude: string,
@@ -38,12 +56,35 @@ class OccurrenceAPI extends API {
       description,
       neighborhoodId,
     });
-    return this.request('POST', 'add', token, body, null);
+    return this.request('POST', 'propose', token, body, null);
   }
 
-  async list(token: string): Promise<Response<OccurenceDTO[]>> {
-    const query = queryfy({});
-    return this.request('GET', 'list', token, null, query);
+  async all(): Promise<OccurenceDTO[]> {
+    const res = await this.request('GET', 'all', null, null, null);
+    return res.result;
+  }
+
+  async list(token: string): Promise<
+    Response<
+      {
+        occurences: OccurenceDTO;
+        subscription: SubscriptionDTO;
+        neighborhood: NeighborhoodDTO;
+      }[]
+    >
+  > {
+    return this.request('GET', 'list', token, null, null);
+  }
+
+  async listToApprove(): Promise<
+    Response<{ occurences: OccurenceDTO; neighborhood: NeighborhoodDTO }[]>
+  > {
+    return this.request('GET', 'to-approve', null, null, null);
+  }
+
+  async confirm(token: string, id: string): Promise<Response<OccurenceDTO>> {
+    const body = JSON.stringify({ id });
+    return this.request('PUT', 'confirm', null, body, null);
   }
 }
 
@@ -61,24 +102,71 @@ export class OccurenceModel extends Model<OccurenceDTO> {
     neighborhoodId: string,
     description: string
   ) {
-    const token = getToken();
     const res = await api.create(
-      token,
       type,
       latitude,
-      neighborhoodId,
       longitude,
+      neighborhoodId,
       description
     );
     if (res.type === 'ERROR') throw new Error(res.cause);
     return new OccurenceModel(res.result);
   }
 
+  static async propose(
+    type: OccurrenceType,
+    latitude: string,
+    longitude: string,
+    neighborhoodId: string,
+    description: string
+  ) {
+    const token = getToken();
+    const res = await api.propose(
+      token,
+      type,
+      latitude,
+      longitude,
+      neighborhoodId,
+      description
+    );
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return new OccurenceModel(res.result);
+  }
+
+  static async all() {
+    const res = await api.all();
+    return res.map((dto) => new OccurenceModel(dto));
+  }
+
   static async list() {
     const token = getToken();
     const res = await api.list(token);
     if (res.type === 'ERROR') throw new Error(res.cause);
-    return res.result.map((dto) => new OccurenceModel(dto));
+    console.log(res.result);
+    return {
+      occurences: res.result.map((dto) => ({
+        occurence: new OccurenceModel(dto.occurences),
+        subscription: SubscriptionModel.fromDTO(dto.subscription),
+        neighborhood: NeighborhoodModel.fromDTO(dto.neighborhood),
+      })),
+      unread: 1,
+    };
+  }
+
+  static async listToApprove() {
+    const res = await api.listToApprove();
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return res.result.map((dto) => ({
+      occurence: new OccurenceModel(dto.occurences),
+      neighborhood: NeighborhoodModel.fromDTO(dto.neighborhood),
+    }));
+  }
+
+  static async confirm(id: string) {
+    const token = getToken();
+    const res = await api.confirm(token, id);
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return new OccurenceModel(res.result);
   }
 
   static fromDTO(dto: OccurenceDTO) {

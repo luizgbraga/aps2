@@ -19,4 +19,14 @@ export class NeighborhoodController {
       res.status(500).json(error);
     }
   }
+
+  static async getFromName(req: Request, res: Response) {
+    try {
+      const name = req.query.name as string;
+      const result = await NeighborhoodRepository.getFromName(name);
+      res.status(200).json({ result, type: 'SUCCESS' });
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
 }

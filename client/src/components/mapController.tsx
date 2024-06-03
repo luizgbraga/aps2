@@ -3,11 +3,11 @@ import { RecentralizeButton } from './RecentralizeButton';
 
 const DEFAULT_LOCATION = { lat: -22.9068, lng: -43.1729 };
 
-export const mapController = (pinnable: boolean) => {
+export const mapController = () => {
   const setup = (ref: HTMLDivElement) => {
     const map = new window.google.maps.Map(ref, {
       center: DEFAULT_LOCATION,
-      zoom: 16,
+      zoom: 12,
       disableDefaultUI: true,
       styles: [
         {
@@ -47,10 +47,12 @@ export const mapController = (pinnable: boolean) => {
   const drawPaths = (
     map: google.maps.Map,
     paths: {
+      route_id: string | undefined;
       shape: google.maps.LatLngLiteral[];
       color: string;
       text_color: string;
-    }[]
+    }[],
+    setPolylines: any
   ) => {
     paths.forEach((element) => {
       const path = new window.google.maps.Polyline({
@@ -61,17 +63,46 @@ export const mapController = (pinnable: boolean) => {
         strokeWeight: 4,
       });
       path.setMap(map);
+      setPolylines((polylines: any) => [
+        ...polylines,
+        { route_id: element.route_id, polyline: path },
+      ]);
     });
   };
 
-  const initMarker = (map: google.maps.Map) => {
-    if (!pinnable) return;
-    navigator.geolocation.getCurrentPosition((position) => {
-      const { latitude, longitude } = position.coords;
-      new window.google.maps.Marker({
-        position: { lat: latitude, lng: longitude },
+  const clearPaths = (
+    polylines: {
+      route_id: string | undefined;
+      polyline: google.maps.Polyline;
+    }[]
+  ) => {
+    polylines.forEach((element) => {
+      element.polyline.setMap(null);
+    });
+  };
+
+  const addMarker = (
+    map: google.maps.Map,
+    position: google.maps.LatLngLiteral,
+    pin: boolean = false
+  ): google.maps.Marker => {
+    if (pin) {
+      return new window.google.maps.Marker({
+        position,
         map,
       });
+    }
+    return new window.google.maps.Marker({
+      position,
+      map,
+      icon: {
+        path: window.google.maps.SymbolPath.CIRCLE,
+        scale: 10,
+        fillColor: 'red',
+        fillOpacity: 1,
+        strokeColor: 'white',
+        strokeWeight: 1,
+      },
     });
   };
 
@@ -80,6 +111,7 @@ export const mapController = (pinnable: boolean) => {
     setLocationToCurrent,
     addRecentralizeButton: renderRecenterButton,
     drawPaths,
-    initMarker,
+    addMarker,
+    clearPaths,
   };
 };

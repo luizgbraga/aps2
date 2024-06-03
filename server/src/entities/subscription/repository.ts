@@ -1,6 +1,7 @@
 import { Subscriptions, subscriptions } from './schema';
 import { db } from '../../database';
 import { eq, sql } from 'drizzle-orm';
+import { neighborhood } from '../../database/schemas';
 
 export interface ISubscriptionRepository {
   subscribe(userId: string, neighborhoodId: string): Promise<Subscriptions[]>;
@@ -26,6 +27,34 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         .set({ unread: sql`${subscriptions.unread} + 1` })
         .where(eq(subscriptions.neighborhoodId, neighborhoodId))
         .returning();
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  static setUnreadToZero = async (userId: string) => {
+    try {
+      return await db
+        .update(subscriptions)
+        .set({ unread: 0 })
+        .where(eq(subscriptions.userId, userId))
+        .returning();
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  static list = async (userId: string) => {
+    try {
+      const result = await db
+        .select()
+        .from(subscriptions)
+        .innerJoin(
+          neighborhood,
+          eq(subscriptions.neighborhoodId, neighborhood.id),
+        )
+        .where(eq(subscriptions.userId, userId));
+      return result.map((sub) => sub.neighborhood);
     } catch (error) {
       throw error;
     }

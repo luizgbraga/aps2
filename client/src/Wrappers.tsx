@@ -13,5 +13,6 @@ export const AuthContext = createContext<Async<UserModel>>(INITIAL_ASYNC);
 
 export const LoggedWrapper: React.FC<Props> = ({ children }) => {
   const me = useAsync(() => UserModel.me());
+
   return <AuthContext.Provider value={me}>{children}</AuthContext.Provider>;
 };

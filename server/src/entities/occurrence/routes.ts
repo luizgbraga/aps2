@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { OccurrenceController } from './controller';
 import { logged } from '../../middlewares/logged';
 import { validateBody } from '../../middlewares/validate';
-import { add } from './schemas';
+import { confirm, del, propose } from './schemas';
 
 class OccurenceRoutes {
   router = Router();
@@ -13,17 +13,19 @@ class OccurenceRoutes {
 
   init() {
     this.router.post(
-      '/add',
-      logged,
-      validateBody(add),
-      OccurrenceController.add,
+      '/propose',
+      validateBody(propose),
+      OccurrenceController.propose,
     );
-    this.router.get('/list', OccurrenceController.list); // list all
+    this.router.get('/all', OccurrenceController.all);
+    this.router.get('/list', logged, OccurrenceController.list);
+    this.router.get('/to-approve', OccurrenceController.listToApprove);
     this.router.put(
-      // update confirmed
       '/confirm',
-      logged,
+      validateBody(confirm),
+      OccurrenceController.confirm,
     );
+    this.router.delete('/', validateBody(del), OccurrenceController.delete);
   }
 }
 

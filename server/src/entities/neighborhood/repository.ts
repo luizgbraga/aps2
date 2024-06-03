@@ -1,6 +1,7 @@
 import { neighborhood } from './schema';
 import { db } from '../../database';
 import { neighborhoods } from './all';
+import { FindError } from './errors';
 
 export class NeighborhoodRepository {
   static fill = async () => {
@@ -18,6 +19,21 @@ export class NeighborhoodRepository {
   static list = async () => {
     try {
       return await db.select().from(neighborhood);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  static getFromName = async (name: string) => {
+    try {
+      const result = await db
+        .select()
+        .from(neighborhood)
+        .where(eq(neighborhood.name, name));
+      if (result.length === 0) {
+        throw new FindError('NEIGHBORHOOD_NOT_FOUND');
+      }
+      return result[0];
     } catch (error) {
       throw error;
     }
