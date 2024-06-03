@@ -55,29 +55,10 @@ export class OccurrenceController {
     }
   }
 
-  static async listToApprove(req: Request, res: Response) {
-    try {
-      const result = await OccurrenceRepository.listToApprove();
-      res.status(200).json({ result, type: 'SUCCESS' });
-    } catch (error) {
-      res.status(500).json(error);
-    }
-  }
-
   static async confirm(req: Request, res: Response) {
     try {
       const id = req.body.id;
       const result = await repository.confirm(id);
-      res.status(200).json({ result, type: 'SUCCESS' });
-    } catch (error) {
-      res.status(500).json(error);
-    }
-  }
-
-  static async delete(req: Request, res: Response) {
-    try {
-      const id = req.body.id;
-      const result = await OccurrenceRepository.delete(id);
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);
