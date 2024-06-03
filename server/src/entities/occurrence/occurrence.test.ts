@@ -12,6 +12,7 @@ describe('subscribe', () => {
           description: 'description',
           type: 'flooding',
           latitude: 'latitude',
+          radius: 10,
           longitude: 'longitude',
           confirmed: false,
           updatedAt: new Date(),

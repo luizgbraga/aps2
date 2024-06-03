@@ -12,7 +12,7 @@ export class OccurrenceController {
       const neighborhoodId = req.body.neighborhoodId;
       const latitude = req.body.latitude;
       const longitude = req.body.longitude;
-      const result = await repository.create(
+      const result = await repository.add(
         type,
         description,
         neighborhoodId,
