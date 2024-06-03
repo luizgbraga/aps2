@@ -128,7 +128,7 @@ export class OccurrenceRepository {
         .innerJoin(neighborhood, eq(occurences.neighborhoodId, neighborhood.id))
         .where(eq(occurences.confirmed, true));
       return result.map((occ) => ({
-        occurence: occ,
+        occurence: occ.occurences,
         neighborhood: occ.neighborhood,
         sensor: sensorRepository.getSensorData(occ.neighborhood.id),
       }));

@@ -6,7 +6,7 @@ const sensorRepository = new FakeSensorRepository();
 export class SensorController {
   static async list(req: Request, res: Response) {
     try {
-      const result = 0;
+      const result = await sensorRepository.list();
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);
