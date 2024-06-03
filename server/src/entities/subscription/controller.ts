@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
 import { SubscriptionRepository } from './repository';
 
+const repository = new SubscriptionRepository();
+
 export class SubscriptionController {
   static async subscribe(req: Request, res: Response) {
     try {
       const userId = req.userId;
       const neighborhoodId = req.body.neighborhoodId;
-      const result = await SubscriptionRepository.subscribe(
+      const result = await repository.subscribe(
         userId,
         neighborhoodId,
       );

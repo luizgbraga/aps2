@@ -1,9 +1,14 @@
-import { trips } from './schema';
+import { trips, Trips } from './schema';
 import { db } from '../../database';
 import { AddNewTripError, GetAllTripsError } from './errors';
 
-export class TripRepository {
-  static getAllTrips = async () => {
+export interface ITripRepository {
+  getAllTrips: () => Promise<any>;
+  addNewTrip: (id: string, route_id: string, headsign: string, direction: number) => Promise<any>;
+}
+
+export class TripRepository implements ITripRepository {
+  getAllTrips = async () => {
     try {
       const result = await db.select().from(trips);
       if (result.length === 0) {
@@ -14,7 +19,8 @@ export class TripRepository {
       throw error;
     }
   };
-  static addNewTrip = async (
+
+  addNewTrip = async (
     id: string,
     route_id: string,
     headsign: string,
@@ -36,6 +42,32 @@ export class TripRepository {
       return result;
     } catch (error) {
       throw error;
+    }
+  };
+}
+
+export class FakeTripRepository implements ITripRepository {
+  trips: Trips[] = [];
+
+  getAllTrips = async () => {
+    if (this.trips.length === 0) {
+      throw new GetAllTripsError('NO TRIPS REGISTERED');
+    }
+    return this.trips;
+  };
+
+  addNewTrip = async (
+    id: string,
+    route_id: string,
+    headsign: string,
+    direction: number,
+  ) => {
+    const newTrip = { id, route_id, headsign, direction };
+    this.trips.push(newTrip);
+    if (this.trips.find(trip => trip.id === id)) {
+      return [newTrip];
+    } else {
+      throw new AddNewTripError('TRIP NOT ADDED');
     }
   };
 }
