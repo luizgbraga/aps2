@@ -6,6 +6,8 @@ import { OccurenceModel } from '../../api/occurences';
 import { Descriptions, Flex, Table, Tabs, TabsProps } from 'antd';
 import { Bar, Pie } from '@ant-design/plots';
 import DescriptionsItem from 'antd/es/descriptions/Item';
+// import { SensorModel } from '../../api/sensor';
+// import { useMap } from '../../components/useMap';
 
 interface NeighborhoodFilter {
   text: string;
@@ -22,6 +24,7 @@ export const AHome: React.FC = () => {
   const res = useAsync(() => OccurenceModel.listApproved());
   const countPerZone = useAsync(() => OccurenceModel.countPerZone());
   const countPerType = useAsync(() => OccurenceModel.countPerType());
+  // const sensors = useAsync(() => SensorModel.list());
   const neighborhoodAdded: string[] = [];
   const neighborhoodFilters = res.result
     ? res.result.reduce((prev: NeighborhoodFilter[], curr) => {
@@ -35,6 +38,7 @@ export const AHome: React.FC = () => {
         return prev;
       }, [])
     : [];
+  // const ref = useRef<HTMLDivElement>(null);
 
   const items: TabsProps['items'] = [
     {
@@ -123,6 +127,11 @@ export const AHome: React.FC = () => {
         }}
         />
       ),
+    },
+    {
+      key: '3',
+      label: 'Sensores',
+      children: <div>sensores aq</div>,
     },
   ];
 

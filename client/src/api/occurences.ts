@@ -86,7 +86,7 @@ class OccurrenceAPI extends API {
   async listApproved(): Promise<
     Response<
       {
-        occurences: OccurenceDTO;
+        occurence: OccurenceDTO;
         neighborhood: NeighborhoodDTO;
         sensor: SensorState | null;
       }[]
@@ -193,7 +193,7 @@ export class OccurenceModel extends Model<OccurenceDTO> {
     const res = await api.listApproved();
     if (res.type === 'ERROR') throw new Error(res.cause);
     return res.result.map((dto) => ({
-      occurence: new OccurenceModel(dto.occurences),
+      occurence: new OccurenceModel(dto.occurence),
       neighborhood: NeighborhoodModel.fromDTO(dto.neighborhood),
       sensor: dto.sensor,
     }));

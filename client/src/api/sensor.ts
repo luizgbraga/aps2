@@ -26,7 +26,7 @@ class SensorAPI extends API {
     super(`${API_URL}/sensor`);
   }
 
-  async getAllStatuses(): Promise<Response<SensorStatus[]>> {
+  async list(): Promise<Response<{ lat: number; lng: number }[]>> {
     return this.request('GET', '', null, null, null);
   }
 }
@@ -34,9 +34,7 @@ class SensorAPI extends API {
 const api = new SensorAPI();
 
 export class SensorModel {
-  static async getAllStatuses() {
-    const res = await api.getAllStatuses();
-    if (res.type === 'ERROR') throw new Error(res.cause);
-    return res.result;
+  static async list() {
+    return api.list();
   }
 }
