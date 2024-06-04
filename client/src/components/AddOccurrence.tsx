@@ -81,6 +81,7 @@ export const AddOccurrence: React.FC<Props> = (props: Props) => {
           <>
             <Form.Item label="Localização" required>
               <div
+                className="teste job"
                 ref={ref}
                 style={{
                   height: '320px',

@@ -74,6 +74,7 @@ export const useMap = (
     clearPaths,
   } = mapController();
   const [map, setMap] = useState<google.maps.Map | null>(null);
+
   const [paths, setPaths] = useState<
     {
       route_id: string | undefined;
@@ -104,6 +105,8 @@ export const useMap = (
   });
 
   useEffect(() => {
+    console.log(ref.current);
+    console.log(map);
     if (ref.current && !map) {
       setMap(setup(ref.current));
     }
@@ -123,7 +126,16 @@ export const useMap = (
         });
       }
     }
-  }, [map, ref, pinnable, allOccurrences]);
+  }, [
+    map,
+    ref,
+    pinnable,
+    allOccurrences,
+    setup,
+    setLocationToCurrent,
+    addRecentralizeButton,
+    addMarker,
+  ]);
 
   function clearMarkers(markers: google.maps.Marker[]) {
     for (const m of markers) {
