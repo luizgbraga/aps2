@@ -15,7 +15,7 @@ class OccurrenceRoutes {
     this.router.post(
       '/propose',
       validateBody(propose),
-      OccurrenceController.propose
+      OccurrenceController.propose,
     );
     this.router.get('/all', OccurrenceController.all);
     this.router.get('/list', logged, OccurrenceController.list);
@@ -23,7 +23,7 @@ class OccurrenceRoutes {
     this.router.put(
       '/confirm',
       validateBody(confirm),
-      OccurrenceController.confirm
+      OccurrenceController.confirm,
     );
     this.router.delete('/', validateBody(del), OccurrenceController.delete);
   }

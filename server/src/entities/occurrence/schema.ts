@@ -27,4 +27,4 @@ export const occurrences = pgTable('occurrences', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export type Occurrences = InferSelectModel<typeof occurrences>;
+export type Occurrence = InferSelectModel<typeof occurrences>;

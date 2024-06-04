@@ -13,4 +13,4 @@ export const shapes = pgTable('shapes', {
   dist_traveled: doublePrecision('dist_traveled').notNull(),
 });
 
-export type Shapes = InferSelectModel<typeof shapes>;
+export type Shape = InferSelectModel<typeof shapes>;

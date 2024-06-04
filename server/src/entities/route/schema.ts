@@ -12,4 +12,4 @@ export const routes = pgTable('routes', {
   text_color: varchar('text_color', { length: 255 }).notNull(),
 });
 
-export type Routes = InferSelectModel<typeof routes>;
+export type Route = InferSelectModel<typeof routes>;

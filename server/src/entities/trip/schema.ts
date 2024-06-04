@@ -10,4 +10,4 @@ export const trips = pgTable('trips', {
   direction: integer('direction').notNull(),
 });
 
-export type Trips = InferSelectModel<typeof trips>;
+export type Trip = InferSelectModel<typeof trips>;
