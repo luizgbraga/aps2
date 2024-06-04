@@ -18,7 +18,7 @@ export type FakeSensor = Sensor & {
 };
 
 export type SensorState = {
-  flood: number;
+  flooding: number;
   landslide: number;
   congestion: number;
 };
