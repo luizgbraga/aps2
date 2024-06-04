@@ -1,4 +1,4 @@
-import { UserRepository } from './user/repository';
+import { FakeUserRepository, UserRepository } from './user/repository';
 import { TripRepository } from './trip/repository';
 import { SubscriptionRepository } from './subscription/repository';
 import { OccurrenceRepository } from './occurrence/repository';
@@ -9,6 +9,8 @@ import { NeighborhoodRepository } from './neighborhood/repository';
 import { MessagesRepository } from './messages/repository';
 import { AffectRepository } from './affect/repository';
 import { AdminRepository } from './admin/repository';
+import { fakeUsers } from './user/fake';
+import { fakeSubscriptions } from './subscription/fake';
 
 export const repositories = {
   user: new UserRepository(),
@@ -22,4 +24,9 @@ export const repositories = {
   messages: new MessagesRepository(),
   affect: new AffectRepository(),
   admin: new AdminRepository(),
+};
+
+export const fakeRepositories = {
+  user: new FakeUserRepository(fakeUsers),
+  subscription: new SubscriptionRepository(fakeSubscriptions),
 };

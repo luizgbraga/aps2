@@ -17,9 +17,9 @@ export class ShapeRepository {
           .from(shapes)
           .where(eq(shapes.trip_id, trip_id))
           .orderBy(shapes.pt_sequence);
-        if (result.length === 0) {
-          throw new GetShapeError('NO SHAPES REGISTERED');
-        }
+        // if (result.length === 0) {
+        //   throw new GetShapeError('NO SHAPES REGISTERED');
+        // }
         return result;
       }
       return result_alt;

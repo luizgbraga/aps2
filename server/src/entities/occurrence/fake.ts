@@ -1,0 +1,43 @@
+import { Occurrence } from './schema';
+
+export const fakeOccurrences = [
+  {
+    id: 'occurrence1',
+    type: 'flooding',
+    description: 'description1',
+    latitude: 'latitude1',
+    longitude: 'longitude1',
+    radius: 10,
+    neighborhoodId: 'neighborhood1',
+    confirmed: false,
+    active: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 'occurrence2',
+    type: 'landslide',
+    description: 'description2',
+    latitude: 'latitude2',
+    longitude: 'longitude2',
+    radius: 20,
+    neighborhoodId: 'neighborhood2',
+    confirmed: true,
+    active: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 'occurrence3',
+    type: 'congestion',
+    description: 'description3',
+    latitude: 'latitude3',
+    longitude: 'longitude3',
+    radius: 30,
+    neighborhoodId: 'neighborhood2',
+    confirmed: false,
+    active: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+] satisfies Occurrence[];

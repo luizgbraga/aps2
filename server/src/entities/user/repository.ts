@@ -127,7 +127,7 @@ export class FakeUserRepository implements IUserRepository {
     if (!user) {
       throw new LoginError('USER_NOT_REGISTERD');
     }
-    const correctPassword = await compare(password, user.password);
+    const correctPassword = password === user.password;
     if (!correctPassword) {
       throw new LoginError('WRONG_PASSWORD');
     }
