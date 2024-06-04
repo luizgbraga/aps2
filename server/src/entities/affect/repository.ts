@@ -261,13 +261,11 @@ export class AffectRepository {
             );
             AffectRepository.getNewWaypointShape(pair[0], pair[1], waypoints);
           });
-          if (borderPoints.length === 0) {
-            AffectRepository.affectNewRoute(
-              occurence_id,
-              element.route_id,
-              true,
-            );
-          }
+          AffectRepository.affectNewRoute(
+            occurence_id,
+            element.route_id,
+            borderPoints.length === 0,
+          );
         });
       });
       return queryResult;
