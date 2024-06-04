@@ -5,9 +5,9 @@ import { AddNewAffectError, GetAffectRoutesError } from './errors';
 import { eq, sql } from 'drizzle-orm';
 import { shapes } from '../shape/schema';
 import { trips } from '../trip/schema';
-import { TripRepository } from 'entities/trip/repository';
-import { ShapeRepository } from 'entities/shape/repository';
-import { RouteRepository } from 'entities/route/repository';
+import { TripRepository } from '../../entities/trip/repository';
+import { ShapeRepository } from '../../entities/shape/repository';
+import { RouteRepository } from '../../entities/route/repository';
 
 export const EARTH_RADIUS = 6374895;
 const WAYPOINTS_NUM = 2;
