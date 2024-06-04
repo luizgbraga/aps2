@@ -3,13 +3,13 @@ import { mapController } from './mapController';
 import { TripsModel } from '../api/trip';
 import { ShapesModel } from '../api/shape';
 import { TripDTO } from '../api/trip';
-import { RoutesModel } from '../api/route';
+import { RouteModel } from '../api/route';
 import { useAsync } from '../utils/async';
 import { OccurrenceModel } from '../api/occurrences';
 
 async function fetchTrips(targetRouteId: string[]) {
   const allTrips = await TripsModel.getAllTrips();
-  const allRoutes = await RoutesModel.getAllRoutes();
+  const allRoutes = await RouteModel.getAllRoutes();
   const filteredTrips = allTrips.filter((trip) =>
     targetRouteId.includes(trip.route_id)
   );

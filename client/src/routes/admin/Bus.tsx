@@ -2,11 +2,11 @@ import React from 'react';
 
 import { AdminLayout } from '../../layout/admin/AdminLayout';
 import { useAsync } from '../../utils/async';
-import { RoutesModel } from '../../api/route';
+import { RouteModel } from '../../api/route';
 import { Table } from 'antd';
 
 export const ABus: React.FC = () => {
-  const res = useAsync(() => RoutesModel.getAllRoutes());
+  const res = useAsync(() => RouteModel.getAllRoutes());
   return (
     <AdminLayout selected="bus" title=" Ônibus">
       <Table

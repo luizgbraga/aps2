@@ -6,6 +6,7 @@ import { OccurrenceModel } from '../../api/occurrences';
 import { Descriptions, Flex, Table, Tabs, TabsProps } from 'antd';
 import { Bar, Pie } from '@ant-design/plots';
 import DescriptionsItem from 'antd/es/descriptions/Item';
+import { MessageModel } from '../../api/messages';
 // import { SensorModel } from '../../api/sensor';
 // import { useMap } from '../../components/useMap';
 
@@ -22,6 +23,7 @@ const occurrenceType = {
 
 export const AHome: React.FC = () => {
   const res = useAsync(() => OccurrenceModel.listApproved());
+  const messages = useAsync(() => MessageModel.all());
   console.log(res);
   const countPerZone = useAsync(() => OccurrenceModel.countPerZone());
   const countPerType = useAsync(() => OccurrenceModel.countPerType());
@@ -29,15 +31,15 @@ export const AHome: React.FC = () => {
   const neighborhoodAdded: string[] = [];
   const neighborhoodFilters = res.result
     ? res.result.reduce((prev: NeighborhoodFilter[], curr) => {
-        if (!neighborhoodAdded.includes(curr.neighborhood.name)) {
-          neighborhoodAdded.push(curr.neighborhood.name);
-          prev.push({
-            text: curr.neighborhood.name,
-            value: curr.neighborhood.name,
-          });
-        }
-        return prev;
-      }, [])
+      if (!neighborhoodAdded.includes(curr.neighborhood.name)) {
+        neighborhoodAdded.push(curr.neighborhood.name);
+        prev.push({
+          text: curr.neighborhood.name,
+          value: curr.neighborhood.name,
+        });
+      }
+      return prev;
+    }, [])
     : [];
   // const ref = useRef<HTMLDivElement>(null);
 
@@ -149,8 +151,43 @@ export const AHome: React.FC = () => {
     },
     {
       key: '3',
+      label: 'Mensagens Operacionais',
+      children: (
+        <Table
+          columns={[
+            {
+              title: 'Mensagem',
+              dataIndex: 'text',
+              key: 'text',
+            },
+            {
+              title: 'Rota',
+              dataIndex: 'route',
+              key: 'route',
+            },
+            {
+              title: 'Data de criação',
+              dataIndex: 'createdAt',
+              key: 'createdAt',
+            },
+          ]}
+          dataSource={messages.result?.map((row) => ({
+            key: row.message.id,
+            text: row.message.text,
+            route: row.route.long_name,
+            createdAt: row.message.createdAt,
+          }))}
+          bordered
+          loading={res.loading}
+          rowKey={(record) => record.key}
+          pagination={{ pageSize: 10, hideOnSinglePage: true }}
+        />
+      )
+    },
+    {
+      key: '4',
       label: 'Sensores',
-      children: <div>sensores aq</div>,
+      children: <div>sensores aq</div>
     },
   ];
 
