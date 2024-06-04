@@ -5,6 +5,8 @@ import { SubscriptionRepository } from '../../entities/subscription/repository';
 import { neighborhood, subscriptions } from '../../database/schemas';
 import { SensorStatus } from '../../entities/sensor/schema';
 import { FakeSensorRepository } from '../../entities/sensor/repository';
+import { AffectRepository } from 'entities/affect/repository';
+import { MessagesRepository } from 'entities/messages/repository';
 
 const EARTH_RADIUS = 6371000;
 const sensorRepository = new FakeSensorRepository();
@@ -63,23 +65,35 @@ export class OccurrenceRepository {
         );
         if (check) {
           isConfirmed = true;
-          // call(lat, lng, rad)
         }
       } else {
         isConfirmed = true;
       }
-      const result = await db.insert(occurrences).values({
-        type,
-        description,
-        neighborhoodId,
-        latitude,
-        longitude,
-        confirmed: isConfirmed,
-        radius,
-      }).returning();
+      const result = await db
+        .insert(occurrences)
+        .values({
+          type,
+          description,
+          neighborhoodId,
+          latitude,
+          longitude,
+          confirmed: isConfirmed,
+          radius,
+        })
+        .returning();
       if (confirmed) {
         SubscriptionRepository.incrementUnread(neighborhoodId);
-        // add message
+      }
+      if (result[0].confirmed) {
+        const affectedRoutedIds = await AffectRepository.updateAffectedRoutes(
+          result[0].id,
+          Number(result[0].latitude),
+          Number(result[0].longitude),
+          result[0].radius,
+        );
+        affectedRoutedIds.forEach(async (route) => {
+          await MessagesRepository.add(route.route_id, 'TODO2');
+        });
       }
       return result;
     } catch (error) {
@@ -147,9 +161,17 @@ export class OccurrenceRepository {
         .set({ confirmed: true })
         .where(eq(occurrences.id, id))
         .returning();
-      updated.forEach((occurrence) => {
+      updated.forEach(async (occurrence) => {
         SubscriptionRepository.incrementUnread(occurrence.neighborhoodId);
-        // call(lat, lng, rad)
+        const affectedRoutedIds = await AffectRepository.updateAffectedRoutes(
+          occurrence.id,
+          Number(occurrence.latitude),
+          Number(occurrence.longitude),
+          occurrence.radius,
+        );
+        affectedRoutedIds.forEach(async (route) => {
+          await MessagesRepository.add(route.route_id, 'TODO');
+        });
       });
     } catch (error) {
       throw error;
@@ -217,6 +239,12 @@ export class OccurrenceRepository {
       if (status.state.flood === 0 && alreadyHasFlooding.length) {
         for (const occurrence of alreadyHasFlooding) {
           await OccurrenceRepository.stopOccurrence(occurrence.id);
+          const affectedRoutedIds = await AffectRepository.getAffectedRoutes(
+            occurrence.id,
+          );
+          affectedRoutedIds.forEach(async (route) => {
+            await MessagesRepository.add(route.route_id, 'TODO3');
+          });
         }
       }
       if (status.state.landslide > 0 && !alreadyHasLandslide.length) {
@@ -233,6 +261,12 @@ export class OccurrenceRepository {
       if (status.state.landslide === 0 && alreadyHasLandslide.length) {
         for (const occurrence of alreadyHasLandslide) {
           await OccurrenceRepository.stopOccurrence(occurrence.id);
+          const affectedRoutedIds = await AffectRepository.getAffectedRoutes(
+            occurrence.id,
+          );
+          affectedRoutedIds.forEach(async (route) => {
+            await MessagesRepository.add(route.route_id, 'TODO3');
+          });
         }
       }
       if (status.state.congestion > 0 && !alreadyHasCongestion.length) {
@@ -249,6 +283,12 @@ export class OccurrenceRepository {
       if (status.state.congestion === 0 && alreadyHasCongestion.length) {
         for (const occurrence of alreadyHasCongestion) {
           await OccurrenceRepository.stopOccurrence(occurrence.id);
+          const affectedRoutedIds = await AffectRepository.getAffectedRoutes(
+            occurrence.id,
+          );
+          affectedRoutedIds.forEach(async (route) => {
+            await MessagesRepository.add(route.route_id, 'TODO3');
+          });
         }
       }
     }
