@@ -13,7 +13,7 @@ class ShapeRoutes {
 
   init() {
     this.router.use(cors());
-    this.router.get('/', RouteController.getShape);
+    this.router.get('/get-shape', RouteController.getShape);
     this.router.post(
       '/newShape',
       validateBody(newShape),

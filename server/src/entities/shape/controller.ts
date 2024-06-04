@@ -38,6 +38,7 @@ export class RouteController {
         pt_lat,
         pt_lon,
         dist_traveled,
+        false
       );
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
