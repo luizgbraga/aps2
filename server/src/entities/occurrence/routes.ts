@@ -4,7 +4,7 @@ import { logged } from '../../middlewares/logged';
 import { validateBody } from '../../middlewares/validate';
 import { confirm, del, propose } from './schemas';
 
-class OccurenceRoutes {
+class OccurrenceRoutes {
   router = Router();
 
   constructor() {
@@ -36,4 +36,4 @@ class OccurenceRoutes {
   }
 }
 
-export default new OccurenceRoutes().router;
+export default new OccurrenceRoutes().router;

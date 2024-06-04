@@ -1,6 +1,6 @@
 import { Button, Flex, Form, Input, Modal, Radio, Spin, Steps } from 'antd';
 import React, { useRef, useState } from 'react';
-import { OccurenceModel, OccurrenceType } from '../api/occurences';
+import { OccurrenceModel, OccurrenceType } from '../api/occurrences';
 import { useMap } from './useMap';
 import { NeighborhoodModel } from '../api/neighborhood';
 import { Status, Wrapper } from '@googlemaps/react-wrapper';
@@ -38,7 +38,7 @@ export const AddOccurrence: React.FC<Props> = (props: Props) => {
             if (component.types.includes('sublocality')) {
               NeighborhoodModel.getFromName(component.long_name).then(
                 (neighborhood) => {
-                  OccurenceModel.propose(
+                  OccurrenceModel.propose(
                     type,
                     lat.toString(),
                     lng.toString(),

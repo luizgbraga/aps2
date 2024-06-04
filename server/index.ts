@@ -8,7 +8,7 @@ const PORT: number = 3001;
 app
   .listen(PORT, 'localhost', () => {
     console.log(`Server is running on port ${PORT}.`);
-    // server.startPolling();
+    server.startPolling();
   })
   .on('error', (err: any) => {
     if (err.code === 'EADDRINUSE') {

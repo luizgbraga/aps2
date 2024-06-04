@@ -4,20 +4,20 @@ import { Button, Card, Descriptions, Flex, Spin, Typography } from 'antd';
 import { DeleteOutlined, CheckOutlined } from '@ant-design/icons';
 import { AdminLayout } from '../../layout/admin/AdminLayout';
 import { useAsync } from '../../utils/async';
-import { OccurenceModel } from '../../api/occurences';
+import { OccurrenceModel } from '../../api/occurrences';
 import { translateType } from '../../utils/translate';
 import { dateDistance } from '../../utils/time';
 
 export const AApproval: React.FC = () => {
   const [loading, setLoading] = useState(-1);
   const {
-    result: occurencesToApprove,
+    result: occurrencesToApprove,
     refetch,
-    loading: loadingOccurences,
-  } = useAsync(() => OccurenceModel.listToApprove());
-  const approveOccurence = (id: string, i: number) => {
+    loading: loadingOccurrences,
+  } = useAsync(() => OccurrenceModel.listToApprove());
+  const approveOccurrence = (id: string, i: number) => {
     setLoading(i);
-    OccurenceModel.confirm(id).then(() => {
+    OccurrenceModel.confirm(id).then(() => {
       refetch();
       setLoading(-1);
     });
@@ -25,7 +25,7 @@ export const AApproval: React.FC = () => {
 
   return (
     <AdminLayout selected="approve" title="Aprovação de ocorrências">
-      {loadingOccurences && (
+      {loadingOccurrences && (
         <Flex
           justify="center"
           align="center"
@@ -34,7 +34,7 @@ export const AApproval: React.FC = () => {
           <Spin />
         </Flex>
       )}
-      {!loadingOccurences && !occurencesToApprove?.length && (
+      {!loadingOccurrences && !occurrencesToApprove?.length && (
         <Flex
           justify="center"
           align="center"
@@ -46,29 +46,29 @@ export const AApproval: React.FC = () => {
         </Flex>
       )}
       <Flex gap="20px" vertical>
-        {!loadingOccurences &&
-          occurencesToApprove?.map((occ, i) => (
+        {!loadingOccurrences &&
+          occurrencesToApprove?.map((occ, i) => (
             <Card
               title={
                 <span>
-                  {translateType(occ.occurence.type)}
+                  {translateType(occ.occurrence.type)}
                   <span style={{ fontWeight: '400' }}>
                     {' - '}
-                    {dateDistance(occ.occurence.createdAt as Date, true)}
+                    {dateDistance(occ.occurrence.createdAt as Date, true)}
                   </span>
                 </span>
               }
               extra={
                 <Flex gap="16px">
                   <Button
-                    onClick={() => approveOccurence(occ.occurence.id, i)}
+                    onClick={() => approveOccurrence(occ.occurrence.id, i)}
                     icon={<DeleteOutlined />}
                   >
                     Descartar
                   </Button>
                   <Button
                     type="primary"
-                    onClick={() => approveOccurence(occ.occurence.id, i)}
+                    onClick={() => approveOccurrence(occ.occurrence.id, i)}
                     icon={<CheckOutlined />}
                     loading={loading === i}
                   >
@@ -89,7 +89,7 @@ export const AApproval: React.FC = () => {
                   {
                     key: '2',
                     label: 'Descrição',
-                    children: occ.occurence.description,
+                    children: occ.occurrence.description,
                   },
                   {
                     key: '3',
@@ -97,7 +97,7 @@ export const AApproval: React.FC = () => {
                     children: (
                       <Typography.Text
                         copyable
-                      >{`${occ.occurence.latitude}, ${occ.occurence.longitude}`}</Typography.Text>
+                      >{`${occ.occurrence.latitude}, ${occ.occurrence.longitude}`}</Typography.Text>
                     ),
                   },
                   {

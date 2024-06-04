@@ -47,10 +47,12 @@ export const mapController = () => {
   const drawPaths = (
     map: google.maps.Map,
     paths: {
+      route_id: string | undefined;
       shape: google.maps.LatLngLiteral[];
       color: string;
       text_color: string;
-    }[]
+    }[],
+    setPolylines: any
   ) => {
     paths.forEach((element) => {
       const path = new window.google.maps.Polyline({
@@ -61,6 +63,21 @@ export const mapController = () => {
         strokeWeight: 4,
       });
       path.setMap(map);
+      setPolylines((polylines: any) => [
+        ...polylines,
+        { route_id: element.route_id, polyline: path },
+      ]);
+    });
+  };
+
+  const clearPaths = (
+    polylines: {
+      route_id: string | undefined;
+      polyline: google.maps.Polyline;
+    }[]
+  ) => {
+    polylines.forEach((element) => {
+      element.polyline.setMap(null);
     });
   };
 
@@ -95,5 +112,6 @@ export const mapController = () => {
     addRecentralizeButton: renderRecenterButton,
     drawPaths,
     addMarker,
+    clearPaths,
   };
 };

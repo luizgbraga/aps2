@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { OccurrenceRepository } from './repository';
-import { OccurenceType } from './schema';
+import { OccurrenceType } from './schema';
 
 export class OccurrenceController {
   static async propose(req: Request, res: Response) {
     try {
-      const type = req.body.type as OccurenceType;
+      const type = req.body.type as OccurrenceType;
       const description = req.body.description;
       const neighborhoodId = req.body.neighborhoodId;
       const latitude = req.body.latitude;

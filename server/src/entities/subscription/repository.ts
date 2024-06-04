@@ -12,6 +12,16 @@ export class SubscriptionRepository {
     }
   };
 
+  static unsubscribe = async (userId: string, neighborhoodId: string) => {
+    try {
+      return await db
+        .delete(subscriptions)
+        .where(eq(subscriptions.neighborhoodId, neighborhoodId));
+    } catch (error) {
+      throw error;
+    }
+  };
+
   static incrementUnread = async (neighborhoodId: string) => {
     try {
       return await db

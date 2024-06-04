@@ -1,0 +1,1 @@
+ALTER TABLE "routes" ALTER COLUMN "inactive" DROP NOT NULL;

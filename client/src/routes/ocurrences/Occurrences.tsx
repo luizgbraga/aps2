@@ -1,28 +1,35 @@
 import {
+  DeleteOutlined,
+  PushpinOutlined,
+  WarningOutlined,
+} from '@ant-design/icons';
+import {
   Button,
   Card,
   Descriptions,
   Drawer,
+  Flex,
   Rate,
   Select,
   Space,
   Table,
   Tag,
 } from 'antd';
-import { PushpinOutlined, WarningOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
-import { OccurenceModel } from '../../api/occurences';
-import { useAsync } from '../../utils/async';
 import { NeighborhoodModel } from '../../api/neighborhood';
-import { LoggedLayout } from '../../layout/logged/LoggedLayout';
+import { OccurrenceModel } from '../../api/occurrences';
 import { SubscriptionModel } from '../../api/subscription';
+import { LoggedLayout } from '../../layout/logged/LoggedLayout';
+import { useAsync } from '../../utils/async';
 import { dateDistance } from '../../utils/time';
 import { translateType } from '../../utils/translate';
 
 const Notifications: React.FC = () => {
-  const { result: occurenceList } = useAsync(() => OccurenceModel.list());
+  const { result: occurrenceList } = useAsync(() => OccurrenceModel.list());
   const { result: neighborhoods } = useAsync(() => NeighborhoodModel.list());
-  const { result: subscriptions } = useAsync(() => SubscriptionModel.list());
+  const { result: subscriptions, refetch: refetchSubscriptions } = useAsync(
+    () => SubscriptionModel.list()
+  );
   const [openDrawer, setOpenDrawer] = useState(false);
   const [neighborhoodToSubscribe, setNeighborhoodToSubscribe] = useState<
     string[]
@@ -35,6 +42,13 @@ const Notifications: React.FC = () => {
     });
     Promise.all(promises).then(() => {
       setOpenDrawer(false);
+      refetchSubscriptions();
+    });
+  };
+
+  const unsubscribe = (neighborhoodId: string) => {
+    SubscriptionModel.unsubscribe(neighborhoodId).then(() => {
+      refetchSubscriptions();
     });
   };
 
@@ -53,15 +67,15 @@ const Notifications: React.FC = () => {
       }
     >
       <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-        {occurenceList?.occurences.map((occ, i) => (
+        {occurrenceList?.occurrences.map((occ, i) => (
           <Card
             title={
               <span>
-                {translateType(occ.occurence.type)}
+                {translateType(occ.occurrence.type)}
                 <span style={{ fontWeight: '400' }}>
                   {' - '}
-                  {dateDistance(occ.occurence.createdAt as Date, true)}
-                  {i < occurenceList.unread && (
+                  {dateDistance(occ.occurrence.createdAt as Date, true)}
+                  {i < occurrenceList.unread && (
                     <Tag color="red" style={{ marginLeft: '10px' }}>
                       Não lida
                     </Tag>
@@ -83,7 +97,7 @@ const Notifications: React.FC = () => {
                 {
                   key: '2',
                   label: 'Descrição',
-                  children: occ.occurence.description,
+                  children: occ.occurrence.description,
                 },
                 {
                   key: '3',
@@ -109,32 +123,50 @@ const Notifications: React.FC = () => {
         onClose={() => setOpenDrawer(false)}
         width={500}
       >
-        <Select
-          mode="multiple"
-          placeholder="Select neighborhood"
-          style={{ width: '100%' }}
-          options={neighborhoods?.map((n) => ({ label: n.name, value: n.id }))}
-          onChange={(value) => setNeighborhoodToSubscribe(value)}
-          filterOption={(inputValue, option) => {
-            if (!option) return false;
-            return option.label
-              .toLowerCase()
-              .includes(inputValue.toLowerCase());
-          }}
-        />
-        <Button
-          type="primary"
-          onClick={subscribe}
-          style={{ marginTop: '20px' }}
+        <Flex
+          align="center"
+          justify="space-between"
+          gap={10}
+          style={{ marginBottom: '20px' }}
         >
-          Bora
-        </Button>
+          <Select
+            mode="multiple"
+            placeholder="Select neighborhood"
+            style={{ width: '100%' }}
+            options={neighborhoods?.map((n) => ({
+              label: n.name,
+              value: n.id,
+            }))}
+            onChange={(value) => setNeighborhoodToSubscribe(value)}
+            filterOption={(inputValue, option) => {
+              if (!option) return false;
+              return option.label
+                .toLowerCase()
+                .includes(inputValue.toLowerCase());
+            }}
+          />
+          <Button type="primary" onClick={subscribe}>
+            Subscribe
+          </Button>
+        </Flex>
         <Table
           columns={[
             {
               title: 'Neighborhood',
               dataIndex: 'neighborhood',
               key: 'neighborhood',
+              render: (_, rec) => (
+                <Flex align="center" justify="space-between">
+                  {rec.neighborhood}
+                  <Button
+                    onClick={() => unsubscribe(rec.key)}
+                    type="primary"
+                    danger
+                  >
+                    <DeleteOutlined />
+                  </Button>
+                </Flex>
+              ),
             },
           ]}
           dataSource={subscriptions?.map((s) => ({
