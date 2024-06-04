@@ -2,6 +2,7 @@ import {
   DeleteOutlined,
   PushpinOutlined,
   WarningOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -55,14 +56,14 @@ const Notifications: React.FC = () => {
   return (
     <LoggedLayout
       selected="notifications"
-      title="Noficações"
+      title="Notificações"
       extra={
         <Button
           type="primary"
-          style={{ marginTop: '10px' }}
           onClick={() => setOpenDrawer(true)}
+          icon={<PlusOutlined />}
         >
-          Subscribe
+          Inscrever-se em bairros
         </Button>
       }
     >
@@ -116,7 +117,7 @@ const Notifications: React.FC = () => {
         ))}
       </Space>
       <Drawer
-        title="Subscribe to neighborhood"
+        title="Inscreva-se em bairros"
         placement="right"
         closable={true}
         open={openDrawer}
@@ -131,7 +132,7 @@ const Notifications: React.FC = () => {
         >
           <Select
             mode="multiple"
-            placeholder="Select neighborhood"
+            placeholder="Selecionar bairros"
             style={{ width: '100%' }}
             options={neighborhoods?.map((n) => ({
               label: n.name,
@@ -146,13 +147,13 @@ const Notifications: React.FC = () => {
             }}
           />
           <Button type="primary" onClick={subscribe}>
-            Subscribe
+            Inscrever-se
           </Button>
         </Flex>
         <Table
           columns={[
             {
-              title: 'Neighborhood',
+              title: 'Bairro',
               dataIndex: 'neighborhood',
               key: 'neighborhood',
               render: (_, rec) => (
