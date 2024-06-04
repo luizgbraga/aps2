@@ -113,6 +113,11 @@ class OccurrenceAPI extends API {
     const body = JSON.stringify({ id });
     return this.request('PUT', 'confirm', null, body, null);
   }
+
+  async delete(token: string, id: string): Promise<Response<OccurrenceDTO>> {
+    const body = JSON.stringify({ id });
+    return this.request('DELETE', '', token, body, null);
+  }
 }
 
 const api = new OccurrenceAPI();
@@ -220,6 +225,13 @@ export class OccurrenceModel extends Model<OccurrenceDTO> {
   static async confirm(id: string) {
     const token = getToken();
     const res = await api.confirm(token, id);
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return new OccurrenceModel(res.result);
+  }
+
+  static async delete(id: string) {
+    const token = getToken();
+    const res = await api.delete(token, id);
     if (res.type === 'ERROR') throw new Error(res.cause);
     return new OccurrenceModel(res.result);
   }

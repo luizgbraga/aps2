@@ -22,6 +22,13 @@ export const AApproval: React.FC = () => {
       setLoading(-1);
     });
   };
+  const deleteOccurrence = (id: string, i: number) => {
+    setLoading(i);
+    OccurrenceModel.delete(id).then(() => {
+      refetch();
+      setLoading(-1);
+    });
+  };
 
   return (
     <AdminLayout selected="approve" title="Aprovação de ocorrências">
@@ -61,7 +68,7 @@ export const AApproval: React.FC = () => {
               extra={
                 <Flex gap="16px">
                   <Button
-                    onClick={() => approveOccurrence(occ.occurrence.id, i)}
+                    onClick={() => deleteOccurrence(occ.occurrence.id, i)}
                     icon={<DeleteOutlined />}
                   >
                     Descartar
