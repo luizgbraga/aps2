@@ -149,15 +149,6 @@ export class OccurrenceRepository {
         .returning();
       updated.forEach((occurrence) => {
         SubscriptionRepository.incrementUnread(occurrence.neighborhoodId);
-        .where(eq(occurences.id, id))
-        .returning({
-          lat: occurences.latitude,
-          lng: occurences.longitude,
-          rad: occurences.radius,
-          neigh_id: occurences.neighborhoodId
-        });
-      updated.forEach((occurence) => {
-        SubscriptionRepository.incrementUnread(occurence.neigh_id);
         // call(lat, lng, rad)
       });
     } catch (error) {
