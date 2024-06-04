@@ -82,6 +82,20 @@ class OccurrenceAPI extends API {
     return this.request('GET', 'to-approve', null, null, null);
   }
 
+  async countPerZone(): Promise<Response<{ zone: string; count: number }[]>> {
+    return this.request('GET', 'count-per-zone', null, null, null);
+  }
+
+  async countPerNeighborhood(): Promise<
+    Response<{ neighborhood: string; count: number }[]>
+  > {
+    return this.request('GET', 'count-per-neighborhood', null, null, null);
+  }
+
+  async countPerType(): Promise<Response<{ type: string; count: number }[]>> {
+    return this.request('GET', 'count-per-type', null, null, null);
+  }
+
   async confirm(token: string, id: string): Promise<Response<OccurrenceDTO>> {
     const body = JSON.stringify({ id });
     return this.request('PUT', 'confirm', null, body, null);
@@ -160,6 +174,24 @@ export class OccurrenceModel extends Model<OccurrenceDTO> {
       occurrence: new OccurrenceModel(dto.occurrences),
       neighborhood: NeighborhoodModel.fromDTO(dto.neighborhood),
     }));
+  }
+
+  static async countPerZone() {
+    const res = await api.countPerZone();
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return res.result;
+  }
+
+  static async countPerNeighborhood() {
+    const res = await api.countPerNeighborhood();
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return res.result;
+  }
+
+  static async countPerType() {
+    const res = await api.countPerType();
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return res.result;
   }
 
   static async confirm(id: string) {

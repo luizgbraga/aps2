@@ -2,7 +2,7 @@ import React from 'react';
 
 import { AdminLayout } from '../../layout/admin/AdminLayout';
 import { useAsync } from '../../utils/async';
-import { OccurenceModel } from '../../api/occurences';
+import { OccurrenceModel } from '../../api/occurrences';
 import { Descriptions, Flex, Table, Tabs, TabsProps } from 'antd';
 import { Bar, Pie } from '@ant-design/plots';
 import DescriptionsItem from 'antd/es/descriptions/Item';
@@ -21,9 +21,9 @@ const occurenceType = {
 };
 
 export const AHome: React.FC = () => {
-  const res = useAsync(() => OccurenceModel.listApproved());
-  const countPerZone = useAsync(() => OccurenceModel.countPerZone());
-  const countPerType = useAsync(() => OccurenceModel.countPerType());
+  const res = useAsync(() => OccurrenceModel.listApproved());
+  const countPerZone = useAsync(() => OccurrenceModel.countPerZone());
+  const countPerType = useAsync(() => OccurrenceModel.countPerType());
   // const sensors = useAsync(() => SensorModel.list());
   const neighborhoodAdded: string[] = [];
   const neighborhoodFilters = res.result
@@ -97,10 +97,21 @@ export const AHome: React.FC = () => {
                     {occurenceType[record.occurence.type]}
                   </DescriptionsItem>
                   <DescriptionsItem label="Localização">
-                    Lat: {record.occurence.latitude}  |  Long: {record.occurence.longitude}
-                  </DescriptionsItem> 
-                  <DescriptionsItem label={record.occurence.type==='flooding'?'Índice pluviométrico' : (record.occurence.type==='landslide'?'Índice de terra':'Congestionamento')}>
-                    {record.sensor ? record.sensor[record.occurence.type] : ' Não há sensores nesta área'}
+                    Lat: {record.occurence.latitude} | Long:{' '}
+                    {record.occurence.longitude}
+                  </DescriptionsItem>
+                  <DescriptionsItem
+                    label={
+                      record.occurence.type === 'flooding'
+                        ? 'Índice pluviométrico'
+                        : record.occurence.type === 'landslide'
+                          ? 'Índice de terra'
+                          : 'Congestionamento'
+                    }
+                  >
+                    {record.sensor
+                      ? record.sensor[record.occurence.type]
+                      : ' Não há sensores nesta área'}
                   </DescriptionsItem>
                 </Descriptions>
               </div>
@@ -111,20 +122,20 @@ export const AHome: React.FC = () => {
           }}
           dataSource={res.result!}
           bordered
-        loading={res.loading}
+          loading={res.loading}
           rowKey={(record) => record.occurence.id}
           pagination={{ pageSize: 10, hideOnSinglePage: true }}
-        rowClassName={(record) => {
-          if (record.occurence.type === 'flooding') {
-            return 'blue-row';
-          } else if (record.occurence.type === 'landslide') {
-            return 'brown-row';
-          } else if (record.occurence.type === 'congestion') {
-            return 'red-row';
-          }else {
-            return '';
-          }
-        }}
+          rowClassName={(record) => {
+            if (record.occurence.type === 'flooding') {
+              return 'blue-row';
+            } else if (record.occurence.type === 'landslide') {
+              return 'brown-row';
+            } else if (record.occurence.type === 'congestion') {
+              return 'red-row';
+            } else {
+              return '';
+            }
+          }}
         />
       ),
     },
