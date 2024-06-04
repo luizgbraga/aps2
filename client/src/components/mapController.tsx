@@ -84,7 +84,8 @@ export const mapController = () => {
   const addMarker = (
     map: google.maps.Map,
     position: google.maps.LatLngLiteral,
-    pin: boolean = false
+    pin: boolean = false,
+    color?: string
   ): google.maps.Marker => {
     if (pin) {
       return new window.google.maps.Marker({
@@ -92,13 +93,14 @@ export const mapController = () => {
         map,
       });
     }
+    const markerColor = color ? color : 'red';
     return new window.google.maps.Marker({
       position,
       map,
       icon: {
         path: window.google.maps.SymbolPath.CIRCLE,
         scale: 10,
-        fillColor: 'red',
+        fillColor: markerColor,
         fillOpacity: 1,
         strokeColor: 'white',
         strokeWeight: 1,

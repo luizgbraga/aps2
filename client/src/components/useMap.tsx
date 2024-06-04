@@ -130,7 +130,7 @@ export const useMap = (
           const m = addMarker(map, {
             lat: sensor.lat,
             lng: sensor.lng,
-          });
+          }, false, 'blue');
           if (m) {
             prevMarkersRef.current.push(m);
           }
