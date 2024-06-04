@@ -82,6 +82,12 @@ class OccurrenceAPI extends API {
     return this.request('GET', 'to-approve', null, null, null);
   }
 
+  async listApproved(): Promise<
+    Response<{ occurences: OccurrenceDTO; neighborhood: NeighborhoodDTO }[]>
+  > {
+    return this.request('GET', 'approved', null, null, null);
+  }
+
   async countPerZone(): Promise<Response<{ zone: string; count: number }[]>> {
     return this.request('GET', 'count-per-zone', null, null, null);
   }
@@ -165,6 +171,15 @@ export class OccurrenceModel extends Model<OccurrenceDTO> {
       })),
       unread: 1,
     };
+  }
+
+  static async listApproved() {
+    const res = await api.listApproved();
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return res.result.map((dto) => ({
+      occurence: new OccurrenceModel(dto.occurences),
+      neighborhood: NeighborhoodModel.fromDTO(dto.neighborhood),
+    }));
   }
 
   static async listToApprove() {
