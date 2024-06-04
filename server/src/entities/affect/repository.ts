@@ -127,9 +127,9 @@ export class AffectRepository {
         .select({ route_id: affect.route_id })
         .from(affect)
         .where(eq(affect.occurence_id, occurence_id));
-      if (result.length === 0) {
-        throw new GetAffectRoutesError('NO ROUTES AFFECTED');
-      }
+      //   if (result.length === 0) {
+      //     throw new GetAffectRoutesError('NO ROUTES AFFECTED');
+      //   }
       return result;
     } catch (error) {
       throw error;
