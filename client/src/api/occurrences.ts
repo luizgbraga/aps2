@@ -2,6 +2,7 @@ import { API_URL } from '../config';
 import { getToken } from '../utils/api';
 import { API, Model } from '../utils/model';
 import { NeighborhoodDTO, NeighborhoodModel } from './neighborhood';
+import { SensorState } from './sensor';
 import { SubscriptionDTO, SubscriptionModel } from './subscription';
 import { Response } from './types';
 
@@ -83,7 +84,13 @@ class OccurrenceAPI extends API {
   }
 
   async listApproved(): Promise<
-    Response<{ occurences: OccurrenceDTO; neighborhood: NeighborhoodDTO }[]>
+    Response<
+      {
+        occurrence: OccurrenceDTO;
+        neighborhood: NeighborhoodDTO;
+        sensor: SensorState | null;
+      }[]
+    >
   > {
     return this.request('GET', 'approved', null, null, null);
   }
@@ -173,21 +180,22 @@ export class OccurrenceModel extends Model<OccurrenceDTO> {
     };
   }
 
-  static async listApproved() {
-    const res = await api.listApproved();
-    if (res.type === 'ERROR') throw new Error(res.cause);
-    return res.result.map((dto) => ({
-      occurence: new OccurrenceModel(dto.occurences),
-      neighborhood: NeighborhoodModel.fromDTO(dto.neighborhood),
-    }));
-  }
-
   static async listToApprove() {
     const res = await api.listToApprove();
     if (res.type === 'ERROR') throw new Error(res.cause);
     return res.result.map((dto) => ({
       occurrence: new OccurrenceModel(dto.occurrences),
       neighborhood: NeighborhoodModel.fromDTO(dto.neighborhood),
+    }));
+  }
+
+  static async listApproved() {
+    const res = await api.listApproved();
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return res.result.map((dto) => ({
+      occurrence: new OccurrenceModel(dto.occurrence),
+      neighborhood: NeighborhoodModel.fromDTO(dto.neighborhood),
+      sensor: dto.sensor,
     }));
   }
 
