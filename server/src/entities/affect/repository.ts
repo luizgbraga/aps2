@@ -74,13 +74,16 @@ function calculateDistance(point1: Point, point2: Point): number {
   );
 }
 
-function calculateBorderPoints(shape: Point[], center: Point, radius: number) {
+function calculateBorderPoints(shape: Point[], center: Point, radius: number) : [[Point, Point][],Point[][]]{
+  let partitionedShape : Point[][] = []
+  let currentShape : Point[] = []
   let pairs: [Point, Point][] = [];
   let left: number = 0;
   let right: number = 0;
   for (let index = 0; index < shape.length; index++) {
     const dist = calculateDistance(shape[index], center);
     if (dist > radius) {
+      currentShape.push(shape[index]);
       if (left == right) {
         left++;
         right++;
@@ -89,11 +92,33 @@ function calculateBorderPoints(shape: Point[], center: Point, radius: number) {
       pairs.push([shape[left - 1], shape[right]]);
       continue;
     }
-    if (index == 0 || index == shape.length - 1) return [];
+    if (index == 0 || index == shape.length - 1) return [[], [shape]];
     right++;
+    if(currentShape.length !== 0){
+      partitionedShape.push(currentShape);
+      currentShape = [];
+    }
   }
-  return pairs;
+  if(currentShape.length !== 0){
+    partitionedShape.push(currentShape);
+  }
+  return [pairs, partitionedShape];
 }
+
+function mergeAlternately(arr1: Point[][], arr2: Point[][]) : Point[]{
+  let result: Point[] = [];
+  const maxLength = Math.max(arr1.length, arr2.length);
+  for (let i = 0; i < maxLength; i++) {
+      if (i < arr1.length) {
+          result.concat(arr1[i]);
+      }
+      if (i < arr2.length) {
+          result.concat(arr2[i]);
+      }
+  }
+  return result;
+}
+
 
 export class AffectRepository {
   static getAffectedRoutes = async (occurence_id: string) => {
@@ -138,7 +163,7 @@ export class AffectRepository {
     origin: Point,
     destination: Point,
     waypoints: Point[],
-  ) => {
+  ) : Promise<[Point[],number]> => {
     const apikey = process.env.MAPS_API_KEY;
     const requestBody = {
       origin: {
@@ -247,24 +272,34 @@ export class AffectRepository {
           const shapeArray: Point[] = shape.map((element) => {
             return [element.pt_lat, element.pt_lon];
           });
-          const borderPoints = calculateBorderPoints(
+          const [borderPoints, partitionedShape] = calculateBorderPoints(
             shapeArray,
             center,
             radius,
           );
-          borderPoints.forEach((pair) => {
+          const newShapesArrayAndDistancePromises = borderPoints.map(async (pair) => {
             const waypoints = calculateWaypoints(
               pair[0],
-              pair[0],
+              pair[1],
               center,
               WAYPOINTS_NUM,
             );
-            AffectRepository.getNewWaypointShape(pair[0], pair[1], waypoints);
+            return await AffectRepository.getNewWaypointShape(pair[0], pair[1], waypoints);
           });
+          const newShapesArrayAndDistance = await Promise.all(newShapesArrayAndDistancePromises);
+          const newShapesArray = newShapesArrayAndDistance.map((element) => { return element[0]; });
+          const tooLongShapesArray = newShapesArrayAndDistance.filter((element) => element[1] >= 2000);
+          const mergedArray = mergeAlternately(partitionedShape, newShapesArray);
+          const inactivateRoute : boolean = borderPoints.length === 0 || tooLongShapesArray.length > 0;
+          if(!inactivateRoute){
+            for (let i = 1;i < mergedArray.length; i++){
+              ShapeRepository.addNewShape(trip.id, i, mergedArray[i][0], mergedArray[i][1], 0, true);
+            }
+          }
           AffectRepository.affectNewRoute(
             occurence_id,
             element.route_id,
-            borderPoints.length === 0,
+            inactivateRoute,
           );
         });
       });
