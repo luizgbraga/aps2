@@ -22,6 +22,7 @@ export const occurrences = pgTable('occurrences', {
     .references(() => neighborhood.id)
     .notNull(),
   confirmed: boolean('confirmed').default(false).notNull(),
+  active: boolean('active').default(true).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

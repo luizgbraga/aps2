@@ -1,6 +1,6 @@
 import { OccurrenceType, occurrences } from './schema';
 import { db } from '../../database';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, lt, sql } from 'drizzle-orm';
 import { SubscriptionRepository } from '../../entities/subscription/repository';
 import { neighborhood, subscriptions } from '../../database/schemas';
 import { SensorStatus } from '../../entities/sensor/schema';
@@ -13,6 +13,7 @@ export class OccurrenceRepository {
     type: OccurrenceType,
     latitude: string,
     longitude: string,
+    distance: number,
   ) => {
     try {
       return await db
@@ -21,8 +22,13 @@ export class OccurrenceRepository {
         .where(
           and(
             eq(occurrences.type, type),
-            eq(occurrences.latitude, latitude),
-            eq(occurrences.longitude, longitude),
+            lt(
+              sql<number>`acos(sin(${latitude}) * sin(${occurrences.latitude}) +
+                cos(${latitude}) * cos(${occurrences.latitude}) *
+                cos(${occurrences.longitude} - ${longitude})) *
+                6371000`,
+              distance,
+            ),
           ),
         );
     } catch (error) {
@@ -40,7 +46,12 @@ export class OccurrenceRepository {
   ) => {
     try {
       let isConfirmed = false;
-      const find = await OccurrenceRepository.find(type, latitude, longitude);
+      const find = await OccurrenceRepository.find(
+        type,
+        latitude,
+        longitude,
+        100,
+      );
       if (find.length > 0) {
         return find[0];
       }
@@ -152,11 +163,41 @@ export class OccurrenceRepository {
     }
   };
 
+  static stopOccurrence = async (id: string) => {
+    try {
+      return await db
+        .update(occurrences)
+        .set({ active: false })
+        .where(eq(occurrences.id, id))
+        .returning();
+    } catch (error) {
+      throw error;
+    }
+  };
+
   static updateOccurrencesFromSensorStatuses = async (
     statuses: SensorStatus[],
   ) => {
     for (const status of statuses) {
-      if (status.state.flood > 0) {
+      const alreadyHasFlooding = await OccurrenceRepository.find(
+        'flooding',
+        status.sensor.latitude.toString(),
+        status.sensor.longitude.toString(),
+        status.sensor.radius,
+      );
+      const alreadyHasLandslide = await OccurrenceRepository.find(
+        'landslide',
+        status.sensor.latitude.toString(),
+        status.sensor.longitude.toString(),
+        status.sensor.radius,
+      );
+      const alreadyHasCongestion = await OccurrenceRepository.find(
+        'congestion',
+        status.sensor.latitude.toString(),
+        status.sensor.longitude.toString(),
+        status.sensor.radius,
+      );
+      if (status.state.flood > 0 && !alreadyHasFlooding.length) {
         await OccurrenceRepository.create(
           'flooding',
           `Alagamento detectado pelo sensor ${status.sensor.id}`,
@@ -167,7 +208,12 @@ export class OccurrenceRepository {
           true,
         );
       }
-      if (status.state.landslide > 0) {
+      if (status.state.flood === 0 && alreadyHasFlooding.length) {
+        for (const occurrence of alreadyHasFlooding) {
+          await OccurrenceRepository.stopOccurrence(occurrence.id);
+        }
+      }
+      if (status.state.landslide > 0 && !alreadyHasLandslide.length) {
         await OccurrenceRepository.create(
           'landslide',
           `Deslizamento detectado pelo sensor ${status.sensor.id}`,
@@ -178,7 +224,12 @@ export class OccurrenceRepository {
           true,
         );
       }
-      if (status.state.congestion > 0) {
+      if (status.state.landslide === 0 && alreadyHasLandslide.length) {
+        for (const occurrence of alreadyHasLandslide) {
+          await OccurrenceRepository.stopOccurrence(occurrence.id);
+        }
+      }
+      if (status.state.congestion > 0 && !alreadyHasCongestion.length) {
         await OccurrenceRepository.create(
           'congestion',
           `Congestionamento detectado pelo sensor ${status.sensor.id}`,
@@ -188,6 +239,11 @@ export class OccurrenceRepository {
           status.sensor.radius,
           true,
         );
+      }
+      if (status.state.congestion === 0 && alreadyHasCongestion.length) {
+        for (const occurrence of alreadyHasCongestion) {
+          await OccurrenceRepository.stopOccurrence(occurrence.id);
+        }
       }
     }
   };
