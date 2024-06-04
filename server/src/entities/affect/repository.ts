@@ -8,7 +8,6 @@ import { trips } from '../trip/schema';
 import { TripRepository } from '../../entities/trip/repository';
 import { ShapeRepository } from '../../entities/shape/repository';
 import { RouteRepository } from '../../entities/route/repository';
-import { array } from 'zod';
 
 export const EARTH_RADIUS = 6374895;
 const WAYPOINTS_NUM = 1;
@@ -72,14 +71,14 @@ function calculateDistance(point1: Point, point2: Point): number {
     EARTH_RADIUS *
     Math.acos(
       Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.cos(lon2Rad - lon1Rad) +
-        Math.sin(lat1Rad) * Math.sin(lat2Rad),
+      Math.sin(lat1Rad) * Math.sin(lat2Rad),
     )
   );
 }
 
-export function calculateBorderPoints(shape: Point[], center: Point, radius: number) : [[Point, Point][],Point[][]]{
-  let partitionedShape : Point[][] = []
-  let currentShape : Point[] = []
+export function calculateBorderPoints(shape: Point[], center: Point, radius: number): [[Point, Point][], Point[][]] {
+  let partitionedShape: Point[][] = []
+  let currentShape: Point[] = []
   let pairs: [Point, Point][] = [];
   let left: number = 0;
   let right: number = 0;
@@ -103,24 +102,24 @@ export function calculateBorderPoints(shape: Point[], center: Point, radius: num
       continue;
     }
     str = str.concat('0');
-    if (index == 0 || index == shape.length - 1){
+    if (index == 0 || index == shape.length - 1) {
       //console.log(str);
       return [[], [shape]];
     }
     right++;
-    if(currentShape.length !== 0){
+    if (currentShape.length !== 0) {
       partitionedShape.push(currentShape);
       currentShape = [];
     }
   }
-  if(currentShape.length !== 0){
+  if (currentShape.length !== 0) {
     partitionedShape.push(currentShape);
   }
   //console.log(str);
   return [pairs, partitionedShape];
 }
 
-export function mergeAlternately(arr1: Point[][], arr2: Point[][]) : Point[]{
+export function mergeAlternately(arr1: Point[][], arr2: Point[][]): Point[] {
   let result: Point[] = [];
   const maxLength = Math.max(arr1.length, arr2.length);
   for (let i = 0; i < maxLength; i++) {
@@ -178,7 +177,7 @@ export class AffectRepository {
     origin: Point,
     destination: Point,
     waypoints: Point[],
-  ) : Promise<[Point[],number]> => {
+  ): Promise<[Point[], number]> => {
     const apikey = process.env.MAPS_API_KEY;
     const requestBody = {
       origin: {
@@ -240,16 +239,16 @@ export class AffectRepository {
       console.log('resposta maops: ' + JSON.stringify(data));
       const leg = data.routes[0].legs[0];
       const dist = leg.distanceMeters;
-      const coordinates : number[][] = leg.polyline.geoJsonLinestring.coordinates;
+      const coordinates: number[][] = leg.polyline.geoJsonLinestring.coordinates;
       const points = coordinates.map((coordinate) => {
-        const point : Point = [coordinate[1], coordinate[0]];
+        const point: Point = [coordinate[1], coordinate[0]];
         return point;
       });
       //console.log(JSON.stringify(data));
       return [points, dist];
     } catch (error) {
       console.error('Error fetching route:', error);
-      return [[],99999999];
+      return [[], 99999999];
     }
   };
   static queryAffectedRoutes = async (
@@ -319,14 +318,14 @@ export class AffectRepository {
           // console.log('border points vazio: ', newShapesArray.length === 0);
           // console.log('array muito longo: ', tooLongShapesArray.length > 0);
           const inactivateRoute = borderPoints.length === 0 || tooLongShapesArray.length > 0 || newShapesArray.length === 0;
-          if(!inactivateRoute){
-            for (let i = 1;i < mergedArray.length; i++){
+          if (!inactivateRoute) {
+            for (let i = 1; i < mergedArray.length; i++) {
               await ShapeRepository.addNewShape(trip.id, i, mergedArray[i][0], mergedArray[i][1], 0, true);
             }
           }
           await AffectRepository.affectNewRoute(
             occurence_id,
-            element.route_id  ,
+            element.route_id,
             inactivateRoute || routeInfo[0].inactive,
           );
         });

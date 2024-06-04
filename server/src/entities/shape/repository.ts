@@ -37,8 +37,8 @@ export class ShapeRepository {
   ) => {
     try {
       const table = alt ? alt_shapes : shapes;
-      const check = await db.select().from(table).where(and(eq(table.trip_id, trip_id),eq(table.pt_sequence,pt_sequence)));
-      if(check.length > 0){
+      const check = await db.select().from(table).where(and(eq(table.trip_id, trip_id), eq(table.pt_sequence, pt_sequence)));
+      if (check.length > 0) {
         await db.delete(table).where(eq(table.trip_id, trip_id));
       }
       const result = await db
