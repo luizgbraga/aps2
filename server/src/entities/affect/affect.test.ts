@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { describe, expect, it } from '@jest/globals';
-import { AffectRepository, calculateBorderPoints, calculateWaypoints, Point } from './repository';
+import { AffectRepository, calculateBorderPoints, calculateWaypoints, mergeAlternately, Point } from './repository';
 import { number } from 'zod';
 
 const path = require("path");
@@ -196,24 +196,30 @@ describe('updateAffectedRoutes', () => {
   //     ]
   //   expect(result).toEqual(expected);
   // });
+  it('should return', async () => {  
+    const result = calculateWaypoints([ -22.90345, -43.27037 ], [ -22.89641, -43.28936 ], [ -22.902369267975896, -43.28023255729598 ], 2);
+    console.log(result);
+    expect(true).toEqual(true);
+  });
   // it('should return', async () => {
-  //   const result = calculateWaypoints([-22.8751, -43.46559], [-22.87348, -43.46373], [-22.874878, -43.463678], 2);
+    
+  //   const result = await AffectRepository.getNewWaypointShape(
+  //     [-22.88033, -43.47826],
+  //     [-22.8803290, -43.4782594],
+  //     [[-22.85290, -43.35756]]
+  //     // [-22.8751, -43.46559],
+  //     // [-22.87348, -43.46373],
+  //     // [
+  //     //   [ -22.87406834305807, -43.465424277078924 ],
+  //     //   [ -22.873275271995453, -43.46474396948523 ]
+  //     // ]
+  //   );
   //   console.log(result);
   //   expect(true).toEqual(true);
   // });
-  it('should return', async () => {
-    
-    const result = await AffectRepository.getNewWaypointShape(
-      [-22.88033, -43.47826],
-      [-22.8803290, -43.4782594],
-      [[-22.85290, -43.35756]]
-      // [-22.8751, -43.46559],
-      // [-22.87348, -43.46373],
-      // [
-      //   [ -22.87406834305807, -43.465424277078924 ],
-      //   [ -22.873275271995453, -43.46474396948523 ]
-      // ]
-    );
-    expect(true).toEqual(true);
-  });
+  // it('should return', async () => {
+  //     const result = mergeAlternately([[[1,2], [3,4]], [[9,10], [11,12]]], [[[5,6],[7,8]]]);
+  //     console.log(result);
+  //     expect(true).toEqual(true);
+  //   });
 });

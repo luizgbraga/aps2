@@ -1,6 +1,6 @@
 import { shapes, alt_shapes } from './schema';
 import { db } from '../../database';
-import { eq, count } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { AddNewShapeError, GetShapeError } from './errors';
 
 export class ShapeRepository {
@@ -17,9 +17,9 @@ export class ShapeRepository {
           .from(shapes)
           .where(eq(shapes.trip_id, trip_id))
           .orderBy(shapes.pt_sequence);
-        if (result.length === 0) {
-          throw new GetShapeError('NO SHAPES REGISTERED');
-        }
+        // if (result.length === 0) {
+        //   throw new GetShapeError('NO SHAPES REGISTERED');
+        // }
         return result;
       }
       return result_alt;
@@ -37,6 +37,10 @@ export class ShapeRepository {
   ) => {
     try {
       const table = alt ? alt_shapes : shapes;
+      const check = await db.select().from(table).where(and(eq(table.trip_id, trip_id),eq(table.pt_sequence,pt_sequence)));
+      if(check.length > 0){
+        await db.delete(table).where(eq(table.trip_id, trip_id));
+      }
       const result = await db
         .insert(table)
         .values({

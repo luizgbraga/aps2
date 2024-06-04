@@ -11,7 +11,7 @@ import { RouteRepository } from '../../entities/route/repository';
 import { array } from 'zod';
 
 export const EARTH_RADIUS = 6374895;
-const WAYPOINTS_NUM = 2;
+const WAYPOINTS_NUM = 1;
 export type Point = [number, number];
 
 function rotate(v: Point, arc: number): Point {
@@ -104,6 +104,7 @@ export function calculateBorderPoints(shape: Point[], center: Point, radius: num
     }
     str = str.concat('0');
     if (index == 0 || index == shape.length - 1){
+      //console.log(str);
       return [[], [shape]];
     }
     right++;
@@ -115,20 +116,20 @@ export function calculateBorderPoints(shape: Point[], center: Point, radius: num
   if(currentShape.length !== 0){
     partitionedShape.push(currentShape);
   }
-  // console.log(str);
+  //console.log(str);
   return [pairs, partitionedShape];
 }
 
-function mergeAlternately(arr1: Point[][], arr2: Point[][]) : Point[]{
+export function mergeAlternately(arr1: Point[][], arr2: Point[][]) : Point[]{
   let result: Point[] = [];
   const maxLength = Math.max(arr1.length, arr2.length);
   for (let i = 0; i < maxLength; i++) {
-      if (i < arr1.length) {
-          result.concat(arr1[i]);
-      }
-      if (i < arr2.length) {
-          result.concat(arr2[i]);
-      }
+    if (i < arr1.length) {
+      result = result.concat(arr1[i]);
+    }
+    if (i < arr2.length) {
+      result = result.concat(arr2[i]);
+    }
   }
   return result;
 }
@@ -236,18 +237,19 @@ export class AffectRepository {
       );
 
       const data = await response.json();
+      console.log('resposta maops: ' + JSON.stringify(data));
       const leg = data.routes[0].legs[0];
       const dist = leg.distanceMeters;
       const coordinates : number[][] = leg.polyline.geoJsonLinestring.coordinates;
       const points = coordinates.map((coordinate) => {
-        const point : Point = [coordinate[0], coordinate[1]];
+        const point : Point = [coordinate[1], coordinate[0]];
         return point;
       });
       //console.log(JSON.stringify(data));
       return [points, dist];
     } catch (error) {
       console.error('Error fetching route:', error);
-      return null;
+      return [[],99999999];
     }
   };
   static queryAffectedRoutes = async (
@@ -285,6 +287,7 @@ export class AffectRepository {
         radius,
       );
       queryResult.forEach(async (element) => {
+        const routeInfo = await RouteRepository.getRoute(element.route_id);
         const trips = await TripRepository.getTrips(element.route_id);
         const center: Point = [latitude, longitude];
         trips.forEach(async (trip) => {
@@ -308,21 +311,28 @@ export class AffectRepository {
           });
           const newShapesArrayAndDistance = await Promise.all(newShapesArrayAndDistancePromises);
           const newShapesArray = newShapesArrayAndDistance.map((element) => { return element[0]; });
-          const tooLongShapesArray = newShapesArrayAndDistance.filter((element) => element[1] >= 5000);
+          const tooLongShapesArray = newShapesArrayAndDistance.filter((element) => element[1] >= 10000);
+
           const mergedArray = mergeAlternately(partitionedShape, newShapesArray);
-          const inactivateRoute : boolean = borderPoints.length === 0 || tooLongShapesArray.length > 0;
+          // console.log(mergedArray);
+          // console.log('border points vazio: ', borderPoints.length === 0);
+          // console.log('border points vazio: ', newShapesArray.length === 0);
+          // console.log('array muito longo: ', tooLongShapesArray.length > 0);
+          const inactivateRoute = borderPoints.length === 0 || tooLongShapesArray.length > 0 || newShapesArray.length === 0;
           if(!inactivateRoute){
             for (let i = 1;i < mergedArray.length; i++){
-              ShapeRepository.addNewShape(trip.id, i, mergedArray[i][0], mergedArray[i][1], 0, true);
+              await ShapeRepository.addNewShape(trip.id, i, mergedArray[i][0], mergedArray[i][1], 0, true);
             }
           }
-          AffectRepository.affectNewRoute(
+          await AffectRepository.affectNewRoute(
             occurence_id,
-            element.route_id,
-            inactivateRoute,
+            element.route_id  ,
+            inactivateRoute || routeInfo[0].inactive,
           );
         });
+        await Promise.all(trips);
       });
+      await Promise.all(queryResult);
       return queryResult;
     } catch (error) {
       throw error;
