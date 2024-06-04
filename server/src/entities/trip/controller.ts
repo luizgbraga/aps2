@@ -1,12 +1,10 @@
 import { Request, Response } from 'express';
-import { TripRepository } from './repository';
-
-const repository = new TripRepository();
+import { repositories } from '../../entities/factory';
 
 export class TripController {
   static async getAllTrips(req: Request, res: Response) {
     try {
-      const dbResults = await repository.getAllTrips();
+      const dbResults = await repositories.trip.getTrips('*');
       const result = dbResults.map((trip) => ({
         id: trip.id,
         route_id: trip.route_id,
@@ -24,7 +22,7 @@ export class TripController {
       const route_id = req.body.route_id;
       const headsign = req.body.headsign;
       const direction = req.body.direction;
-      const result = await repository.addNewTrip(
+      const result = await repositories.trip.addNewTrip(
         id,
         route_id,
         headsign,

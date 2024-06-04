@@ -1,14 +1,12 @@
 import { Request, Response } from 'express';
-import { SubscriptionRepository } from './repository';
-
-const repository = new SubscriptionRepository();
+import { repositories } from '../../entities/factory';
 
 export class SubscriptionController {
   static async subscribe(req: Request, res: Response) {
     try {
       const userId = req.userId;
       const neighborhoodId = req.body.neighborhoodId;
-      const result = await repository.subscribe(
+      const result = await repositories.subscription.subscribe(
         userId,
         neighborhoodId,
       );
@@ -22,7 +20,7 @@ export class SubscriptionController {
     try {
       const userId = req.userId;
       const neighborhoodId = req.body.neighborhoodId;
-      const result = await repository.unsubscribe(
+      const result = await repositories.subscription.unsubscribe(
         userId,
         neighborhoodId,
       );
@@ -35,7 +33,7 @@ export class SubscriptionController {
   static async list(req: Request, res: Response) {
     try {
       const userId = req.userId;
-      const result = repository.list(userId);
+      const result = repositories.subscription.list(userId);
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);

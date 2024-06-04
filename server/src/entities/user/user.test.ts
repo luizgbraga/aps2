@@ -4,7 +4,7 @@ import { LoginError, RegisterError } from './errors';
 import { hash } from '../../utils/hash';
 
 const setup = () => {
-  return new FakeUserRepository();
+  return new FakeUserRepository([]);
 };
 
 describe('register', () => {

@@ -1,19 +1,16 @@
 import { OccurrenceType, Occurrence, occurrences } from './schema';
 import { db } from '../../database';
 import { and, eq, sql } from 'drizzle-orm';
+import { FakeSubscriptionRepository } from '../../entities/subscription/repository';
 import {
-  FakeSubscriptionRepository,
-  SubscriptionRepository,
-} from '../../entities/subscription/repository';
-import {
+  Neighborhood,
   Subscription,
   neighborhood,
   subscriptions,
 } from '../../database/schemas';
-import { AffectRepository } from '../../entities/affect/repository';
-import { MessagesRepository } from '../../entities/messages/repository';
-import { FakeSensorRepository } from 'entities/sensor/repository';
-import { SensorStatus } from 'entities/sensor/schema';
+import { FakeSensorRepository } from '../../entities/sensor/repository';
+import { SensorStatus } from '../../entities/sensor/schema';
+import { repositories } from 'entities/factory';
 
 const EARTH_RADIUS = 6371000;
 const sensorRepository = new FakeSensorRepository();
@@ -38,14 +35,14 @@ export interface IOccurrenceRepository {
     userId: string,
   ): Promise<{ subscriptions: Subscription; occurrences: Occurrence }[]>;
   confirm(id: string): Promise<void>;
-  listToApprove(): Promise<{neighborhood: Neighborhood; occurences: Occurrences}[]>;
-  delete(id: string): Promise<Occurrences[]>;
-  addOccurrencesFromSensorsStatuses(statuses: SensorStatus[]): Promise<void>;
+  listToApprove(): Promise<
+    { neighborhood: Neighborhood; occurrences: Occurrence }[]
+  >;
+  delete(id: string): Promise<Occurrence[]>;
+  updateOccurrencesFromSensorsStatuses(statuses: SensorStatus[]): Promise<void>;
 }
 
 export class OccurrenceRepository implements IOccurrenceRepository {
-  subscriptionRepository = new SubscriptionRepository();
-
   findNearOccurrences = async (
     type: OccurrenceType,
     latitude: string,
@@ -91,7 +88,6 @@ export class OccurrenceRepository implements IOccurrenceRepository {
       );
       if (find.length > 0) {
         return find;
-        return find;
       }
       if (!confirmed) {
         const check = await sensorRepository.check(
@@ -117,17 +113,18 @@ export class OccurrenceRepository implements IOccurrenceRepository {
         })
         .returning();
       if (confirmed) {
-        this.subscriptionRepository.incrementUnread(neighborhoodId);
+        repositories.subscription.incrementUnread(neighborhoodId);
       }
       if (result[0].confirmed) {
-        const affectedRoutedIds = await AffectRepository.updateAffectedRoutes(
-          result[0].id,
-          Number(result[0].latitude),
-          Number(result[0].longitude),
-          result[0].radius,
-        );
+        const affectedRoutedIds =
+          await repositories.affect.updateAffectedRoutes(
+            result[0].id,
+            Number(result[0].latitude),
+            Number(result[0].longitude),
+            result[0].radius,
+          );
         affectedRoutedIds.forEach(async (route) => {
-          await MessagesRepository.add(route.route_id, 'TODO2');
+          await repositories.messages.add(route.route_id, 'TODO2');
         });
       }
       return result;
@@ -167,7 +164,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
           ),
         )
         .orderBy(occurrences.createdAt);
-      SubscriptionRepository.setUnreadToZero(userId);
+      repositories.subscription.setUnreadToZero(userId);
       return result;
     } catch (error) {
       throw error;
@@ -270,15 +267,16 @@ export class OccurrenceRepository implements IOccurrenceRepository {
         .where(eq(occurrences.id, id))
         .returning();
       updated.forEach(async (occurrence) => {
-        this.subscriptionRepository.incrementUnread(occurrence.neighborhoodId);
-        const affectedRoutedIds = await AffectRepository.updateAffectedRoutes(
-          occurrence.id,
-          Number(occurrence.latitude),
-          Number(occurrence.longitude),
-          occurrence.radius,
-        );
+        repositories.subscription.incrementUnread(occurrence.neighborhoodId);
+        const affectedRoutedIds =
+          await repositories.affect.updateAffectedRoutes(
+            occurrence.id,
+            Number(occurrence.latitude),
+            Number(occurrence.longitude),
+            occurrence.radius,
+          );
         affectedRoutedIds.forEach(async (route) => {
-          await MessagesRepository.add(route.route_id, 'TODO');
+          await repositories.messages.add(route.route_id, 'TODO');
         });
       });
     } catch (error) {
@@ -286,7 +284,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
     }
   };
 
-  static delete = async (id: string) => {
+  delete = async (id: string) => {
     try {
       return await db
         .delete(occurrences)
@@ -309,7 +307,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
     }
   };
 
-  updateOccurrencesFromSensorStatuses = async (statuses: SensorStatus[]) => {
+  updateOccurrencesFromSensorsStatuses = async (statuses: SensorStatus[]) => {
     for (const status of statuses) {
       const alreadyHasFlooding = await this.findNearOccurrences(
         'flooding',
@@ -317,20 +315,18 @@ export class OccurrenceRepository implements IOccurrenceRepository {
         status.sensor.longitude.toString(),
         status.sensor.radius,
       );
-      const alreadyHasLandslide =
-        await this.findNearOccurrences(
-          'landslide',
-          status.sensor.latitude.toString(),
-          status.sensor.longitude.toString(),
-          status.sensor.radius,
-        );
-      const alreadyHasCongestion =
-        await this.findNearOccurrences(
-          'congestion',
-          status.sensor.latitude.toString(),
-          status.sensor.longitude.toString(),
-          status.sensor.radius,
-        );
+      const alreadyHasLandslide = await this.findNearOccurrences(
+        'landslide',
+        status.sensor.latitude.toString(),
+        status.sensor.longitude.toString(),
+        status.sensor.radius,
+      );
+      const alreadyHasCongestion = await this.findNearOccurrences(
+        'congestion',
+        status.sensor.latitude.toString(),
+        status.sensor.longitude.toString(),
+        status.sensor.radius,
+      );
       if (status.state.flooding > 0 && !alreadyHasFlooding.length) {
         await this.add(
           'flooding',
@@ -345,11 +341,11 @@ export class OccurrenceRepository implements IOccurrenceRepository {
       if (status.state.flooding === 0 && alreadyHasFlooding.length) {
         for (const occurrence of alreadyHasFlooding) {
           await this.stopOccurrence(occurrence.id);
-          const affectedRoutedIds = await AffectRepository.getAffectedRoutes(
+          const affectedRoutedIds = await repositories.affect.getAffectedRoutes(
             occurrence.id,
           );
           affectedRoutedIds.forEach(async (route) => {
-            await MessagesRepository.add(route.route_id, 'TODO3');
+            await repositories.messages.add(route.route_id, 'TODO3');
           });
         }
       }
@@ -367,11 +363,11 @@ export class OccurrenceRepository implements IOccurrenceRepository {
       if (status.state.landslide === 0 && alreadyHasLandslide.length) {
         for (const occurrence of alreadyHasLandslide) {
           await this.stopOccurrence(occurrence.id);
-          const affectedRoutedIds = await AffectRepository.getAffectedRoutes(
+          const affectedRoutedIds = await repositories.affect.getAffectedRoutes(
             occurrence.id,
           );
           affectedRoutedIds.forEach(async (route) => {
-            await MessagesRepository.add(route.route_id, 'TODO3');
+            await repositories.messages.add(route.route_id, 'TODO3');
           });
         }
       }
@@ -389,11 +385,11 @@ export class OccurrenceRepository implements IOccurrenceRepository {
       if (status.state.congestion === 0 && alreadyHasCongestion.length) {
         for (const occurrence of alreadyHasCongestion) {
           await this.stopOccurrence(occurrence.id);
-          const affectedRoutedIds = await AffectRepository.getAffectedRoutes(
+          const affectedRoutedIds = await repositories.affect.getAffectedRoutes(
             occurrence.id,
           );
           affectedRoutedIds.forEach(async (route) => {
-            await MessagesRepository.add(route.route_id, 'TODO3');
+            await repositories.messages.add(route.route_id, 'TODO3');
           });
         }
       }
@@ -495,29 +491,38 @@ export class FakeOccurrenceRepository implements IOccurrenceRepository {
     });
     const initialFakeSubscription = new FakeSubscriptionRepository(
       this.fakeSubscriptions,
+      [],
     );
     modifiedOccurrences.forEach((element) => {
       initialFakeSubscription.incrementUnread(element.neighborhoodId);
     });
   };
 
-  async all(): Promise<Occurrences[]> {
-    throw new Error("Not Implemented");
+  async all(): Promise<Occurrence[]> {
+    throw new Error('Not Implemented');
   }
 
-  async listToApprove(): Promise<{neighborhood: Neighborhood; occurences: Occurrences}[]> {
-    throw new Error("Not Implemented");
+  async listToApprove(): Promise<
+    { neighborhood: Neighborhood; occurrences: Occurrence }[]
+  > {
+    throw new Error('Not Implemented');
   }
 
-  async delete(id: string): Promise<Occurrences[]> {
-    throw new Error("Not Implemented");
+  async delete(id: string): Promise<Occurrence[]> {
+    throw new Error('Not Implemented');
   }
 
-  async addOccurrencesFromSensorsStatuses(statuses: SensorStatus[]): Promise<void> {
-    throw new Error("Not Implemented");
+  async updateOccurrencesFromSensorsStatuses(
+    statuses: SensorStatus[],
+  ): Promise<void> {
+    throw new Error('Not Implemented');
   }
 
-  async find(type: OccurenceType, latitude: string, longitude: string): Promise<Occurrences[]> {
-    throw new Error("Not Implemented");
+  async find(
+    type: OccurrenceType,
+    latitude: string,
+    longitude: string,
+  ): Promise<Occurrence[]> {
+    throw new Error('Not Implemented');
   }
 }

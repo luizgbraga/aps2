@@ -81,6 +81,10 @@ export class UserRepository implements IUserRepository {
 export class FakeUserRepository implements IUserRepository {
   users: User[] = [];
 
+  constructor(initialUsers: User[]) {
+    this.users = initialUsers;
+  }
+
   me = async (userId: string) => {
     const user = this.users.find((user) => user.id === userId);
     if (!user) {

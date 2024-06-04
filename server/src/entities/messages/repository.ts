@@ -1,9 +1,9 @@
 import { messages } from './schema';
 import { db } from '../../database';
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 export class MessagesRepository {
-  static list = async (routeId: string) => {
+  list = async (routeId: string) => {
     try {
       const result = await db
         .select()
@@ -15,7 +15,7 @@ export class MessagesRepository {
     }
   };
 
-  static add = async (routeId: string, text: string) => {
+  add = async (routeId: string, text: string) => {
     try {
       return await db.insert(messages).values({ routeId, text }).returning();
     } catch (error) {

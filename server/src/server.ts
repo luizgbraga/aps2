@@ -23,10 +23,10 @@ export class Server {
 
   async startPolling() {
     const sensorRepository = new FakeSensorRepository();
-
+    const occurrenceRepository = new OccurrenceRepository();
     setInterval(async () => {
       const sensorsStatuses = await sensorRepository.getAllStatuses();
-      await OccurrenceRepository.updateOccurrencesFromSensorStatuses(
+      await occurrenceRepository.updateOccurrencesFromSensorsStatuses(
         sensorsStatuses,
       );
     }, POLLING_INTERVAL);

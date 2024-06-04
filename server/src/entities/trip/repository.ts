@@ -4,7 +4,7 @@ import { AddNewTripError, GetAllTripsError } from './errors';
 import { eq } from 'drizzle-orm';
 
 export class TripRepository {
-  static getTrips = async (route_id: string) => {
+  getTrips = async (route_id: string) => {
     try {
       let result = null;
       if (route_id == '*') {
