@@ -16,25 +16,22 @@ export class OccurrenceRepository {
     distance: number,
   ) => {
     try {
-      return await db
-        .select()
-        .from(occurrences)
-        .where(
-          and(
-            eq(occurrences.type, type),
-            lt(
-              sql<number>`acos(sin(${latitude}) * sin(${occurrences.latitude}) +
-                cos(${latitude}) * cos(${occurrences.latitude}) *
-                cos(${occurrences.longitude} - ${longitude})) *
-                6371000`,
-              distance,
-            ),
-          ),
+      const allOcc = await db.select().from(occurrences);
+      return allOcc.filter((occurrence) => {
+        const distanceBetween = Math.acos(
+          Math.sin(parseFloat(latitude)) *
+            Math.sin(Number(occurrence.latitude)) +
+            Math.cos(parseFloat(latitude)) *
+              Math.cos(Number(occurrence.latitude)) *
+              Math.cos(parseFloat(longitude) - Number(occurrence.longitude)),
         );
+        return distanceBetween * 6371000 < distance;
+      });
     } catch (error) {
       throw error;
     }
   };
+
   static create = async (
     type: OccurrenceType,
     description: string,

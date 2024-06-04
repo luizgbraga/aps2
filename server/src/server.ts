@@ -25,7 +25,6 @@ export class Server {
     const sensorRepository = new FakeSensorRepository();
 
     setInterval(async () => {
-      console.log('poll');
       const sensorsStatuses = await sensorRepository.getAllStatuses();
       await OccurrenceRepository.updateOccurrencesFromSensorStatuses(
         sensorsStatuses,
