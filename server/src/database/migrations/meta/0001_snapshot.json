@@ -1,6 +1,6 @@
 {
-  "id": "426788e1-a1d2-4030-9e71-5597c5b4d709",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "afce6aff-684f-4ea9-92cc-ed056f3d3b8e",
+  "prevId": "426788e1-a1d2-4030-9e71-5597c5b4d709",
   "version": "5",
   "dialect": "pg",
   "tables": {
@@ -324,7 +324,7 @@
           "name": "inactive",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "default": false
         }
       },

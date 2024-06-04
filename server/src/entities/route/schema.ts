@@ -11,7 +11,7 @@ export const routes = pgTable('routes', {
   type: integer('type').notNull(),
   color: varchar('color', { length: 255 }).notNull(),
   text_color: varchar('text_color', { length: 255 }).notNull(),
-  inactive: boolean('inactive')
+  inactive: boolean('inactive').default(false),
 });
 
 export type Route = InferSelectModel<typeof routes>;

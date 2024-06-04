@@ -6,7 +6,7 @@ import { Routes } from './routes';
 import { FakeSensorRepository } from './entities/sensor/repository';
 import { OccurrenceRepository } from './entities/occurrence/repository';
 
-const POLLING_INTERVAL = 60000;
+const POLLING_INTERVAL = 10000;
 
 export class Server {
   constructor(app: Application) {

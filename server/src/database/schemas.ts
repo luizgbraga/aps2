@@ -7,3 +7,4 @@ export * from '../entities/route/schema';
 export * from '../entities/trip/schema';
 export * from '../entities/shape/schema';
 export * from '../entities/affect/schema';
+export * from '../entities/messages/schema';

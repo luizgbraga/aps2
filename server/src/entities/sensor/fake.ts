@@ -17,7 +17,7 @@ export const sensors = [
     },
     congestionInterval: {
       start: 12,
-      end: 20,
+      end: 23,
     },
   },
 ] satisfies FakeSensor[];

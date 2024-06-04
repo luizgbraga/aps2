@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS "routes" (
 	"type" integer NOT NULL,
 	"color" varchar(255) NOT NULL,
 	"text_color" varchar(255) NOT NULL,
-	"inactive" boolean
+	"inactive" boolean DEFAULT false NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "trips" (
@@ -81,6 +81,13 @@ CREATE TABLE IF NOT EXISTS "shapes" (
 CREATE TABLE IF NOT EXISTS "affect" (
 	"occurence_id" uuid NOT NULL,
 	"route_id" varchar NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "messages" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"text" varchar(255) NOT NULL,
+	"route_id" varchar NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 DO $$ BEGIN
@@ -121,6 +128,12 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "affect" ADD CONSTRAINT "affect_route_id_routes_id_fk" FOREIGN KEY ("route_id") REFERENCES "routes"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "messages" ADD CONSTRAINT "messages_route_id_routes_id_fk" FOREIGN KEY ("route_id") REFERENCES "routes"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

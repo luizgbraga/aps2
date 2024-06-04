@@ -3,7 +3,7 @@ import { validateBody } from '../../middlewares/validate';
 import { list } from './schemas';
 import { MessagesController } from './controller';
 
-class SubscriptionRoutes {
+class MessageRoutes {
   router = Router();
 
   constructor() {
@@ -15,4 +15,4 @@ class SubscriptionRoutes {
   }
 }
 
-export default new SubscriptionRoutes().router;
+export default new MessageRoutes().router;

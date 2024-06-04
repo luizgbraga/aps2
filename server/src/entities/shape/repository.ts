@@ -9,15 +9,15 @@ export class ShapeRepository {
       const result_alt = await db
         .select()
         .from(alt_shapes)
-        .where(eq(shapes.trip_id, trip_id))
-        .orderBy(shapes.pt_sequence);
+        .where(eq(alt_shapes.trip_id, trip_id))
+        .orderBy(alt_shapes.pt_sequence);
       if (result_alt.length === 0) {
         const result = await db
-        .select()
-        .from(shapes)
-        .where(eq(shapes.trip_id, trip_id))
-        .orderBy(shapes.pt_sequence);
-        if (result_alt.length === 0){
+          .select()
+          .from(shapes)
+          .where(eq(shapes.trip_id, trip_id))
+          .orderBy(shapes.pt_sequence);
+        if (result.length === 0) {
           throw new GetShapeError('NO SHAPES REGISTERED');
         }
         return result;
@@ -33,7 +33,7 @@ export class ShapeRepository {
     pt_lat: number,
     pt_lon: number,
     dist_traveled: number,
-    alt : boolean
+    alt: boolean,
   ) => {
     try {
       const table = alt ? alt_shapes : shapes;
