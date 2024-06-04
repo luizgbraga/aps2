@@ -22,6 +22,13 @@
       "when": 1717122755302,
       "tag": "0002_fresh_mad_thinker",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1717461579980,
+      "tag": "0003_cheerful_ink",
+      "breakpoints": true
     }
   ]
 }

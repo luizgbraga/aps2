@@ -1,4 +1,4 @@
-import { type OccurrenceType } from '../api/occurences';
+import { type OccurrenceType } from '../api/occurrences';
 
 export const translateType = (type: OccurrenceType) => {
   switch (type) {

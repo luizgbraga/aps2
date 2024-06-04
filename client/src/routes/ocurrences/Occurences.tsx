@@ -17,7 +17,7 @@ import {
 } from 'antd';
 import React, { useState } from 'react';
 import { NeighborhoodModel } from '../../api/neighborhood';
-import { OccurenceModel } from '../../api/occurences';
+import { OccurrenceModel } from '../../api/occurrences';
 import { SubscriptionModel } from '../../api/subscription';
 import { LoggedLayout } from '../../layout/logged/LoggedLayout';
 import { useAsync } from '../../utils/async';
@@ -25,7 +25,7 @@ import { dateDistance } from '../../utils/time';
 import { translateType } from '../../utils/translate';
 
 const Notifications: React.FC = () => {
-  const { result: occurenceList } = useAsync(() => OccurenceModel.list());
+  const { result: occurrenceList } = useAsync(() => OccurrenceModel.list());
   const { result: neighborhoods } = useAsync(() => NeighborhoodModel.list());
   const { result: subscriptions, refetch: refetchSubscriptions } = useAsync(
     () => SubscriptionModel.list()
@@ -67,15 +67,15 @@ const Notifications: React.FC = () => {
       }
     >
       <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-        {occurenceList?.occurences.map((occ, i) => (
+        {occurrenceList?.occurrences.map((occ, i) => (
           <Card
             title={
               <span>
-                {translateType(occ.occurence.type)}
+                {translateType(occ.occurrence.type)}
                 <span style={{ fontWeight: '400' }}>
                   {' - '}
-                  {dateDistance(occ.occurence.createdAt as Date, true)}
-                  {i < occurenceList.unread && (
+                  {dateDistance(occ.occurrence.createdAt as Date, true)}
+                  {i < occurrenceList.unread && (
                     <Tag color="red" style={{ marginLeft: '10px' }}>
                       Não lida
                     </Tag>
@@ -97,7 +97,7 @@ const Notifications: React.FC = () => {
                 {
                   key: '2',
                   label: 'Descrição',
-                  children: occ.occurence.description,
+                  children: occ.occurrence.description,
                 },
                 {
                   key: '3',

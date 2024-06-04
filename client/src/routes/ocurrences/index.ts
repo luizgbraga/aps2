@@ -1,3 +1,3 @@
-import Ocurrences from './Occurences';
+import Ocurrences from './Occurrences';
 
 export default Ocurrences;

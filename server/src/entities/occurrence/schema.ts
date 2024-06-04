@@ -9,11 +9,11 @@ import { InferSelectModel } from 'drizzle-orm';
 import { neighborhood } from '../../entities/neighborhood/schema';
 import { doublePrecision } from 'drizzle-orm/pg-core';
 
-export type OccurenceType = 'flooding' | 'landslide' | 'congestion';
+export type OccurrenceType = 'flooding' | 'landslide' | 'congestion';
 
-export const occurences = pgTable('occurences', {
+export const occurrences = pgTable('occurrences', {
   id: uuid('id').primaryKey().defaultRandom(),
-  type: varchar('type').$type<OccurenceType>().notNull(),
+  type: varchar('type').$type<OccurrenceType>().notNull(),
   description: varchar('description', { length: 255 }).notNull(),
   latitude: varchar('latitude', { length: 255 }).notNull(),
   longitude: varchar('longitude', { length: 255 }).notNull(),
@@ -26,4 +26,4 @@ export const occurences = pgTable('occurences', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export type Occurences = InferSelectModel<typeof occurences>;
+export type Occurrences = InferSelectModel<typeof occurrences>;

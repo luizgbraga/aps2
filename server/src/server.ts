@@ -27,7 +27,7 @@ export class Server {
     setInterval(async () => {
       console.log('poll');
       const sensorsStatuses = await sensorRepository.getAllStatuses();
-      await OccurrenceRepository.addOccurrencesFromSensorsStatuses(
+      await OccurrenceRepository.updateOccurrencesFromSensorStatuses(
         sensorsStatuses,
       );
     }, POLLING_INTERVAL);

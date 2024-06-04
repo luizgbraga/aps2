@@ -4,7 +4,7 @@ import { logged } from '../../middlewares/logged';
 import { validateBody } from '../../middlewares/validate';
 import { confirm, del, propose } from './schemas';
 
-class OccurenceRoutes {
+class OccurrenceRoutes {
   router = Router();
 
   constructor() {
@@ -15,7 +15,7 @@ class OccurenceRoutes {
     this.router.post(
       '/propose',
       validateBody(propose),
-      OccurrenceController.propose,
+      OccurrenceController.propose
     );
     this.router.get('/all', OccurrenceController.all);
     this.router.get('/list', logged, OccurrenceController.list);
@@ -23,10 +23,10 @@ class OccurenceRoutes {
     this.router.put(
       '/confirm',
       validateBody(confirm),
-      OccurrenceController.confirm,
+      OccurrenceController.confirm
     );
     this.router.delete('/', validateBody(del), OccurrenceController.delete);
   }
 }
 
-export default new OccurenceRoutes().router;
+export default new OccurrenceRoutes().router;

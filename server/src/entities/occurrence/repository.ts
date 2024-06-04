@@ -1,4 +1,4 @@
-import { OccurenceType, occurences } from './schema';
+import { OccurrenceType, occurrences } from './schema';
 import { db } from '../../database';
 import { and, eq } from 'drizzle-orm';
 import { SubscriptionRepository } from '../../entities/subscription/repository';
@@ -10,19 +10,19 @@ const sensorRepository = new FakeSensorRepository();
 
 export class OccurrenceRepository {
   static find = async (
-    type: OccurenceType,
+    type: OccurrenceType,
     latitude: string,
     longitude: string,
   ) => {
     try {
       return await db
         .select()
-        .from(occurences)
+        .from(occurrences)
         .where(
           and(
-            eq(occurences.type, type),
-            eq(occurences.latitude, latitude),
-            eq(occurences.longitude, longitude),
+            eq(occurrences.type, type),
+            eq(occurrences.latitude, latitude),
+            eq(occurrences.longitude, longitude),
           ),
         );
     } catch (error) {
@@ -30,7 +30,7 @@ export class OccurrenceRepository {
     }
   };
   static create = async (
-    type: OccurenceType,
+    type: OccurrenceType,
     description: string,
     neighborhoodId: string,
     latitude: string,
@@ -55,7 +55,7 @@ export class OccurrenceRepository {
       } else {
         isConfirmed = true;
       }
-      const result = await db.insert(occurences).values({
+      const result = await db.insert(occurrences).values({
         type,
         description,
         neighborhoodId,
@@ -77,8 +77,8 @@ export class OccurrenceRepository {
     try {
       return await db
         .select()
-        .from(occurences)
-        .where(eq(occurences.confirmed, true));
+        .from(occurrences)
+        .where(eq(occurrences.confirmed, true));
     } catch (error) {
       throw error;
     }
@@ -90,17 +90,20 @@ export class OccurrenceRepository {
         .select()
         .from(subscriptions)
         .innerJoin(
-          occurences,
-          eq(subscriptions.neighborhoodId, occurences.neighborhoodId),
+          occurrences,
+          eq(subscriptions.neighborhoodId, occurrences.neighborhoodId),
         )
         .innerJoin(
           neighborhood,
           eq(subscriptions.neighborhoodId, neighborhood.id),
         )
         .where(
-          and(eq(subscriptions.userId, userId), eq(occurences.confirmed, true)),
+          and(
+            eq(subscriptions.userId, userId),
+            eq(occurrences.confirmed, true),
+          ),
         )
-        .orderBy(occurences.createdAt);
+        .orderBy(occurrences.createdAt);
       SubscriptionRepository.setUnreadToZero(userId);
       return result;
     } catch (error) {
@@ -112,9 +115,12 @@ export class OccurrenceRepository {
     try {
       return await db
         .select()
-        .from(occurences)
-        .innerJoin(neighborhood, eq(occurences.neighborhoodId, neighborhood.id))
-        .where(eq(occurences.confirmed, false));
+        .from(occurrences)
+        .innerJoin(
+          neighborhood,
+          eq(occurrences.neighborhoodId, neighborhood.id),
+        )
+        .where(eq(occurrences.confirmed, false));
     } catch (error) {
       throw error;
     }
@@ -123,12 +129,12 @@ export class OccurrenceRepository {
   static confirm = async (id: string) => {
     try {
       const updated = await db
-        .update(occurences)
+        .update(occurrences)
         .set({ confirmed: true })
-        .where(eq(occurences.id, id))
+        .where(eq(occurrences.id, id))
         .returning();
-      updated.forEach((occurence) => {
-        SubscriptionRepository.incrementUnread(occurence.neighborhoodId);
+      updated.forEach((occurrence) => {
+        SubscriptionRepository.incrementUnread(occurrence.neighborhoodId);
       });
     } catch (error) {
       throw error;
@@ -138,15 +144,15 @@ export class OccurrenceRepository {
   static delete = async (id: string) => {
     try {
       return await db
-        .delete(occurences)
-        .where(eq(occurences.id, id))
+        .delete(occurrences)
+        .where(eq(occurrences.id, id))
         .returning();
     } catch (error) {
       throw error;
     }
   };
 
-  static addOccurrencesFromSensorsStatuses = async (
+  static updateOccurrencesFromSensorStatuses = async (
     statuses: SensorStatus[],
   ) => {
     for (const status of statuses) {
