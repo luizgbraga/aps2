@@ -1,26 +1,28 @@
-import { Subscription, subscriptions } from './schema';
+import { subscriptions } from './schema';
 import { db } from '../../database';
 import { eq, sql } from 'drizzle-orm';
 import { neighborhood } from '../../database/schemas';
 
-export interface ISubscriptionRepository {
-  subscribe(userId: string, neighborhoodId: string): Promise<Subscription[]>;
-  incrementUnread(neighborhoodId: string): Promise<Subscription[]>;
-}
-
-export class SubscriptionRepository implements ISubscriptionRepository {
-  subscribe = async (userId: string, neighborhoodId: string) => {
+export class SubscriptionRepository {
+  static subscribe = async (userId: string, neighborhoodId: string) => {
     try {
-      return await db
-        .insert(subscriptions)
-        .values({ userId, neighborhoodId })
-        .returning();
+      return await db.insert(subscriptions).values({ userId, neighborhoodId });
     } catch (error) {
       throw error;
     }
   };
 
-  incrementUnread = async (neighborhoodId: string) => {
+  static unsubscribe = async (userId: string, neighborhoodId: string) => {
+    try {
+      return await db
+        .delete(subscriptions)
+        .where(eq(subscriptions.neighborhoodId, neighborhoodId));
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  static incrementUnread = async (neighborhoodId: string) => {
     try {
       return await db
         .update(subscriptions)
@@ -58,37 +60,5 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     } catch (error) {
       throw error;
     }
-  };
-}
-
-export class FakeSubscriptionRepository implements ISubscriptionRepository {
-  fakeSubscriptions: Subscription[];
-
-  constructor(initialFakeSubscription: Subscription[]) {
-    this.fakeSubscriptions = initialFakeSubscription;
-  }
-
-  subscribe = async (userId: string, neighborhoodId: string) => {
-    const subscription = {
-      userId,
-      neighborhoodId,
-      unread: 0,
-      createdAt: new Date(),
-    };
-    this.fakeSubscriptions.push(subscription);
-    return [subscription];
-  };
-
-  incrementUnread = async (neighborhoodId: string) => {
-    const updatedSubscriptionss = [] as Subscription[];
-
-    this.fakeSubscriptions.forEach((element) => {
-      if (element.neighborhoodId === neighborhoodId) {
-        element.unread++;
-        updatedSubscriptionss.push(element);
-      }
-    });
-
-    return updatedSubscriptionss;
   };
 }

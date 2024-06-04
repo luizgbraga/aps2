@@ -38,6 +38,9 @@ export interface IOccurrenceRepository {
     userId: string,
   ): Promise<{ subscriptions: Subscription; occurrences: Occurrence }[]>;
   confirm(id: string): Promise<void>;
+  listToApprove(): Promise<{neighborhood: Neighborhood; occurences: Occurrences}[]>;
+  delete(id: string): Promise<Occurrences[]>;
+  addOccurrencesFromSensorsStatuses(statuses: SensorStatus[]): Promise<void>;
 }
 
 export class OccurrenceRepository implements IOccurrenceRepository {
@@ -88,6 +91,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
       );
       if (find.length > 0) {
         return find;
+        return find;
       }
       if (!confirmed) {
         const check = await sensorRepository.check(
@@ -132,7 +136,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
     }
   };
 
-  static all = async () => {
+  all = async () => {
     try {
       return await db
         .select()
@@ -170,7 +174,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
     }
   };
 
-  static listToApprove = async () => {
+  listToApprove = async () => {
     try {
       return await db
         .select()
@@ -496,4 +500,24 @@ export class FakeOccurrenceRepository implements IOccurrenceRepository {
       initialFakeSubscription.incrementUnread(element.neighborhoodId);
     });
   };
+
+  async all(): Promise<Occurrences[]> {
+    throw new Error("Not Implemented");
+  }
+
+  async listToApprove(): Promise<{neighborhood: Neighborhood; occurences: Occurrences}[]> {
+    throw new Error("Not Implemented");
+  }
+
+  async delete(id: string): Promise<Occurrences[]> {
+    throw new Error("Not Implemented");
+  }
+
+  async addOccurrencesFromSensorsStatuses(statuses: SensorStatus[]): Promise<void> {
+    throw new Error("Not Implemented");
+  }
+
+  async find(type: OccurenceType, latitude: string, longitude: string): Promise<Occurrences[]> {
+    throw new Error("Not Implemented");
+  }
 }

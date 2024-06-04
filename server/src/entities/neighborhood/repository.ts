@@ -2,6 +2,7 @@ import { neighborhood } from './schema';
 import { db } from '../../database';
 import { neighborhoods } from './all';
 import { FindError } from './errors';
+import { eq } from 'drizzle-orm';
 
 export class NeighborhoodRepository {
   static fill = async () => {
