@@ -14,7 +14,7 @@ interface NeighborhoodFilter {
   value: string;
 }
 
-const occurenceType = {
+const occurrenceType = {
   flooding: 'Alagamento',
   landslide: 'Deslizamento',
   congestion: 'Congestionamento',
@@ -82,7 +82,7 @@ export const AHome: React.FC = () => {
             },
             {
               title: 'Data de criação',
-              dataIndex: ['occurence', 'createdAt'],
+              dataIndex: ['occurrence', 'createdAt'],
               key: 'createdAt',
             },
           ]}
@@ -91,46 +91,46 @@ export const AHome: React.FC = () => {
               <div>
                 <Descriptions title="Detalhes da ocorrência">
                   <DescriptionsItem label="Descrição">
-                    {record.occurence.description}
+                    {record.occurrence.description}
                   </DescriptionsItem>
                   <DescriptionsItem label="Tipo de ocorrência">
-                    {occurenceType[record.occurence.type]}
+                    {occurrenceType[record.occurrence.type]}
                   </DescriptionsItem>
                   <DescriptionsItem label="Localização">
-                    Lat: {record.occurence.latitude} | Long:{' '}
-                    {record.occurence.longitude}
+                    Lat: {record.occurrence.latitude} | Long:{' '}
+                    {record.occurrence.longitude}
                   </DescriptionsItem>
                   <DescriptionsItem
                     label={
-                      record.occurence.type === 'flooding'
+                      record.occurrence.type === 'flooding'
                         ? 'Índice pluviométrico'
-                        : record.occurence.type === 'landslide'
+                        : record.occurrence.type === 'landslide'
                           ? 'Índice de terra'
                           : 'Congestionamento'
                     }
                   >
                     {record.sensor
-                      ? record.sensor[record.occurence.type]
+                      ? record.sensor[record.occurrence.type]
                       : ' Não há sensores nesta área'}
                   </DescriptionsItem>
                 </Descriptions>
               </div>
             ),
             rowExpandable: (record) =>
-              record.occurence.description ? true : false,
+              record.occurrence.description ? true : false,
             expandRowByClick: true,
           }}
           dataSource={res.result!}
           bordered
           loading={res.loading}
-          rowKey={(record) => record.occurence.id}
+          rowKey={(record) => record.occurrence.id}
           pagination={{ pageSize: 10, hideOnSinglePage: true }}
           rowClassName={(record) => {
-            if (record.occurence.type === 'flooding') {
+            if (record.occurrence.type === 'flooding') {
               return 'blue-row';
-            } else if (record.occurence.type === 'landslide') {
+            } else if (record.occurrence.type === 'landslide') {
               return 'brown-row';
-            } else if (record.occurence.type === 'congestion') {
+            } else if (record.occurrence.type === 'congestion') {
               return 'red-row';
             } else {
               return '';
