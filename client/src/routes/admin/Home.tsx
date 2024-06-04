@@ -22,6 +22,7 @@ const occurrenceType = {
 
 export const AHome: React.FC = () => {
   const res = useAsync(() => OccurrenceModel.listApproved());
+  console.log(res);
   const countPerZone = useAsync(() => OccurrenceModel.countPerZone());
   const countPerType = useAsync(() => OccurrenceModel.countPerType());
   // const sensors = useAsync(() => SensorModel.list());
@@ -67,22 +68,22 @@ export const AHome: React.FC = () => {
           columns={[
             {
               title: 'Bairro',
-              dataIndex: ['neighborhood', 'name'],
+              dataIndex: 'neighborhood',
               key: 'neighborhood',
               filters: neighborhoodFilters,
               filterMode: 'tree',
               filterSearch: false,
               onFilter: (value, record) =>
-                record.neighborhood.name.startsWith(value as string),
+                record.neighborhood.startsWith(value as string),
             },
             {
               title: 'Zona',
-              dataIndex: ['neighborhood', 'zone'],
-              key: 'description',
+              dataIndex: 'zone',
+              key: 'zone',
             },
             {
               title: 'Data de criação',
-              dataIndex: ['occurrence', 'createdAt'],
+              dataIndex: 'createdAt',
               key: 'createdAt',
             },
           ]}
@@ -120,7 +121,14 @@ export const AHome: React.FC = () => {
               record.occurrence.description ? true : false,
             expandRowByClick: true,
           }}
-          dataSource={res.result!}
+          dataSource={res.result?.map((row) => ({
+            key: row.occurrence.id,
+            neighborhood: row.neighborhood.name,
+            zone: row.neighborhood.zone,
+            createdAt: row.occurrence.createdAt,
+            occurrence: row.occurrence,
+            sensor: row.sensor,
+          }))}
           bordered
           loading={res.loading}
           rowKey={(record) => record.occurrence.id}

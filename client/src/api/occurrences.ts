@@ -15,9 +15,9 @@ export type OccurrenceDTO = {
   longitude: string;
   neighborhoodId: string;
   description: string;
-  confirmed?: boolean;
-  createdAt?: Date | string | null;
-  updatedAt?: Date | string | null;
+  confirmed: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 class OccurrenceAPI extends API {

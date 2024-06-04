@@ -159,10 +159,13 @@ export class OccurrenceRepository {
       const result = await db
         .select()
         .from(occurrences)
-        .innerJoin(neighborhood, eq(occurrences.neighborhoodId, neighborhood.id))
+        .innerJoin(
+          neighborhood,
+          eq(occurrences.neighborhoodId, neighborhood.id),
+        )
         .where(eq(occurrences.confirmed, true));
       return result.map((occ) => ({
-        occurence: occ.occurrences,
+        occurrence: occ.occurrences,
         neighborhood: occ.neighborhood,
         sensor: sensorRepository.getSensorData(occ.neighborhood.id),
       }));
@@ -179,7 +182,10 @@ export class OccurrenceRepository {
           count: sql<number>`cast(count(${occurrences.id}) as int)`,
         })
         .from(occurrences)
-        .innerJoin(neighborhood, eq(occurrences.neighborhoodId, neighborhood.id))
+        .innerJoin(
+          neighborhood,
+          eq(occurrences.neighborhoodId, neighborhood.id),
+        )
         .where(eq(occurrences.confirmed, true))
         .groupBy(neighborhood.zone);
     } catch (error) {
@@ -195,7 +201,10 @@ export class OccurrenceRepository {
           count: sql<number>`cast(count(${occurrences.id}) as int)`,
         })
         .from(occurrences)
-        .innerJoin(neighborhood, eq(occurrences.neighborhoodId, neighborhood.id))
+        .innerJoin(
+          neighborhood,
+          eq(occurrences.neighborhoodId, neighborhood.id),
+        )
         .where(eq(occurrences.confirmed, true))
         .groupBy(neighborhood.name);
     } catch (error) {
