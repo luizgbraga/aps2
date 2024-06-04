@@ -12,6 +12,7 @@ class MessageRoutes {
 
   init() {
     this.router.get('/', validateBody(list), MessagesController.list);
+    this.router.get('/all', MessagesController.all);
   }
 }
 

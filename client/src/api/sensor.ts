@@ -35,6 +35,11 @@ const api = new SensorAPI();
 
 export class SensorModel {
   static async list() {
-    return api.list();
+    const res = await api.list();
+    if (res.type == 'ERROR') throw new Error(res.cause);
+    return res.result.map((dto) => ({
+      lat: dto.lat,
+      lng: dto.lng
+    }));
   }
 }

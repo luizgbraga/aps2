@@ -6,11 +6,11 @@ import { MapFilter } from '../../components/MapFilter';
 import { LoggedLayout } from '../../layout/logged/LoggedLayout';
 import { MAPS_API_KEY } from '../../config';
 import { useAsync } from '../../utils/async';
-import { RoutesModel } from '../../api/route';
+import { RouteModel } from '../../api/route';
 import { useMap } from '../../components/useMap';
 
 export const Home: React.FC = () => {
-  const routes = useAsync(() => RoutesModel.getAllRoutes());
+  const routes = useAsync(() => RouteModel.getAllRoutes());
   const ref = useRef<HTMLDivElement>(null);
   const { map, changeRouteIds } = useMap(ref, false);
 

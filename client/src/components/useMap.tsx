@@ -3,13 +3,14 @@ import { mapController } from './mapController';
 import { TripsModel } from '../api/trip';
 import { ShapesModel } from '../api/shape';
 import { TripDTO } from '../api/trip';
-import { RoutesModel } from '../api/route';
+import { RouteModel } from '../api/route';
 import { useAsync } from '../utils/async';
 import { OccurrenceModel } from '../api/occurrences';
+import { SensorModel } from '../api/sensor';
 
 async function fetchTrips(targetRouteId: string[]) {
   const allTrips = await TripsModel.getAllTrips();
-  const allRoutes = await RoutesModel.getAllRoutes();
+  const allRoutes = await RouteModel.getAllRoutes();
   const filteredTrips = allTrips.filter((trip) =>
     targetRouteId.includes(trip.route_id)
   );
@@ -63,7 +64,8 @@ async function fetchTripsShapes(
 
 export const useMap = (
   ref: RefObject<HTMLDivElement | null>,
-  pinnable: boolean
+  pinnable: boolean,
+  admin?: boolean
 ) => {
   const {
     setup,
@@ -90,7 +92,7 @@ export const useMap = (
   >([]);
   const prevMarkersRef = useRef([] as google.maps.Marker[]);
   const { result: allOccurrences } = useAsync(() => OccurrenceModel.all());
-
+  const { result: allSensors } = useAsync(() => SensorModel.list());
   map?.addListener('click', (e: any) => {
     if (!pinnable) return;
     const m = addMarker(
@@ -112,12 +114,23 @@ export const useMap = (
       if (prevMarkersRef.current.length && pinnable) return;
       setLocationToCurrent(map);
       addRecentralizeButton(map);
-      if (allOccurrences && !pinnable) {
+      if (allOccurrences && !pinnable && !admin) {
         allOccurrences.forEach((occurrence) => {
           const m = addMarker(map, {
             lat: parseFloat(occurrence.latitude),
             lng: parseFloat(occurrence.longitude),
           });
+          if (m) {
+            prevMarkersRef.current.push(m);
+          }
+        });
+      }
+      if (allSensors && !pinnable && admin) {
+        allSensors.forEach((sensor) => {
+          const m = addMarker(map, {
+            lat: sensor.lat,
+            lng: sensor.lng,
+          }, false, 'blue');
           if (m) {
             prevMarkersRef.current.push(m);
           }

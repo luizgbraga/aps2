@@ -11,4 +11,13 @@ export class MessagesController {
       res.status(500).json(error);
     }
   }
+
+  static async all(req: Request, res: Response) {
+    try {
+      const result = await MessagesRepository.all();
+      res.status(200).json({ result, type: 'SUCCESS' });
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
 }

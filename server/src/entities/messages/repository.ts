@@ -1,6 +1,7 @@
 import { messages } from './schema';
 import { db } from '../../database';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
+import { routes } from '../../database/schemas';
 
 export class MessagesRepository {
   list = async (routeId: string) => {
@@ -14,6 +15,21 @@ export class MessagesRepository {
       throw error;
     }
   };
+
+  static all = async () => {
+    try {
+      const result = await db
+        .select()
+        .from(messages)
+        .innerJoin(
+          routes,
+          eq(routes.id, messages.routeId),
+        );
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   add = async (routeId: string, text: string) => {
     try {
