@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
-import { FakeSensorRepository } from './repository';
+import { MessagesRepository } from './repository';
 
-const sensorRepository = new FakeSensorRepository();
-
-export class SensorController {
+export class MessagesController {
   static async list(req: Request, res: Response) {
     try {
-      const result = await sensorRepository.list();
+      const routeId = req.query.routeId as string;
+      const result = await MessagesRepository.list(routeId);
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);

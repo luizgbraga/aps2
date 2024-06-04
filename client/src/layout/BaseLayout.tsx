@@ -126,8 +126,10 @@ export const BaseLayout: React.FC<Props> = (props: Props) => {
         <Divider style={{ margin: 0 }} />
         <Layout.Content className="base-content">
           {props.title && (
-            <Flex gap="30px" className="base-title">
-              <Typography.Title>{props.title}</Typography.Title>
+            <Flex gap="30px" className="base-title" align="center">
+              <Typography.Title style={{ margin: 0 }}>
+                {props.title}
+              </Typography.Title>
               {props.extra}
             </Flex>
           )}

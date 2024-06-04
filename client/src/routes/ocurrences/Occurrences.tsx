@@ -2,6 +2,7 @@ import {
   DeleteOutlined,
   PushpinOutlined,
   WarningOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -17,7 +18,7 @@ import {
 } from 'antd';
 import React, { useState } from 'react';
 import { NeighborhoodModel } from '../../api/neighborhood';
-import { OccurenceModel } from '../../api/occurences';
+import { OccurrenceModel } from '../../api/occurrences';
 import { SubscriptionModel } from '../../api/subscription';
 import { LoggedLayout } from '../../layout/logged/LoggedLayout';
 import { useAsync } from '../../utils/async';
@@ -25,7 +26,7 @@ import { dateDistance } from '../../utils/time';
 import { translateType } from '../../utils/translate';
 
 const Notifications: React.FC = () => {
-  const { result: occurenceList } = useAsync(() => OccurenceModel.list());
+  const { result: occurrenceList } = useAsync(() => OccurrenceModel.list());
   const { result: neighborhoods } = useAsync(() => NeighborhoodModel.list());
   const { result: subscriptions, refetch: refetchSubscriptions } = useAsync(
     () => SubscriptionModel.list()
@@ -55,27 +56,27 @@ const Notifications: React.FC = () => {
   return (
     <LoggedLayout
       selected="notifications"
-      title="Noficações"
+      title="Notificações"
       extra={
         <Button
           type="primary"
-          style={{ marginTop: '10px' }}
           onClick={() => setOpenDrawer(true)}
+          icon={<PlusOutlined />}
         >
-          Subscribe
+          Inscrever-se em bairros
         </Button>
       }
     >
       <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-        {occurenceList?.occurences.map((occ, i) => (
+        {occurrenceList?.occurrences.map((occ, i) => (
           <Card
             title={
               <span>
-                {translateType(occ.occurence.type)}
+                {translateType(occ.occurrence.type)}
                 <span style={{ fontWeight: '400' }}>
                   {' - '}
-                  {dateDistance(occ.occurence.createdAt as Date, true)}
-                  {i < occurenceList.unread && (
+                  {dateDistance(occ.occurrence.createdAt as Date, true)}
+                  {i < occurrenceList.unread && (
                     <Tag color="red" style={{ marginLeft: '10px' }}>
                       Não lida
                     </Tag>
@@ -97,7 +98,7 @@ const Notifications: React.FC = () => {
                 {
                   key: '2',
                   label: 'Descrição',
-                  children: occ.occurence.description,
+                  children: occ.occurrence.description,
                 },
                 {
                   key: '3',
@@ -116,7 +117,7 @@ const Notifications: React.FC = () => {
         ))}
       </Space>
       <Drawer
-        title="Subscribe to neighborhood"
+        title="Inscreva-se em bairros"
         placement="right"
         closable={true}
         open={openDrawer}
@@ -131,7 +132,7 @@ const Notifications: React.FC = () => {
         >
           <Select
             mode="multiple"
-            placeholder="Select neighborhood"
+            placeholder="Selecionar bairros"
             style={{ width: '100%' }}
             options={neighborhoods?.map((n) => ({
               label: n.name,
@@ -146,13 +147,13 @@ const Notifications: React.FC = () => {
             }}
           />
           <Button type="primary" onClick={subscribe}>
-            Subscribe
+            Inscrever-se
           </Button>
         </Flex>
         <Table
           columns={[
             {
-              title: 'Neighborhood',
+              title: 'Bairro',
               dataIndex: 'neighborhood',
               key: 'neighborhood',
               render: (_, rec) => (

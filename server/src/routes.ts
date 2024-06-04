@@ -8,6 +8,7 @@ import occurrenceRoutes from './entities/occurrence/routes';
 import subscriptionRoutes from './entities/subscription/routes';
 import neighborhoodRoutes from './entities/neighborhood/routes';
 import sensorRoutes from './entities/sensor/routes';
+import messageRoutes from './entities/messages/routes';
 
 export class Routes {
   constructor(app: Application) {
@@ -20,5 +21,6 @@ export class Routes {
     app.use('/api/subscription', subscriptionRoutes);
     app.use('/api/neighborhood', neighborhoodRoutes);
     app.use('/api/sensor', sensorRoutes);
+    app.use('/api/messages', messageRoutes);
   }
 }

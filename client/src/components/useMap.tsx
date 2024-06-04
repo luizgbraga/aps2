@@ -5,7 +5,7 @@ import { ShapesModel } from '../api/shape';
 import { TripDTO } from '../api/trip';
 import { RoutesModel } from '../api/route';
 import { useAsync } from '../utils/async';
-import { OccurenceModel } from '../api/occurences';
+import { OccurrenceModel } from '../api/occurrences';
 
 async function fetchTrips(targetRouteId: string[]) {
   const allTrips = await TripsModel.getAllTrips();
@@ -74,6 +74,7 @@ export const useMap = (
     clearPaths,
   } = mapController();
   const [map, setMap] = useState<google.maps.Map | null>(null);
+
   const [paths, setPaths] = useState<
     {
       route_id: string | undefined;
@@ -88,7 +89,7 @@ export const useMap = (
     { route_id: string; polyline: google.maps.Polyline }[]
   >([]);
   const prevMarkersRef = useRef([] as google.maps.Marker[]);
-  const { result: allOccurences } = useAsync(() => OccurenceModel.all());
+  const { result: allOccurrences } = useAsync(() => OccurrenceModel.all());
 
   map?.addListener('click', (e: any) => {
     if (!pinnable) return;
@@ -111,11 +112,11 @@ export const useMap = (
       if (prevMarkersRef.current.length && pinnable) return;
       setLocationToCurrent(map);
       addRecentralizeButton(map);
-      if (allOccurences && !pinnable) {
-        allOccurences.forEach((occurence) => {
+      if (allOccurrences && !pinnable) {
+        allOccurrences.forEach((occurrence) => {
           const m = addMarker(map, {
-            lat: parseFloat(occurence.latitude),
-            lng: parseFloat(occurence.longitude),
+            lat: parseFloat(occurrence.latitude),
+            lng: parseFloat(occurrence.longitude),
           });
           if (m) {
             prevMarkersRef.current.push(m);
@@ -123,7 +124,16 @@ export const useMap = (
         });
       }
     }
-  }, [map, ref, pinnable, allOccurences]);
+  }, [
+    map,
+    ref,
+    pinnable,
+    allOccurrences,
+    setup,
+    setLocationToCurrent,
+    addRecentralizeButton,
+    addMarker,
+  ]);
 
   function clearMarkers(markers: google.maps.Marker[]) {
     for (const m of markers) {
