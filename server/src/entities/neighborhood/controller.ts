@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { NeighborhoodRepository } from './repository';
+import { repositories } from '../../entities/factory';
 
 export class NeighborhoodController {
   static async fill(req: Request, res: Response) {
     try {
-      const result = await NeighborhoodRepository.fill();
+      const result = await repositories.neighborhood.fill();
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);
@@ -13,7 +13,7 @@ export class NeighborhoodController {
 
   static async list(req: Request, res: Response) {
     try {
-      const result = await NeighborhoodRepository.list();
+      const result = await repositories.neighborhood.list();
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);
@@ -23,7 +23,7 @@ export class NeighborhoodController {
   static async getFromName(req: Request, res: Response) {
     try {
       const name = req.query.name as string;
-      const result = await NeighborhoodRepository.getFromName(name);
+      const result = await repositories.neighborhood.getFromName(name);
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);
