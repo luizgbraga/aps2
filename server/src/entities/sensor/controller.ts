@@ -4,9 +4,9 @@ import { FakeSensorRepository } from './repository';
 const sensorRepository = new FakeSensorRepository();
 
 export class SensorController {
-  static async list(req: Request, res: Response) {
+  static async getAllStatuses(req: Request, res: Response) {
     try {
-      const result = await sensorRepository.list();
+      const result = await sensorRepository.getAllStatuses();
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);

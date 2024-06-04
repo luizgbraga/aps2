@@ -1,6 +1,6 @@
 import { OccurrenceType, occurrences } from './schema';
 import { db } from '../../database';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { SubscriptionRepository } from '../../entities/subscription/repository';
 import { neighborhood, subscriptions } from '../../database/schemas';
 import { SensorStatus } from '../../entities/sensor/schema';
@@ -154,70 +154,6 @@ export class OccurrenceRepository {
     }
   };
 
-  static listApproved = async () => {
-    try {
-      const result = await db
-        .select()
-        .from(occurrences)
-        .innerJoin(neighborhood, eq(occurrences.neighborhoodId, neighborhood.id))
-        .where(eq(occurrences.confirmed, true));
-      return result.map((occ) => ({
-        occurence: occ.occurrences,
-        neighborhood: occ.neighborhood,
-        sensor: sensorRepository.getSensorData(occ.neighborhood.id),
-      }));
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  static countPerZone = async () => {
-    try {
-      return await db
-        .select({
-          zone: neighborhood.zone,
-          count: sql<number>`cast(count(${occurrences.id}) as int)`,
-        })
-        .from(occurrences)
-        .innerJoin(neighborhood, eq(occurrences.neighborhoodId, neighborhood.id))
-        .where(eq(occurrences.confirmed, true))
-        .groupBy(neighborhood.zone);
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  static countPerNeighborhood = async () => {
-    try {
-      return await db
-        .select({
-          neighborhood: neighborhood.name,
-          count: sql<number>`cast(count(${occurrences.id}) as int)`,
-        })
-        .from(occurrences)
-        .innerJoin(neighborhood, eq(occurrences.neighborhoodId, neighborhood.id))
-        .where(eq(occurrences.confirmed, true))
-        .groupBy(neighborhood.name);
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  static countPerType = async () => {
-    try {
-      return await db
-        .select({
-          type: occurrences.type,
-          count: sql<number>`cast(count(${occurrences.id}) as int)`,
-        })
-        .from(occurrences)
-        .where(eq(occurrences.confirmed, true))
-        .groupBy(occurrences.type);
-    } catch (error) {
-      throw error;
-    }
-  };
-
   static confirm = async (id: string) => {
     try {
       const updated = await db
@@ -289,7 +225,7 @@ export class OccurrenceRepository {
           status.sensor.longitude.toString(),
           status.sensor.radius,
         );
-      if (status.state.flooding > 0 && !alreadyHasFlooding.length) {
+      if (status.state.flood > 0 && !alreadyHasFlooding.length) {
         await OccurrenceRepository.create(
           'flooding',
           `Alagamento detectado pelo sensor ${status.sensor.id}`,
@@ -300,7 +236,7 @@ export class OccurrenceRepository {
           true,
         );
       }
-      if (status.state.flooding === 0 && alreadyHasFlooding.length) {
+      if (status.state.flood === 0 && alreadyHasFlooding.length) {
         for (const occurrence of alreadyHasFlooding) {
           await OccurrenceRepository.stopOccurrence(occurrence.id);
           const affectedRoutedIds = await AffectRepository.getAffectedRoutes(

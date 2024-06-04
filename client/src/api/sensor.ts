@@ -11,7 +11,7 @@ export type Sensor = {
 };
 
 export type SensorState = {
-  flooding: number;
+  flood: number;
   landslide: number;
   congestion: number;
 };
@@ -26,7 +26,7 @@ class SensorAPI extends API {
     super(`${API_URL}/sensor`);
   }
 
-  async list(): Promise<Response<{ lat: number; lng: number }[]>> {
+  async getAllStatuses(): Promise<Response<SensorStatus[]>> {
     return this.request('GET', '', null, null, null);
   }
 }
@@ -34,7 +34,9 @@ class SensorAPI extends API {
 const api = new SensorAPI();
 
 export class SensorModel {
-  static async list() {
-    return api.list();
+  static async getAllStatuses() {
+    const res = await api.getAllStatuses();
+    if (res.type === 'ERROR') throw new Error(res.cause);
+    return res.result;
   }
 }

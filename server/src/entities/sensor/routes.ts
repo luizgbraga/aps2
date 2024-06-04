@@ -10,7 +10,7 @@ class SensorRoutes {
   }
 
   private init() {
-    this.router.get('/', SensorController.list);
+    this.router.get('/', SensorController.getAllStatuses);
   }
 }
 
