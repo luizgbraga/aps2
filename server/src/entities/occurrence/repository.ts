@@ -5,8 +5,8 @@ import { SubscriptionRepository } from '../../entities/subscription/repository';
 import { neighborhood, subscriptions } from '../../database/schemas';
 import { SensorStatus } from '../../entities/sensor/schema';
 import { FakeSensorRepository } from '../../entities/sensor/repository';
-import { AffectRepository } from 'entities/affect/repository';
-import { MessagesRepository } from 'entities/messages/repository';
+import { AffectRepository } from '../../entities/affect/repository';
+import { MessagesRepository } from '../../entities/messages/repository';
 
 const EARTH_RADIUS = 6371000;
 const sensorRepository = new FakeSensorRepository();
