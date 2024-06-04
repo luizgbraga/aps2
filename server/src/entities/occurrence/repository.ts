@@ -1,30 +1,64 @@
-import { OccurenceType, Occurences, occurences } from './schema';
+import { OccurenceType, Occurences as Occurrences, occurences } from './schema';
 import { db } from '../../database';
 import { and, eq } from 'drizzle-orm';
-import {
-  FakeSubscriptionRepository,
-  SubscriptionRepository,
-} from '../../entities/subscription/repository';
-import { Subscriptions, subscriptions } from '../../database/schemas';
+import { SubscriptionRepository, FakeSubscriptionRepository } from '../../entities/subscription/repository';
+import { Neighborhood, Subscriptions, neighborhood, subscriptions } from '../../database/schemas';
+import { SensorStatus } from '../../entities/sensor/schema';
+import { FakeSensorRepository } from '../../entities/sensor/repository';
+
+
+const sensorRepository = new FakeSensorRepository();
 
 export interface IOccurrenceRepository {
-  add(
+  find(
+    type: OccurenceType,
+    latitude: string,
+    longitude: string
+  ): Promise<Occurrences[]>;
+  create(
     type: OccurenceType,
     description: string,
     neighborhoodId: string,
     latitude: string,
     longitude: string,
-  ): Promise<Occurences[]>;
+    radius: number,
+    confirmed: boolean
+  ): Promise<Occurrences[]>;
+  all(): Promise<Occurrences[]>;
   list(
     userId: string,
-  ): Promise<{ subscriptions: Subscriptions; occurences: Occurences }[]>;
+  ): Promise<{ subscriptions: Subscriptions; occurences: Occurrences }[]>;
   confirm(id: string): Promise<void>;
+  listToApprove(): Promise<{neighborhood: Neighborhood; occurences: Occurrences}[]>;
+  delete(id: string): Promise<Occurrences[]>;
+  addOccurrencesFromSensorsStatuses(statuses: SensorStatus[]): Promise<void>;
 }
 
 export class OccurrenceRepository implements IOccurrenceRepository {
   subscriptionRepository = new SubscriptionRepository();
 
-  add = async (
+  find = async (
+    type: OccurenceType,
+    latitude: string,
+    longitude: string,
+  ) => {
+    try {
+      return await db
+        .select()
+        .from(occurences)
+        .where(
+          and(
+            eq(occurences.type, type),
+            eq(occurences.latitude, latitude),
+            eq(occurences.longitude, longitude),
+          ),
+        );
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  create = async (
     type: OccurenceType,
     description: string,
     neighborhoodId: string,
@@ -35,9 +69,9 @@ export class OccurrenceRepository implements IOccurrenceRepository {
   ) => {
     try {
       let isConfirmed = false;
-      const find = await OccurrenceRepository.find(type, latitude, longitude);
+      const find = await this.find(type, latitude, longitude);
       if (find.length > 0) {
-        return find[0];
+        return find;
       }
       if (!confirmed) {
         const check = await sensorRepository.check(
@@ -58,9 +92,9 @@ export class OccurrenceRepository implements IOccurrenceRepository {
         longitude,
         confirmed: isConfirmed,
         radius,
-      });
+      }).returning();
       if (confirmed) {
-        SubscriptionRepository.incrementUnread(neighborhoodId);
+        this.subscriptionRepository.incrementUnread(neighborhoodId);
       }
       return result;
     } catch (error) {
@@ -68,12 +102,12 @@ export class OccurrenceRepository implements IOccurrenceRepository {
     }
   };
 
-  static all = async () => {
+  all = async () => {
     try {
       return await db
-        .insert(occurences)
-        .values({ type, description, neighborhoodId, latitude, longitude })
-        .returning();
+        .select()
+        .from(occurences)
+        .where(eq(occurences.confirmed, true));
     } catch (error) {
       throw error;
     }
@@ -103,7 +137,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
     }
   };
 
-  static listToApprove = async () => {
+  listToApprove = async () => {
     try {
       return await db
         .select()
@@ -130,7 +164,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
     }
   };
 
-  static delete = async (id: string) => {
+  delete = async (id: string) => {
     try {
       return await db
         .delete(occurences)
@@ -141,12 +175,12 @@ export class OccurrenceRepository implements IOccurrenceRepository {
     }
   };
 
-  static addOccurrencesFromSensorsStatuses = async (
+  addOccurrencesFromSensorsStatuses = async (
     statuses: SensorStatus[],
   ) => {
     for (const status of statuses) {
       if (status.state.flood > 0) {
-        await OccurrenceRepository.create(
+        await this.create(
           'flooding',
           `Alagamento detectado pelo sensor ${status.sensor.id}`,
           status.sensor.neighborhoodId,
@@ -157,7 +191,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
         );
       }
       if (status.state.landslide > 0) {
-        await OccurrenceRepository.create(
+        await this.create(
           'landslide',
           `Deslizamento detectado pelo sensor ${status.sensor.id}`,
           status.sensor.neighborhoodId,
@@ -168,7 +202,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
         );
       }
       if (status.state.congestion > 0) {
-        await OccurrenceRepository.create(
+        await this.create(
           'congestion',
           `Congestionamento detectado pelo sensor ${status.sensor.id}`,
           status.sensor.neighborhoodId,
@@ -183,23 +217,25 @@ export class OccurrenceRepository implements IOccurrenceRepository {
 }
 
 export class FakeOccurrenceRepository implements IOccurrenceRepository {
-  fakeOccurrences: Occurences[];
+  fakeOccurrences: Occurrences[];
   fakeSubscriptions: Subscriptions[];
 
   constructor(
-    initialFakeOccurrences: Occurences[],
+    initialFakeOccurrences: Occurrences[],
     initialFakeSubscriptions: Subscriptions[],
   ) {
     this.fakeOccurrences = initialFakeOccurrences;
     this.fakeSubscriptions = initialFakeSubscriptions;
   }
 
-  add = async (
+  create = async (
     type: OccurenceType,
     description: string,
     neighborhoodId: string,
     latitude: string,
     longitude: string,
+    radius: number,
+    isConfirmed: boolean
   ) => {
     try {
       const occurrence = {
@@ -212,6 +248,8 @@ export class FakeOccurrenceRepository implements IOccurrenceRepository {
         longitude: longitude,
         confirmed: false,
         updatedAt: new Date(),
+        radius: radius,
+        isConfirmed: isConfirmed
       };
       this.fakeOccurrences.push(occurrence);
       return [occurrence];
@@ -223,7 +261,7 @@ export class FakeOccurrenceRepository implements IOccurrenceRepository {
   list = async (userId: string) => {
     const joinResult: {
       subscriptions: Subscriptions;
-      occurences: Occurences;
+      occurences: Occurrences;
     }[] = [];
     this.fakeSubscriptions.forEach((subscriptionElement) => {
       this.fakeOccurrences.forEach((occurrenceElement) => {
@@ -243,7 +281,7 @@ export class FakeOccurrenceRepository implements IOccurrenceRepository {
   };
 
   confirm = async (id: string) => {
-    const modifiedOccurrences = [] as Occurences[];
+    const modifiedOccurrences = [] as Occurrences[];
     this.fakeOccurrences.forEach((element) => {
       if (element.id === id) {
         element.confirmed = true;
@@ -257,4 +295,24 @@ export class FakeOccurrenceRepository implements IOccurrenceRepository {
       initialFakeSubscription.incrementUnread(element.neighborhoodId);
     });
   };
+
+  async all(): Promise<Occurrences[]> {
+    throw new Error("Not Implemented");
+  }
+
+  async listToApprove(): Promise<{neighborhood: Neighborhood; occurences: Occurrences}[]> {
+    throw new Error("Not Implemented");
+  }
+
+  async delete(id: string): Promise<Occurrences[]> {
+    throw new Error("Not Implemented");
+  }
+
+  async addOccurrencesFromSensorsStatuses(statuses: SensorStatus[]): Promise<void> {
+    throw new Error("Not Implemented");
+  }
+
+  async find(type: OccurenceType, latitude: string, longitude: string): Promise<Occurrences[]> {
+    throw new Error("Not Implemented");
+  }
 }

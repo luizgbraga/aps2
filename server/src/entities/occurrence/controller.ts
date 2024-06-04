@@ -12,7 +12,7 @@ export class OccurrenceController {
       const neighborhoodId = req.body.neighborhoodId;
       const latitude = req.body.latitude;
       const longitude = req.body.longitude;
-      const result = await repository.add(
+      const result = await repository.create(
         type,
         description,
         neighborhoodId,
@@ -29,7 +29,7 @@ export class OccurrenceController {
 
   static async all(req: Request, res: Response) {
     try {
-      const result = await OccurrenceRepository.all();
+      const result = await repository.all();
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);
@@ -48,7 +48,7 @@ export class OccurrenceController {
 
   static async listToApprove(req: Request, res: Response) {
     try {
-      const result = await OccurrenceRepository.listToApprove();
+      const result = await repository.listToApprove();
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);
@@ -68,7 +68,7 @@ export class OccurrenceController {
   static async delete(req: Request, res: Response) {
     try {
       const id = req.body.id;
-      const result = await OccurrenceRepository.delete(id);
+      const result = await repository.delete(id);
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);

@@ -1,11 +1,14 @@
 import { Subscriptions, subscriptions } from './schema';
 import { db } from '../../database';
 import { eq, sql } from 'drizzle-orm';
-import { neighborhood } from '../../database/schemas';
+import { Neighborhood, neighborhood } from '../../database/schemas';
 
 export interface ISubscriptionRepository {
   subscribe(userId: string, neighborhoodId: string): Promise<Subscriptions[]>;
   incrementUnread(neighborhoodId: string): Promise<Subscriptions[]>;
+  unsubscribe(userId: string, neighborhoodId: string): Promise<Subscriptions[]>;
+  setUnreadToZero(userId: string): Promise<Subscriptions[]>;
+  list(userId: string): Promise<Neighborhood[]>;
 }
 
 export class SubscriptionRepository implements ISubscriptionRepository {
@@ -15,6 +18,16 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         .insert(subscriptions)
         .values({ userId, neighborhoodId })
         .returning();
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  unsubscribe = async (userId: string, neighborhoodId: string) => {
+    try {
+      return await db
+        .delete(subscriptions)
+        .where(eq(subscriptions.neighborhoodId, neighborhoodId)).returning();
     } catch (error) {
       throw error;
     }
@@ -32,7 +45,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     }
   };
 
-  static setUnreadToZero = async (userId: string) => {
+  setUnreadToZero = async (userId: string) => {
     try {
       return await db
         .update(subscriptions)
@@ -44,7 +57,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     }
   };
 
-  static list = async (userId: string) => {
+  list = async (userId: string) => {
     try {
       const result = await db
         .select()
@@ -79,6 +92,21 @@ export class FakeSubscriptionRepository implements ISubscriptionRepository {
     return [subscription];
   };
 
+  unsubscribe = async (userId: string, neighborhoodId: string) => {
+    const newSubscriptionsArray = [] as Subscriptions[];
+    const deletedSubscriptions = [] as Subscriptions[];
+    this.fakeSubscriptions.forEach(subscription => {
+      if(subscription.userId === userId && subscription.neighborhoodId === neighborhoodId) {
+        deletedSubscriptions.push(subscription);
+      }
+      else {
+        newSubscriptionsArray.push(subscription)
+      }
+    });
+    this.fakeSubscriptions = newSubscriptionsArray;
+    return deletedSubscriptions;
+  };
+
   incrementUnread = async (neighborhoodId: string) => {
     const updatedSubscriptionss = [] as Subscriptions[];
 
@@ -91,4 +119,21 @@ export class FakeSubscriptionRepository implements ISubscriptionRepository {
 
     return updatedSubscriptionss;
   };
+
+  setUnreadToZero = async (userId: string) => {
+    const updatedSubscriptionss = [] as Subscriptions[];
+
+    this.fakeSubscriptions.forEach((element) => {
+      if (element.userId === userId) {
+        element.unread = 0;
+        updatedSubscriptionss.push(element);
+      }
+    });
+
+    return updatedSubscriptionss;
+  };
+  
+  list = async (userId: string) => {
+    throw new Error("Not implemented");
+  }
 }
