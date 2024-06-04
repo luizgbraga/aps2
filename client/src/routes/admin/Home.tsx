@@ -1,5 +1,4 @@
-import React from 'react';
-
+import React, { useRef } from 'react';
 import { AdminLayout } from '../../layout/admin/AdminLayout';
 import { useAsync } from '../../utils/async';
 import { OccurrenceModel } from '../../api/occurrences';
@@ -7,8 +6,9 @@ import { Descriptions, Flex, Table, Tabs, TabsProps } from 'antd';
 import { Bar, Pie } from '@ant-design/plots';
 import DescriptionsItem from 'antd/es/descriptions/Item';
 import { MessageModel } from '../../api/messages';
-// import { SensorModel } from '../../api/sensor';
-// import { useMap } from '../../components/useMap';
+import { useMap } from '../../components/useMap';
+import { Wrapper } from '@googlemaps/react-wrapper';
+import { MAPS_API_KEY } from '../../config';
 
 interface NeighborhoodFilter {
   text: string;
@@ -24,10 +24,11 @@ const occurrenceType = {
 export const AHome: React.FC = () => {
   const res = useAsync(() => OccurrenceModel.listApproved());
   const messages = useAsync(() => MessageModel.all());
+  const ref = useRef<HTMLDivElement>(null);
+  const { map } = useMap(ref, false, true);
   console.log(res);
   const countPerZone = useAsync(() => OccurrenceModel.countPerZone());
   const countPerType = useAsync(() => OccurrenceModel.countPerType());
-  // const sensors = useAsync(() => SensorModel.list());
   const neighborhoodAdded: string[] = [];
   const neighborhoodFilters = res.result
     ? res.result.reduce((prev: NeighborhoodFilter[], curr) => {
@@ -187,7 +188,18 @@ export const AHome: React.FC = () => {
     {
       key: '4',
       label: 'Sensores',
-      children: <div>sensores aq</div>
+      children: (
+        <Wrapper apiKey={MAPS_API_KEY}>
+          <div
+            ref={ref}
+            style={{
+              height: '500px',
+              width: '100%',
+              display: map ? 'flex' : 'none',
+            }}
+          />
+        </Wrapper>
+      )
     },
   ];
 
