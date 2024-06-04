@@ -74,9 +74,13 @@ function calculateDistance(point1: Point, point2: Point): number {
   );
 }
 
-function calculateBorderPoints(shape: Point[], center: Point, radius: number) : [[Point, Point][],Point[][]]{
-  let partitionedShape : Point[][] = []
-  let currentShape : Point[] = []
+function calculateBorderPoints(
+  shape: Point[],
+  center: Point,
+  radius: number,
+): [[Point, Point][], Point[][]] {
+  let partitionedShape: Point[][] = [];
+  let currentShape: Point[] = [];
   let pairs: [Point, Point][] = [];
   let left: number = 0;
   let right: number = 0;
@@ -94,34 +98,35 @@ function calculateBorderPoints(shape: Point[], center: Point, radius: number) : 
     }
     if (index == 0 || index == shape.length - 1) return [[], [shape]];
     right++;
-    if(currentShape.length !== 0){
+    if (currentShape.length !== 0) {
       partitionedShape.push(currentShape);
       currentShape = [];
     }
   }
-  if(currentShape.length !== 0){
+  if (currentShape.length !== 0) {
     partitionedShape.push(currentShape);
   }
   return [pairs, partitionedShape];
 }
 
-function mergeAlternately(arr1: Point[][], arr2: Point[][]) : Point[]{
+function mergeAlternately(arr1: Point[][], arr2: Point[][]): Point[] {
   let result: Point[] = [];
   const maxLength = Math.max(arr1.length, arr2.length);
   for (let i = 0; i < maxLength; i++) {
-      if (i < arr1.length) {
-          result.concat(arr1[i]);
-      }
-      if (i < arr2.length) {
-          result.concat(arr2[i]);
-      }
+    if (i < arr1.length) {
+      result.concat(arr1[i]);
+    }
+    if (i < arr2.length) {
+      result.concat(arr2[i]);
+    }
   }
   return result;
 }
 
-
 export class AffectRepository {
-  static getAffectedRoutes = async (occurence_id: string) => {
+  tripsRepository = new TripRepository();
+
+  getAffectedRoutes = async (occurence_id: string) => {
     try {
       const result = await db
         .select({ route_id: affect.route_id })
@@ -135,7 +140,7 @@ export class AffectRepository {
       throw error;
     }
   };
-  static affectNewRoute = async (
+  affectNewRoute = async (
     occurence_id: string,
     route_id: string,
     inactive: boolean,
@@ -159,11 +164,11 @@ export class AffectRepository {
       throw error;
     }
   };
-  static getNewWaypointShape = async (
+  getNewWaypointShape = async (
     origin: Point,
     destination: Point,
     waypoints: Point[],
-  ) : Promise<[Point[],number]> => {
+  ): Promise<[Point[], number]> => {
     const apikey = process.env.MAPS_API_KEY;
     const requestBody = {
       origin: {
@@ -230,7 +235,7 @@ export class AffectRepository {
       return null;
     }
   };
-  static queryAffectedRoutes = async (
+  queryAffectedRoutes = async (
     latitude: number,
     longitude: number,
     radius: number,
@@ -252,20 +257,20 @@ export class AffectRepository {
       .innerJoin(sq, eq(sq.trip_id, trips.id));
     return queryResult;
   };
-  static updateAffectedRoutes = async (
+  updateAffectedRoutes = async (
     occurence_id: string,
     latitude: number,
     longitude: number,
     radius: number,
   ) => {
     try {
-      const queryResult = await AffectRepository.queryAffectedRoutes(
+      const queryResult = await this.queryAffectedRoutes(
         latitude,
         longitude,
         radius,
       );
       queryResult.forEach(async (element) => {
-        const trips = await TripRepository.getTrips(element.route_id);
+        const trips = await this.tripsRepository.getTrips(element.route_id);
         const center: Point = [latitude, longitude];
         trips.forEach(async (trip) => {
           const shape = await ShapeRepository.getShape(trip.id);
@@ -277,30 +282,49 @@ export class AffectRepository {
             center,
             radius,
           );
-          const newShapesArrayAndDistancePromises = borderPoints.map(async (pair) => {
-            const waypoints = calculateWaypoints(
-              pair[0],
-              pair[1],
-              center,
-              WAYPOINTS_NUM,
-            );
-            return await AffectRepository.getNewWaypointShape(pair[0], pair[1], waypoints);
+          const newShapesArrayAndDistancePromises = borderPoints.map(
+            async (pair) => {
+              const waypoints = calculateWaypoints(
+                pair[0],
+                pair[1],
+                center,
+                WAYPOINTS_NUM,
+              );
+              return await this.getNewWaypointShape(
+                pair[0],
+                pair[1],
+                waypoints,
+              );
+            },
+          );
+          const newShapesArrayAndDistance = await Promise.all(
+            newShapesArrayAndDistancePromises,
+          );
+          const newShapesArray = newShapesArrayAndDistance.map((element) => {
+            return element[0];
           });
-          const newShapesArrayAndDistance = await Promise.all(newShapesArrayAndDistancePromises);
-          const newShapesArray = newShapesArrayAndDistance.map((element) => { return element[0]; });
-          const tooLongShapesArray = newShapesArrayAndDistance.filter((element) => element[1] >= 2000);
-          const mergedArray = mergeAlternately(partitionedShape, newShapesArray);
-          const inactivateRoute : boolean = borderPoints.length === 0 || tooLongShapesArray.length > 0;
-          if(!inactivateRoute){
-            for (let i = 1;i < mergedArray.length; i++){
-              ShapeRepository.addNewShape(trip.id, i, mergedArray[i][0], mergedArray[i][1], 0, true);
+          const tooLongShapesArray = newShapesArrayAndDistance.filter(
+            (element) => element[1] >= 2000,
+          );
+          const mergedArray = mergeAlternately(
+            partitionedShape,
+            newShapesArray,
+          );
+          const inactivateRoute: boolean =
+            borderPoints.length === 0 || tooLongShapesArray.length > 0;
+          if (!inactivateRoute) {
+            for (let i = 1; i < mergedArray.length; i++) {
+              ShapeRepository.addNewShape(
+                trip.id,
+                i,
+                mergedArray[i][0],
+                mergedArray[i][1],
+                0,
+                true,
+              );
             }
           }
-          AffectRepository.affectNewRoute(
-            occurence_id,
-            element.route_id,
-            inactivateRoute,
-          );
+          this.affectNewRoute(occurence_id, element.route_id, inactivateRoute);
         });
       });
       return queryResult;

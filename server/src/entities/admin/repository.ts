@@ -6,7 +6,7 @@ import { generate } from '../../utils/token';
 import { compare, hash } from '../../utils/hash';
 
 export class AdminRepository {
-  static login = async (username: string, password: string) => {
+  login = async (username: string, password: string) => {
     try {
       const result = await db
         .select()
@@ -26,7 +26,7 @@ export class AdminRepository {
     }
   };
 
-  static me = async (userId: string) => {
+  me = async (userId: string) => {
     try {
       return await db.select().from(admins).where(eq(admins.id, userId));
     } catch (error) {

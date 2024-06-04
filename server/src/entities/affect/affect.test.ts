@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { AffectRepository } from './repository';
 
+const repository = new AffectRepository();
 describe('updateAffectedRoutes', () => {
   it('should return the expected array of route_ids', async () => {
     const expectedResult = [
@@ -17,13 +18,13 @@ describe('updateAffectedRoutes', () => {
       { route_id: 'O0788AAA0A' },
       { route_id: 'O0812AAA0A' },
       { route_id: 'O0819AAA0A' },
-      { route_id: 'O0926AAA0A' }
+      { route_id: 'O0926AAA0A' },
     ];
-    const result = await AffectRepository.updateAffectedRoutes(
+    const result = await repository.updateAffectedRoutes(
       '123',
       -22.874878,
       -43.463678,
-      50
+      50,
     );
     expect(result).toEqual(expectedResult);
   });

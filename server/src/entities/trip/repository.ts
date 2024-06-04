@@ -1,16 +1,19 @@
-import { trips } from './schema';
+import { trips, Trip } from './schema';
 import { db } from '../../database';
 import { AddNewTripError, GetAllTripsError } from './errors';
-import { eq } from 'drizzle-orm'
+import { eq } from 'drizzle-orm';
 
 export class TripRepository {
-  static getTrips = async (route_id : string) => {
+  getTrips = async (route_id: string) => {
     try {
       let result = null;
-      if(route_id == '*'){
+      if (route_id == '*') {
         result = await db.select().from(trips);
-      } else{
-        result = await db.select().from(trips).where(eq(trips.route_id,route_id));
+      } else {
+        result = await db
+          .select()
+          .from(trips)
+          .where(eq(trips.route_id, route_id));
       }
       if (result.length === 0) {
         throw new GetAllTripsError('NO TRIPS REGISTERED');
@@ -20,7 +23,8 @@ export class TripRepository {
       throw error;
     }
   };
-  static addNewTrip = async (
+
+  addNewTrip = async (
     id: string,
     route_id: string,
     headsign: string,

@@ -1,11 +1,11 @@
 import { neighborhood } from './schema';
 import { db } from '../../database';
-import { eq, ne, sql } from 'drizzle-orm';
 import { neighborhoods } from './all';
 import { FindError } from './errors';
+import { eq } from 'drizzle-orm';
 
 export class NeighborhoodRepository {
-  static fill = async () => {
+  fill = async () => {
     try {
       const all = neighborhoods.map((neighborhood) => ({
         name: neighborhood.name,
@@ -17,7 +17,7 @@ export class NeighborhoodRepository {
     }
   };
 
-  static list = async () => {
+  list = async () => {
     try {
       return await db.select().from(neighborhood);
     } catch (error) {
@@ -25,7 +25,7 @@ export class NeighborhoodRepository {
     }
   };
 
-  static getFromName = async (name: string) => {
+  getFromName = async (name: string) => {
     try {
       const result = await db
         .select()
