@@ -1,8 +1,10 @@
-import { Button, Flex, Form, Input, Modal, Radio, Steps } from 'antd';
+import { Button, Flex, Form, Input, Modal, Radio, Spin, Steps } from 'antd';
 import React, { useRef, useState } from 'react';
 import { OccurrenceModel, OccurrenceType } from '../api/occurrences';
 import { useMap } from './useMap';
 import { NeighborhoodModel } from '../api/neighborhood';
+import { Status, Wrapper } from '@googlemaps/react-wrapper';
+import { MAPS_API_KEY } from '../config';
 
 type Props = {
   open: boolean;
@@ -55,6 +57,21 @@ export const AddOccurrence: React.FC<Props> = (props: Props) => {
     });
   };
 
+  const render = (status: Status) => {
+    if (status === Status.LOADING) {
+      return (
+        <Flex
+          justify="center"
+          align="center"
+          style={{ width: '100%', height: '100%' }}
+        >
+          <Spin size="large" />
+        </Flex>
+      );
+    }
+    return <span />;
+  };
+
   return (
     <Modal
       open={props.open}
@@ -80,15 +97,16 @@ export const AddOccurrence: React.FC<Props> = (props: Props) => {
         {step === 0 && (
           <>
             <Form.Item label="Localização" required>
-              <div
-                className="teste job"
-                ref={ref}
-                style={{
-                  height: '320px',
-                  width: '100%',
-                  display: map ? 'flex' : 'none',
-                }}
-              />
+              <Wrapper apiKey={MAPS_API_KEY} render={render}>
+                <div
+                  ref={ref}
+                  style={{
+                    height: '320px',
+                    width: '100%',
+                    display: map ? 'flex' : 'none',
+                  }}
+                />
+              </Wrapper>
             </Form.Item>
             <Flex justify="end" gap="12px">
               <Button onClick={props.onCancel}>Cancelar</Button>
