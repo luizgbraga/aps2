@@ -24,6 +24,7 @@ export class RouteController {
         type: routeTypeMap[route.type],
         color: route.color,
         text_color: colorFormatterMap[route.text_color],
+        inactive: route.inactive,
       }));
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
