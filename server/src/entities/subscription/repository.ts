@@ -1,11 +1,11 @@
-import { Subscriptions, subscriptions } from './schema';
+import { Subscription, subscriptions } from './schema';
 import { db } from '../../database';
 import { eq, sql } from 'drizzle-orm';
 import { neighborhood } from '../../database/schemas';
 
 export interface ISubscriptionRepository {
-  subscribe(userId: string, neighborhoodId: string): Promise<Subscriptions[]>;
-  incrementUnread(neighborhoodId: string): Promise<Subscriptions[]>;
+  subscribe(userId: string, neighborhoodId: string): Promise<Subscription[]>;
+  incrementUnread(neighborhoodId: string): Promise<Subscription[]>;
 }
 
 export class SubscriptionRepository implements ISubscriptionRepository {
@@ -62,9 +62,9 @@ export class SubscriptionRepository implements ISubscriptionRepository {
 }
 
 export class FakeSubscriptionRepository implements ISubscriptionRepository {
-  fakeSubscriptions: Subscriptions[];
+  fakeSubscriptions: Subscription[];
 
-  constructor(initialFakeSubscription: Subscriptions[]) {
+  constructor(initialFakeSubscription: Subscription[]) {
     this.fakeSubscriptions = initialFakeSubscription;
   }
 
@@ -80,7 +80,7 @@ export class FakeSubscriptionRepository implements ISubscriptionRepository {
   };
 
   incrementUnread = async (neighborhoodId: string) => {
-    const updatedSubscriptionss = [] as Subscriptions[];
+    const updatedSubscriptionss = [] as Subscription[];
 
     this.fakeSubscriptions.forEach((element) => {
       if (element.neighborhoodId === neighborhoodId) {
