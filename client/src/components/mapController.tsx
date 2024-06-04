@@ -49,19 +49,41 @@ export const mapController = () => {
     paths: {
       route_id: string | undefined;
       shape: google.maps.LatLngLiteral[];
+      inactive: boolean;
       color: string;
       text_color: string;
     }[],
     setPolylines: any
   ) => {
     paths.forEach((element) => {
-      const path = new window.google.maps.Polyline({
-        path: element.shape,
-        geodesic: true,
-        strokeColor: element.color,
-        strokeOpacity: 0.6,
-        strokeWeight: 4,
-      });
+      const path = new window.google.maps.Polyline(
+        element.inactive
+          ? {
+              path: element.shape,
+              geodesic: true,
+              strokeColor: element.color,
+              strokeOpacity: 0.6,
+              strokeWeight: 6,
+              icons: [
+                {
+                  icon: {
+                    path: 'M 0,-1 0,1',
+                    strokeOpacity: 10,
+                    scale: 3,
+                  },
+                  offset: '0',
+                  repeat: '10px',
+                },
+              ],
+            }
+          : {
+              path: element.shape,
+              geodesic: true,
+              strokeColor: element.color,
+              strokeOpacity: 0.6,
+              strokeWeight: 4,
+            }
+      );
       path.setMap(map);
       setPolylines((polylines: any) => [
         ...polylines,
