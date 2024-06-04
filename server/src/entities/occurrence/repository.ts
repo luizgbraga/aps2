@@ -10,7 +10,7 @@ import {
 } from '../../database/schemas';
 import { FakeSensorRepository } from '../../entities/sensor/repository';
 import { SensorStatus } from '../../entities/sensor/schema';
-import { repositories } from 'entities/factory';
+import { repositories } from '../../entities/factory';
 
 const EARTH_RADIUS = 6371000;
 const sensorRepository = new FakeSensorRepository();

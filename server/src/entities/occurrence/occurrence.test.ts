@@ -16,6 +16,7 @@ describe('subscribe', () => {
           longitude: 'longitude',
           confirmed: false,
           updatedAt: new Date(),
+          active: true,
         },
       ],
       [

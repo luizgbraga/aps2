@@ -109,10 +109,13 @@ export class FakeSubscriptionRepository implements ISubscriptionRepository {
   };
 
   unsubscribe = async (userId: string, neighborhoodId: string) => {
-    this.subscriptions = this.subscriptions.filter(
-      (sub) => sub.userId !== userId && sub.neighborhoodId !== neighborhoodId,
-    );
-    return this.subscriptions;
+    const unsubscribeds = [];
+    for (const sub of this.subscriptions) {
+      if (sub.userId === userId && sub.neighborhoodId === neighborhoodId) {
+        unsubscribeds.push(sub);
+      }
+    }
+    return unsubscribeds;
   };
 
   incrementUnread = async (neighborhoodId: string) => {

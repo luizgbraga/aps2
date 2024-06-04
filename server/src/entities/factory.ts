@@ -1,4 +1,4 @@
-import { FakeUserRepository, UserRepository } from './user/repository';
+import { UserRepository } from './user/repository';
 import { TripRepository } from './trip/repository';
 import { SubscriptionRepository } from './subscription/repository';
 import { OccurrenceRepository } from './occurrence/repository';
