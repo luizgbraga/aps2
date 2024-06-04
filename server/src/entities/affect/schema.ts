@@ -2,6 +2,7 @@ import { pgTable, uuid, varchar, primaryKey } from 'drizzle-orm/pg-core';
 import { InferSelectModel } from 'drizzle-orm';
 import { routes } from '../route/schema';
 import { occurences } from '../occurrence/schema';
+import { boolean } from 'drizzle-orm/mysql-core';
 
 export const affect = pgTable('affect', {
   occurence_id: uuid('occurence_id').references(() => occurences.id).notNull(),

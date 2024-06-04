@@ -64,7 +64,7 @@ export class OccurrenceRepository {
         longitude,
         confirmed: isConfirmed,
         radius,
-      });
+      }).returning();
       if (confirmed) {
         SubscriptionRepository.incrementUnread(neighborhoodId);
       }

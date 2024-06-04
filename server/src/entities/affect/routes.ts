@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { RouteController } from './controller';
+import { AffectController } from './controller';
 import { affectNewRoute} from './schemas';
 import { validateBody } from '../../middlewares/validate';
 import cors from 'cors';
@@ -13,7 +13,7 @@ class AffectRoutes {
 
   init() {
     this.router.use(cors());
-    this.router.get('/affectedRoutes',RouteController.getAffectedRoutes);
+    this.router.get('/affectedRoutes', AffectController.getAffectedRoutes);
     this.router.options('*', cors());
   }
 }

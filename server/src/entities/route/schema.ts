@@ -1,6 +1,7 @@
 import { pgTable, uuid, varchar } from 'drizzle-orm/pg-core';
 import { InferSelectModel } from 'drizzle-orm';
 import { integer } from 'drizzle-orm/pg-core';
+import { boolean } from 'drizzle-orm/pg-core';
 
 export const routes = pgTable('routes', {
   id: varchar('id').primaryKey(),
@@ -10,6 +11,7 @@ export const routes = pgTable('routes', {
   type: integer('type').notNull(),
   color: varchar('color', { length: 255 }).notNull(),
   text_color: varchar('text_color', { length: 255 }).notNull(),
+  inactive: boolean('inactive')
 });
 
 export type Routes = InferSelectModel<typeof routes>;
