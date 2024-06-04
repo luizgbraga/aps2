@@ -16,7 +16,7 @@ class ShapesAPI extends API {
 
   async getShape(trip_id: string): Promise<Response<ShapeDTO[]>> {
     const query = `trip_id=${trip_id}`;
-    return this.request('GET', '/', null, null, query);
+    return this.request('GET', 'get-shape', null, null, query);
   }
 }
 
