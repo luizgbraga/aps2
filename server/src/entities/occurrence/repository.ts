@@ -1,23 +1,27 @@
 import { OccurrenceType, occurrences } from './schema';
 import { db } from '../../database';
-import { and, eq, lt, sql } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { SubscriptionRepository } from '../../entities/subscription/repository';
 import { neighborhood, subscriptions } from '../../database/schemas';
 import { SensorStatus } from '../../entities/sensor/schema';
 import { FakeSensorRepository } from '../../entities/sensor/repository';
 
+const EARTH_RADIUS = 6371000;
 const sensorRepository = new FakeSensorRepository();
 
 export class OccurrenceRepository {
-  static find = async (
+  static findNearOccurrences = async (
     type: OccurrenceType,
     latitude: string,
     longitude: string,
     distance: number,
   ) => {
     try {
-      const allOcc = await db.select().from(occurrences);
-      return allOcc.filter((occurrence) => {
+      const allOccurrences = await db.select().from(occurrences);
+      return allOccurrences.filter((occurrence) => {
+        if (occurrence.type !== type) {
+          return false;
+        }
         const distanceBetween = Math.acos(
           Math.sin(parseFloat(latitude)) *
             Math.sin(Number(occurrence.latitude)) +
@@ -25,7 +29,7 @@ export class OccurrenceRepository {
               Math.cos(Number(occurrence.latitude)) *
               Math.cos(parseFloat(longitude) - Number(occurrence.longitude)),
         );
-        return distanceBetween * 6371000 < distance;
+        return distanceBetween * EARTH_RADIUS < distance;
       });
     } catch (error) {
       throw error;
@@ -43,7 +47,7 @@ export class OccurrenceRepository {
   ) => {
     try {
       let isConfirmed = false;
-      const find = await OccurrenceRepository.find(
+      const find = await OccurrenceRepository.findNearOccurrences(
         type,
         latitude,
         longitude,
@@ -59,6 +63,7 @@ export class OccurrenceRepository {
         );
         if (check) {
           isConfirmed = true;
+          // call(lat, lng, rad)
         }
       } else {
         isConfirmed = true;
@@ -71,9 +76,10 @@ export class OccurrenceRepository {
         longitude,
         confirmed: isConfirmed,
         radius,
-      });
+      }).returning();
       if (confirmed) {
         SubscriptionRepository.incrementUnread(neighborhoodId);
+        // add message
       }
       return result;
     } catch (error) {
@@ -143,6 +149,7 @@ export class OccurrenceRepository {
         .returning();
       updated.forEach((occurrence) => {
         SubscriptionRepository.incrementUnread(occurrence.neighborhoodId);
+        // call(lat, lng, rad)
       });
     } catch (error) {
       throw error;
@@ -176,24 +183,26 @@ export class OccurrenceRepository {
     statuses: SensorStatus[],
   ) => {
     for (const status of statuses) {
-      const alreadyHasFlooding = await OccurrenceRepository.find(
+      const alreadyHasFlooding = await OccurrenceRepository.findNearOccurrences(
         'flooding',
         status.sensor.latitude.toString(),
         status.sensor.longitude.toString(),
         status.sensor.radius,
       );
-      const alreadyHasLandslide = await OccurrenceRepository.find(
-        'landslide',
-        status.sensor.latitude.toString(),
-        status.sensor.longitude.toString(),
-        status.sensor.radius,
-      );
-      const alreadyHasCongestion = await OccurrenceRepository.find(
-        'congestion',
-        status.sensor.latitude.toString(),
-        status.sensor.longitude.toString(),
-        status.sensor.radius,
-      );
+      const alreadyHasLandslide =
+        await OccurrenceRepository.findNearOccurrences(
+          'landslide',
+          status.sensor.latitude.toString(),
+          status.sensor.longitude.toString(),
+          status.sensor.radius,
+        );
+      const alreadyHasCongestion =
+        await OccurrenceRepository.findNearOccurrences(
+          'congestion',
+          status.sensor.latitude.toString(),
+          status.sensor.longitude.toString(),
+          status.sensor.radius,
+        );
       if (status.state.flood > 0 && !alreadyHasFlooding.length) {
         await OccurrenceRepository.create(
           'flooding',

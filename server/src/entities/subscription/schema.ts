@@ -23,4 +23,4 @@ export const subscriptions = pgTable(
   }),
 );
 
-export type Subscriptions = InferSelectModel<typeof subscriptions>;
+export type Subscription = InferSelectModel<typeof subscriptions>;
