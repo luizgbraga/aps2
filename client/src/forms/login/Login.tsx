@@ -1,20 +1,10 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import {
-  Button,
-  Flex,
-  Form,
-  Input,
-  Typography,
-  notification,
-  Segmented,
-} from 'antd';
+import { Button, Flex, Form, Input, Typography, notification } from 'antd';
 import { LoginModel } from '../../api/login';
 import { toCpf } from '../../utils/string';
 import { AuthContext } from '../../Wrappers';
-
-type Login = 'Cidadão' | 'Ônibus';
 
 export const LoginForm: React.FC = () => {
   const nav = useNavigate();
@@ -23,7 +13,6 @@ export const LoginForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [cpf, setCpf] = useState('');
   const [password, setPassword] = useState('');
-  const [login, setLogin] = useState<Login>('Cidadão');
 
   const onSubmit = () => {
     setLoading(true);
@@ -54,14 +43,6 @@ export const LoginForm: React.FC = () => {
         onFinish={onSubmit}
       >
         <Flex vertical align="center">
-          {' '}
-          <Segmented
-            options={['Cidadão', 'Ônibus']}
-            value={login}
-            onChange={setLogin}
-            size="large"
-            style={{ marginBottom: '20px' }}
-          />
           <Typography.Title level={2} style={{ margin: 4 }}>
             Bem-vindo de volta
           </Typography.Title>

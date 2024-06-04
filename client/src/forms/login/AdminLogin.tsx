@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button, Flex, Form, Input, Typography, notification } from 'antd';
-import { AdminLoginModel } from '../../api/admin';
+import { AdminModel } from '../../api/admin';
+import { AdminContext } from '../../Wrappers';
 
 export const AdminLogin: React.FC = () => {
   const nav = useNavigate();
+  const admin = useContext(AdminContext);
 
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState('');
@@ -13,10 +15,11 @@ export const AdminLogin: React.FC = () => {
 
   const onSubmit = () => {
     setLoading(true);
-    AdminLoginModel.login(username, password)
+    AdminModel.login(username, password)
       .then((res) => {
         localStorage.setItem('token', res);
-        nav('/_admin/home');
+        nav('/_admin/dashboard');
+        admin.refetch();
       })
       .catch((e) => {
         notification.error({

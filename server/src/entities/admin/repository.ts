@@ -25,4 +25,12 @@ export class AdminRepository {
       throw error;
     }
   };
+
+  static me = async (userId: string) => {
+    try {
+      return await db.select().from(admins).where(eq(admins.id, userId));
+    } catch (error) {
+      throw error;
+    }
+  };
 }

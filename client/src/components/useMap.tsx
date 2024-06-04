@@ -105,8 +105,6 @@ export const useMap = (
   });
 
   useEffect(() => {
-    console.log(ref.current);
-    console.log(map);
     if (ref.current && !map) {
       setMap(setup(ref.current));
     }
