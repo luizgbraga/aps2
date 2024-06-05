@@ -17,14 +17,17 @@ async function fetchTrips(targetRouteId: string[]) {
   return filteredTrips.map((trip) => {
     let color = '';
     let text_color = '';
+    let inactive = false
     const route = allRoutes.find((x) => x.id === trip.route_id);
     if (route) {
+      inactive = route.inactive;
       color = '#' + route.color;
       if (route.text_color) text_color = route.text_color;
     }
     return {
       route_id: route?.id,
       trip: trip,
+      inactive: inactive,
       color: color,
       text_color: text_color,
     };
@@ -35,6 +38,7 @@ async function fetchTripsShapes(
   trips: {
     route_id: string | undefined;
     trip: TripDTO;
+    inactive: boolean;
     color: string;
     text_color: string;
   }[]
@@ -44,6 +48,7 @@ async function fetchTripsShapes(
     return {
       route_id: element.route_id,
       shape: shape,
+      inactive: element.inactive,
       color: element.color,
       text_color: element.text_color,
     };
@@ -55,6 +60,7 @@ async function fetchTripsShapes(
       shape: shapeObject.shape.map((shape) => {
         return { lat: shape.pt_lat, lng: shape.pt_lon };
       }),
+      inactive: shapeObject.inactive,
       color: shapeObject.color,
       text_color: shapeObject.color,
     };
@@ -76,11 +82,11 @@ export const useMap = (
     clearPaths,
   } = mapController();
   const [map, setMap] = useState<google.maps.Map | null>(null);
-
   const [paths, setPaths] = useState<
     {
       route_id: string | undefined;
       shape: { lat: number; lng: number }[];
+      inactive: boolean;
       color: string;
       text_color: string;
     }[]
@@ -101,41 +107,23 @@ export const useMap = (
       true
     );
     clearMarkers(prevMarkersRef.current);
-    if (m) {
-      prevMarkersRef.current.push(m);
-    }
+    if (m) prevMarkersRef.current.push(m);
   });
 
   useEffect(() => {
-    if (ref.current && !map) {
-      setMap(setup(ref.current));
-    }
-    if (map) {
-      if (prevMarkersRef.current.length && pinnable) return;
-      setLocationToCurrent(map);
-      addRecentralizeButton(map);
-      if (allOccurrences && !pinnable && !admin) {
-        allOccurrences.forEach((occurrence) => {
-          const m = addMarker(map, {
-            lat: parseFloat(occurrence.latitude),
-            lng: parseFloat(occurrence.longitude),
-          });
-          if (m) {
-            prevMarkersRef.current.push(m);
-          }
+    if (ref.current && !map) setMap(setup(ref.current));
+    if (!map) return;
+    if (prevMarkersRef.current.length && pinnable) return;
+    setLocationToCurrent(map);
+    addRecentralizeButton(map);
+    if (allOccurrences && !pinnable) {
+      allOccurrences.forEach((occurrence) => {
+        const m = addMarker(map, {
+          lat: parseFloat(occurrence.latitude),
+          lng: parseFloat(occurrence.longitude),
         });
-      }
-      if (allSensors && !pinnable && admin) {
-        allSensors.forEach((sensor) => {
-          const m = addMarker(map, {
-            lat: sensor.lat,
-            lng: sensor.lng,
-          }, false, 'blue');
-          if (m) {
-            prevMarkersRef.current.push(m);
-          }
-        });
-      }
+        if (m) prevMarkersRef.current.push(m);
+      });
     }
   }, [
     map,
@@ -149,9 +137,7 @@ export const useMap = (
   ]);
 
   function clearMarkers(markers: google.maps.Marker[]) {
-    for (const m of markers) {
-      m.setMap(null);
-    }
+    for (const m of markers) m.setMap(null);
   }
 
   // changeRouteIds is called when the user updates the filter. It (and the following useEffects) draws the newly selected lines and removes any that were removed
@@ -162,11 +148,11 @@ export const useMap = (
     const removedRoutes = routeIds.filter(
       (route) => !newRouteIds.includes(route)
     );
-    setRouteIds(newRouteIds);
-    setRouteIdsToDraw(addedRoutes);
     const polylinesToRemove = polylines.filter((polyline) =>
       removedRoutes.includes(polyline.route_id)
     );
+    setRouteIds(newRouteIds);
+    setRouteIdsToDraw(addedRoutes);
     clearPaths(polylinesToRemove);
   };
 

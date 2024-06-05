@@ -15,6 +15,14 @@ export class RouteRepository {
       throw error;
     }
   };
+  static getRoute = async (id : string) => {
+    try {
+      const result = await db.select().from(routes).where(eq(routes.id, id));
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
   static addNewRoute = async (
     id: string,
     short_name: string,

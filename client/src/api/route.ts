@@ -11,6 +11,7 @@ export type RouteDTO = {
   type: string;
   color: string;
   text_color?: string;
+  inactive: boolean;
 };
 
 class RouteAPI extends API {

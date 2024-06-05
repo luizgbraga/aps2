@@ -11,9 +11,8 @@ import {
 import { FakeSensorRepository } from '../../entities/sensor/repository';
 import { SensorStatus } from '../../entities/sensor/schema';
 import { repositories } from '../../entities/factory';
-
-const EARTH_RADIUS = 6371000;
-const sensorRepository = new FakeSensorRepository();
+import { AffectRepository, EARTH_RADIUS } from '../../entities/affect/repository';
+import { MessagesRepository } from '../../entities/messages/repository';
 
 export interface IOccurrenceRepository {
   findNearOccurrences(
@@ -57,10 +56,10 @@ export class OccurrenceRepository implements IOccurrenceRepository {
         }
         const distanceBetween = Math.acos(
           Math.sin(parseFloat(latitude)) *
-            Math.sin(Number(occurrence.latitude)) +
-            Math.cos(parseFloat(latitude)) *
-              Math.cos(Number(occurrence.latitude)) *
-              Math.cos(parseFloat(longitude) - Number(occurrence.longitude)),
+          Math.sin(Number(occurrence.latitude)) +
+          Math.cos(parseFloat(latitude)) *
+          Math.cos(Number(occurrence.latitude)) *
+          Math.cos(parseFloat(longitude) - Number(occurrence.longitude)),
         );
         return distanceBetween * EARTH_RADIUS < distance;
       });
@@ -90,7 +89,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
         return find;
       }
       if (!confirmed) {
-        const check = await sensorRepository.check(
+        const check = await repositories.sensor.check(
           Number(latitude),
           Number(longitude),
         );
@@ -199,7 +198,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
       return result.map((occ) => ({
         occurrence: occ.occurrences,
         neighborhood: occ.neighborhood,
-        sensor: sensorRepository.getSensorData(occ.neighborhood.id),
+        sensor: repositories.sensor.getSensorData(occ.neighborhood.id),
       }));
     } catch (error) {
       throw error;
@@ -344,6 +343,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
           const affectedRoutedIds = await repositories.affect.getAffectedRoutes(
             occurrence.id,
           );
+          repositories.affect.normalizeAffectedRoutes(affectedRoutedIds.map((route) => route.route_id));
           affectedRoutedIds.forEach(async (route) => {
             await repositories.messages.add(route.route_id, 'TODO3');
           });
@@ -366,6 +366,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
           const affectedRoutedIds = await repositories.affect.getAffectedRoutes(
             occurrence.id,
           );
+          repositories.affect.normalizeAffectedRoutes(affectedRoutedIds.map((route) => route.route_id));
           affectedRoutedIds.forEach(async (route) => {
             await repositories.messages.add(route.route_id, 'TODO3');
           });
@@ -388,6 +389,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
           const affectedRoutedIds = await repositories.affect.getAffectedRoutes(
             occurrence.id,
           );
+          repositories.affect.normalizeAffectedRoutes(affectedRoutedIds.map((route) => route.route_id));
           affectedRoutedIds.forEach(async (route) => {
             await repositories.messages.add(route.route_id, 'TODO3');
           });

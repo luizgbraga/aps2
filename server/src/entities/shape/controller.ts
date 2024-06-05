@@ -20,7 +20,7 @@ export class RouteController {
       if (error instanceof GetShapeBadRequestError) {
         res.status(400).json(error);
       } else {
-        
+
         res.status(500).json(error);
       }
     }
@@ -32,12 +32,17 @@ export class RouteController {
       const pt_lat = req.body.pt_lat;
       const pt_lon = req.body.pt_lon;
       const dist_traveled = req.body.dist_traveled;
+      const shapeList = [
+        {
+          trip_id: trip_id,
+          pt_sequence: pt_sequence,
+          pt_lat: pt_lat,
+          pt_lon: pt_lon,
+          dist_traveled: dist_traveled
+        }
+      ]
       const result = await ShapeRepository.addNewShape(
-        trip_id,
-        pt_sequence,
-        pt_lat,
-        pt_lon,
-        dist_traveled,
+        shapeList,
         false
       );
       res.status(200).json({ result, type: 'SUCCESS' });
