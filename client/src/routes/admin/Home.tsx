@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { AdminLayout } from '../../layout/admin/AdminLayout';
 import { useAsync } from '../../utils/async';
 import { OccurrenceModel } from '../../api/occurrences';
-import { Descriptions, Flex, Table, Tabs, TabsProps } from 'antd';
+import { Button, Descriptions, Flex, Table, Tabs, TabsProps } from 'antd';
 import { Bar, Pie } from '@ant-design/plots';
 import DescriptionsItem from 'antd/es/descriptions/Item';
 import { MessageModel } from '../../api/messages';
@@ -27,6 +27,11 @@ export const AHome: React.FC = () => {
   const ref = useRef<HTMLDivElement>(null);
   const { map } = useMap(ref, false, true);
   console.log(res);
+  const stopOccurrence = (id: string) => {
+    OccurrenceModel.stopOccurrence(id).then(() => {
+      res.refetch();
+    })
+  }
   const countPerZone = useAsync(() => OccurrenceModel.countPerZone());
   const countPerType = useAsync(() => OccurrenceModel.countPerType());
   const neighborhoodAdded: string[] = [];
@@ -116,6 +121,15 @@ export const AHome: React.FC = () => {
                     {record.sensor
                       ? record.sensor[record.occurrence.type]
                       : ' Não há sensores nesta área'}
+                  </DescriptionsItem>
+                  <DescriptionsItem>
+                    <Button
+                      danger={true}
+                      type='primary'
+                      onClick={() => stopOccurrence(record.occurrence.id)}
+                    >
+                      Encerrar
+                    </Button>
                   </DescriptionsItem>
                 </Descriptions>
               </div>

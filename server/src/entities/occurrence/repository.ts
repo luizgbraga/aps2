@@ -89,6 +89,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
       if (find.length > 0) {
         return find;
       }
+      console.log(confirmed);
       if (!confirmed) {
         const check = await sensorRepository.check(
           Number(latitude),
@@ -195,7 +196,10 @@ export class OccurrenceRepository implements IOccurrenceRepository {
           neighborhood,
           eq(occurrences.neighborhoodId, neighborhood.id),
         )
-        .where(eq(occurrences.confirmed, true));
+        .where(and(
+          eq(occurrences.confirmed, true),
+          eq(occurrences.active, true)
+        ));
       return result.map((occ) => ({
         occurrence: occ.occurrences,
         neighborhood: occ.neighborhood,
