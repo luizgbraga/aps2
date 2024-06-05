@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { RouteRepository } from './repository';
+import { repositories } from '../factory';
 
 const routeTypeMap: { [key: number]: string } = {
   200: 'frescao',
@@ -15,7 +16,7 @@ const colorFormatterMap: { [key: string]: string } = {
 export class RouteController {
   static async getAllRoutes(req: Request, res: Response) {
     try {
-      const dbResults = await RouteRepository.getAllRoutes();
+      const dbResults = await repositories.route.getAllRoutes();
       const result = dbResults.map((route) => ({
         id: route.id,
         short_name: route.short_name,
@@ -40,7 +41,7 @@ export class RouteController {
       const type = req.body.type;
       const color = req.body.color;
       const text_color = req.body.text_color;
-      const result = await RouteRepository.addNewRoute(
+      const result = await repositories.route.addNewRoute(
         id,
         short_name,
         long_name,
