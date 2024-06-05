@@ -11,7 +11,10 @@ import {
 import { FakeSensorRepository } from '../../entities/sensor/repository';
 import { SensorStatus } from '../../entities/sensor/schema';
 import { repositories } from '../../entities/factory';
-import { AffectRepository, EARTH_RADIUS } from '../../entities/affect/repository';
+import {
+  AffectRepository,
+  EARTH_RADIUS,
+} from '../../entities/affect/repository';
 import { MessagesRepository } from '../../entities/messages/repository';
 
 export interface IOccurrenceRepository {
@@ -56,10 +59,10 @@ export class OccurrenceRepository implements IOccurrenceRepository {
         }
         const distanceBetween = Math.acos(
           Math.sin(parseFloat(latitude)) *
-          Math.sin(Number(occurrence.latitude)) +
-          Math.cos(parseFloat(latitude)) *
-          Math.cos(Number(occurrence.latitude)) *
-          Math.cos(parseFloat(longitude) - Number(occurrence.longitude)),
+            Math.sin(Number(occurrence.latitude)) +
+            Math.cos(parseFloat(latitude)) *
+              Math.cos(Number(occurrence.latitude)) *
+              Math.cos(parseFloat(longitude) - Number(occurrence.longitude)),
         );
         return distanceBetween * EARTH_RADIUS < distance;
       });
@@ -123,7 +126,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
             Number(result[0].longitude),
             result[0].radius,
           );
-        affectedRoutedIds.forEach(async (route) => {
+        affectedRoutedIds.forEach(async (route: any) => {
           await repositories.messages.add(route.route_id, 'TODO2');
         });
       }
@@ -195,10 +198,9 @@ export class OccurrenceRepository implements IOccurrenceRepository {
           neighborhood,
           eq(occurrences.neighborhoodId, neighborhood.id),
         )
-        .where(and(
-          eq(occurrences.confirmed, true),
-          eq(occurrences.active, true)
-        ));
+        .where(
+          and(eq(occurrences.confirmed, true), eq(occurrences.active, true)),
+        );
       return result.map((occ) => ({
         occurrence: occ.occurrences,
         neighborhood: occ.neighborhood,
@@ -278,7 +280,7 @@ export class OccurrenceRepository implements IOccurrenceRepository {
             Number(occurrence.longitude),
             occurrence.radius,
           );
-        affectedRoutedIds.forEach(async (route) => {
+        affectedRoutedIds.forEach(async (route: any) => {
           await repositories.messages.add(route.route_id, 'TODO');
         });
       });
@@ -347,7 +349,9 @@ export class OccurrenceRepository implements IOccurrenceRepository {
           const affectedRoutedIds = await repositories.affect.getAffectedRoutes(
             occurrence.id,
           );
-          repositories.affect.normalizeAffectedRoutes(affectedRoutedIds.map((route) => route.route_id));
+          repositories.affect.normalizeAffectedRoutes(
+            affectedRoutedIds.map((route) => route.route_id),
+          );
           affectedRoutedIds.forEach(async (route) => {
             await repositories.messages.add(route.route_id, 'TODO3');
           });
@@ -370,7 +374,9 @@ export class OccurrenceRepository implements IOccurrenceRepository {
           const affectedRoutedIds = await repositories.affect.getAffectedRoutes(
             occurrence.id,
           );
-          repositories.affect.normalizeAffectedRoutes(affectedRoutedIds.map((route) => route.route_id));
+          repositories.affect.normalizeAffectedRoutes(
+            affectedRoutedIds.map((route) => route.route_id),
+          );
           affectedRoutedIds.forEach(async (route) => {
             await repositories.messages.add(route.route_id, 'TODO3');
           });
@@ -393,7 +399,9 @@ export class OccurrenceRepository implements IOccurrenceRepository {
           const affectedRoutedIds = await repositories.affect.getAffectedRoutes(
             occurrence.id,
           );
-          repositories.affect.normalizeAffectedRoutes(affectedRoutedIds.map((route) => route.route_id));
+          repositories.affect.normalizeAffectedRoutes(
+            affectedRoutedIds.map((route) => route.route_id),
+          );
           affectedRoutedIds.forEach(async (route) => {
             await repositories.messages.add(route.route_id, 'TODO3');
           });

@@ -21,16 +21,16 @@ export const getOSRRoute = async (
   center: Point,
   radius: number,
 ): Promise<[Point[], number]> => {
+  const polygon = buildPolygon(center, radius);
+  const object = {
+    type: 'Polygon',
+    coordinates: [
+      polygon.map((point) => {
+        return invertPoint(point);
+      }),
+    ],
+  };
   try {
-    const polygon = buildPolygon(center, radius);
-    const object = {
-      type: 'Polygon',
-      coordinates: [
-        polygon.map((point) => {
-          return invertPoint(point);
-        }),
-      ],
-    };
     const response = await fetch(baseUrl, {
       method: 'POST',
       headers: {
@@ -44,7 +44,7 @@ export const getOSRRoute = async (
         },
       }),
     });
-    // console.log(start, end, center, polygon);
+    console.log(polygon);
     // if (!response.ok) {
     //   throw new Error(`Error fetching route: ${response.statusText}`);
     // }
@@ -60,9 +60,6 @@ export const getOSRRoute = async (
     // return [[], 9999999];
   }
 };
-
-const encodedPolyline =
-  'b{}jCff|fGu@iBa@w@cBoBgAeAqAgAu@_@UOcEsBmD_BoHeE_@U{@i@e@a@QQs@y@q@aAu@mAWa@{A_Ck@_A{@uA{AaCEU?mA@eBL{@J_@\\oAXkAl@}Bf@_Bn@uB|@sCHU|@wCFw@AkAEQAMQe@Wk@g@u@k@s@wCcDOO}B_COSqBgCeAmAWc@Yy@Qq@Kk@Ig@W}AKe@g@sCuAaH_AuCSq@i@eBc@}AYu@cBoEa@cAYq@GKyBcEq@oA[m@o@iAoBmDq@oAWi@Wk@g@_Am@eAQc@wAaCaBsC_@s@m@kAWu@w@qE[yBAGI]g@eBOYMOIEe@q@w@eAKa@Ca@ASDoAtAyFRw@La@rA{EL_ALgABYP_B?g@G{@?U_@}COeAOqBQ{AAYVu@FKLGhEoAXKtBo@XEd@Eh@Av@BpGb@j@?v@CjAExASn@QZKx@c@|@o@|{@wm@t@e@pBsAj@a@z@]`HgCt@SfIqA`@E`Ck@bFy@JC^ElB[h@MdFy@tAWr@QnBa@`AMb@Ix@WbCq@ZEVBLFt@t@hAnAfAr@nBdAf@Nh@cHJMLEp@D`Dh@~@JtAN~BDv@?tCOv@MbAO`@?f@KtBo@xC{@BC@KCQEGMCeARm@BUFcBd@sAXkBZO@QUEUBYTa@dAc@pBoAdAi@fBs@bBy@lA_@x@]~Bu@tIgClA[nA]`F{AjCeAf@Ol@K\\Id@GnBVzEM\\AXEfBu@ROBI?KAQs@gBS[_AYo@eAMU[_@MK_BcAK?GBGNCH?JRRRVdAr@Qn@U^Sb@@FoANIH?F';
 
 function decodePolyline(encoded: any) {
   let index = 0;

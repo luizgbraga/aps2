@@ -5,11 +5,8 @@ import { AddNewAffectError, GetAffectRoutesError } from './errors';
 import { eq, sql } from 'drizzle-orm';
 import { shapes } from '../shape/schema';
 import { trips } from '../trip/schema';
-import { TripRepository } from '../../entities/trip/repository';
 import { ShapeColumns, ShapeRepository } from '../../entities/shape/repository';
-import { RouteRepository } from '../../entities/route/repository';
-import { repositories } from '../factory';
-import { getOSRRoute } from './osr';
+import { repositories } from '../../entities/factory';
 
 export const EARTH_RADIUS = 6374895;
 const WAYPOINTS_NUM = 1;
@@ -35,9 +32,7 @@ function crossProductZ(origin: Point, destination: Point): number {
 function calculateArc(vector1: Point, vector2: Point, num: number): number {
   const dot = dotProduct(vector1, vector2);
   const cross = crossProductZ(vector1, vector2);
-  return (
-    (Math.abs(Math.atan2(cross, dot)) * cross) / Math.abs(cross) / (num + 1)
-  );
+  return (Math.abs(Math.atan2(cross, dot)) * cross) / Math.abs(cross) / (num + 1);
 }
 
 export function calculateWaypoints(
@@ -75,26 +70,20 @@ function calculateDistance(point1: Point, point2: Point): number {
     EARTH_RADIUS *
     Math.acos(
       Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.cos(lon2Rad - lon1Rad) +
-        Math.sin(lat1Rad) * Math.sin(lat2Rad),
+      Math.sin(lat1Rad) * Math.sin(lat2Rad),
     )
   );
 }
 
-export function calculateBorderPoints(
-  shape: Point[],
-  center: Point,
-  radius: number,
-): [[Point, Point][], Point[][]] {
-  let partitionedShape: Point[][] = [];
-  let currentShape: Point[] = [];
+export function calculateBorderPoints(shape: Point[], center: Point, radius: number): [[Point, Point][], Point[][]] {
+  let partitionedShape: Point[][] = []
+  let currentShape: Point[] = []
   let pairs: [Point, Point][] = [];
   let left: number = 0;
   let right: number = 0;
-  const distArray = shape
-    .map((point) => {
-      return calculateDistance(point, center);
-    })
-    .filter((el) => el <= radius);
+  const distArray = shape.map((point) => {
+    return calculateDistance(point, center);
+  }).filter((el) => el <= radius);
   let str = '';
   for (let index = 0; index < shape.length; index++) {
     const dist = calculateDistance(shape[index], center);
@@ -143,10 +132,9 @@ export function mergeAlternately(arr1: Point[][], arr2: Point[][]): Point[] {
   return result;
 }
 
-export class AffectRepository {
-  tripsRepository = new TripRepository();
 
-  getAffectedRoutes = async (occurence_id: string) => {
+export class AffectRepository {
+   getAffectedRoutes = async (occurence_id: string) => {
     try {
       const result = await db
         .select({ route_id: affect.route_id })
@@ -160,7 +148,7 @@ export class AffectRepository {
       throw error;
     }
   };
-  affectNewRoute = async (
+   affectNewRoute = async (
     occurence_id: string,
     route_id: string,
     inactive: boolean,
@@ -184,7 +172,7 @@ export class AffectRepository {
       throw error;
     }
   };
-  getNewWaypointShape = async (
+   getNewWaypointShape = async (
     origin: Point,
     destination: Point,
     waypoints: Point[],
@@ -250,8 +238,7 @@ export class AffectRepository {
       console.log('resposta maops: ' + JSON.stringify(data));
       const leg = data.routes[0].legs[0];
       const dist = leg.distanceMeters;
-      const coordinates: number[][] =
-        leg.polyline.geoJsonLinestring.coordinates;
+      const coordinates: number[][] = leg.polyline.geoJsonLinestring.coordinates;
       const points = coordinates.map((coordinate) => {
         const point: Point = [coordinate[1], coordinate[0]];
         return point;
@@ -263,7 +250,7 @@ export class AffectRepository {
       return [[], 99999999];
     }
   };
-  queryAffectedRoutes = async (
+   queryAffectedRoutes = async (
     latitude: number,
     longitude: number,
     radius: number,
@@ -285,7 +272,7 @@ export class AffectRepository {
       .innerJoin(sq, eq(sq.trip_id, trips.id));
     return queryResult;
   };
-  normalizeAffectedRoutes = async (route_ids: string[]) => {
+   normalizeAffectedRoutes = async (route_ids: string[]) => {
     route_ids.forEach(async (route_id) => {
       const trips = await repositories.trip.getTrips(route_id);
       trips.forEach(async (trip) => {
@@ -295,19 +282,19 @@ export class AffectRepository {
     });
     await Promise.all(route_ids);
   };
-  updateAffectedRoutes = async (
+   updateAffectedRoutes = async (
     occurence_id: string,
     latitude: number,
     longitude: number,
     radius: number,
   ) => {
     try {
-      const queryResult = await this.queryAffectedRoutes(
+      const queryResult = await repositories.affect.queryAffectedRoutes(
         latitude,
         longitude,
         radius,
       );
-      queryResult.forEach(async (element) => {
+      queryResult.forEach(async (element:any) => {
         const routeInfo = await repositories.route.getRoute(element.route_id);
         const trips = await repositories.trip.getTrips(element.route_id);
         const center: Point = [latitude, longitude];
@@ -321,57 +308,33 @@ export class AffectRepository {
             center,
             radius,
           );
-          const newShapesArrayAndDistancePromises = borderPoints.map(
-            async (pair) => {
-              //   const waypoints = calculateWaypoints(
-              //     pair[0],
-              //     pair[1],
-              //     center,
-              //     WAYPOINTS_NUM,
-              //   );
-              //   return await this.getNewWaypointShape(
-              //     pair[0],
-              //     pair[1],
-              //     waypoints,
-              //   );
-              // },
-              const ret = await getOSRRoute(pair[0], pair[1], center, radius);
-              console.log(ret);
-              return ret;
-            },
-          );
-          const newShapesArrayAndDistance = await Promise.all(
-            newShapesArrayAndDistancePromises,
-          );
-          const newShapesArray = newShapesArrayAndDistance.map((element) => {
-            return element[0];
+          const newShapesArrayAndDistancePromises = borderPoints.map(async (pair) => {
+            const waypoints = calculateWaypoints(
+              pair[0],
+              pair[1],
+              center,
+              WAYPOINTS_NUM,
+            );
+            return await repositories.affect.getNewWaypointShape(pair[0], pair[1], waypoints);
           });
-          const tooLongShapesArray = newShapesArrayAndDistance.filter(
-            (element) => element[1] >= 5000,
-          );
+          const newShapesArrayAndDistance = await Promise.all(newShapesArrayAndDistancePromises);
+          const newShapesArray = newShapesArrayAndDistance.map((element) => { return element[0]; });
+          const tooLongShapesArray = newShapesArrayAndDistance.filter((element) => element[1] >= 5000);
 
-          const mergedArray = mergeAlternately(
-            partitionedShape,
-            newShapesArray,
-          );
+          const mergedArray = mergeAlternately(partitionedShape, newShapesArray);
           // console.log(mergedArray);
           // console.log('border points vazio: ', borderPoints.length === 0);
           // console.log('border points vazio: ', newShapesArray.length === 0);
           // console.log('array muito longo: ', tooLongShapesArray.length > 0);
-          const inactivateRoute =
-            borderPoints.length === 0 ||
-            tooLongShapesArray.length > 0 ||
-            newShapesArray.length === 0;
+          const inactivateRoute = borderPoints.length === 0 || tooLongShapesArray.length > 0 || newShapesArray.length === 0;
           if (!inactivateRoute) {
-            const shapeInput: ShapeColumns[] = mergedArray.map(
-              (point, index) => ({
-                trip_id: trip.id,
-                pt_sequence: index + 1,
-                pt_lat: point[0],
-                pt_lon: point[1],
-                dist_traveled: 0,
-              }),
-            );
+            const shapeInput: ShapeColumns[] = mergedArray.map((point, index) => ({
+              trip_id: trip.id,
+              pt_sequence: index + 1,
+              pt_lat: point[0],
+              pt_lon: point[1],
+              dist_traveled: 0,
+            }));
             await ShapeRepository.addNewShape(shapeInput, true);
           }
           await repositories.affect.affectNewRoute(
