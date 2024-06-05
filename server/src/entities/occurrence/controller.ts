@@ -110,4 +110,14 @@ export class OccurrenceController {
       res.status(500).json(error);
     }
   }
+
+  static async stopOccurrence(req: Request, res: Response) {
+    try {
+      const id = req.body.id;
+      const result = await repository.stopOccurrence(id);
+      res.status(200).json({ result, type: 'SUCCESS' });
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
 }

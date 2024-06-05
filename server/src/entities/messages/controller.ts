@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { repositories } from '../../entities/factory'
+import { repositories } from '../../entities/factory';
+import { MessagesRepository } from './repository';
 
 export class MessagesController {
   static async list(req: Request, res: Response) {
