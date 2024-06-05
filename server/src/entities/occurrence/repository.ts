@@ -5,10 +5,9 @@ import { SubscriptionRepository } from '../../entities/subscription/repository';
 import { neighborhood, subscriptions } from '../../database/schemas';
 import { SensorStatus } from '../../entities/sensor/schema';
 import { FakeSensorRepository } from '../../entities/sensor/repository';
-import { AffectRepository } from '../../entities/affect/repository';
+import { AffectRepository, EARTH_RADIUS } from '../../entities/affect/repository';
 import { MessagesRepository } from '../../entities/messages/repository';
 
-const EARTH_RADIUS = 6371000;
 const sensorRepository = new FakeSensorRepository();
 
 export class OccurrenceRepository {
@@ -26,10 +25,10 @@ export class OccurrenceRepository {
         }
         const distanceBetween = Math.acos(
           Math.sin(parseFloat(latitude)) *
-            Math.sin(Number(occurrence.latitude)) +
-            Math.cos(parseFloat(latitude)) *
-              Math.cos(Number(occurrence.latitude)) *
-              Math.cos(parseFloat(longitude) - Number(occurrence.longitude)),
+          Math.sin(Number(occurrence.latitude)) +
+          Math.cos(parseFloat(latitude)) *
+          Math.cos(Number(occurrence.latitude)) *
+          Math.cos(parseFloat(longitude) - Number(occurrence.longitude)),
         );
         return distanceBetween * EARTH_RADIUS < distance;
       });
@@ -200,7 +199,6 @@ export class OccurrenceRepository {
       throw error;
     }
   };
-
   static updateOccurrencesFromSensorStatuses = async (
     statuses: SensorStatus[],
   ) => {
@@ -242,6 +240,7 @@ export class OccurrenceRepository {
           const affectedRoutedIds = await AffectRepository.getAffectedRoutes(
             occurrence.id,
           );
+          AffectRepository.normalizeAffectedRoutes(affectedRoutedIds.map((route) => route.route_id));
           affectedRoutedIds.forEach(async (route) => {
             await MessagesRepository.add(route.route_id, 'TODO3');
           });
@@ -264,6 +263,7 @@ export class OccurrenceRepository {
           const affectedRoutedIds = await AffectRepository.getAffectedRoutes(
             occurrence.id,
           );
+          AffectRepository.normalizeAffectedRoutes(affectedRoutedIds.map((route) => route.route_id));
           affectedRoutedIds.forEach(async (route) => {
             await MessagesRepository.add(route.route_id, 'TODO3');
           });
@@ -286,6 +286,7 @@ export class OccurrenceRepository {
           const affectedRoutedIds = await AffectRepository.getAffectedRoutes(
             occurrence.id,
           );
+          AffectRepository.normalizeAffectedRoutes(affectedRoutedIds.map((route) => route.route_id));
           affectedRoutedIds.forEach(async (route) => {
             await MessagesRepository.add(route.route_id, 'TODO3');
           });

@@ -1,7 +1,14 @@
 import { shapes, alt_shapes } from './schema';
 import { db } from '../../database';
 import { eq, and } from 'drizzle-orm';
-import { AddNewShapeError, GetShapeError } from './errors';
+
+export type ShapeColumns = {
+  trip_id: string;
+  pt_sequence: number;
+  pt_lat: number;
+  pt_lon: number;
+  dist_traveled: number;
+};
 
 export class ShapeRepository {
   static getShape = async (trip_id: string) => {
@@ -27,29 +34,42 @@ export class ShapeRepository {
       throw error;
     }
   };
+  static normalizeAltShape = async (trip_id: string) => {
+    try {
+      const result = await db
+        .delete(alt_shapes)
+        .where(eq(alt_shapes.trip_id, trip_id))
+        .returning();
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
   static addNewShape = async (
-    trip_id: string,
-    pt_sequence: number,
-    pt_lat: number,
-    pt_lon: number,
-    dist_traveled: number,
-    alt: boolean,
+    shapeList: ShapeColumns[],
+    alt: boolean
   ) => {
+    if (shapeList.length === 0) {
+      console.log("Shapelist empty");
+      return [];
+    }
     try {
       const table = alt ? alt_shapes : shapes;
-      const check = await db.select().from(table).where(and(eq(table.trip_id, trip_id), eq(table.pt_sequence, pt_sequence)));
+      const check = await db.select().from(table).where(and(eq(table.trip_id, shapeList[0].trip_id), eq(table.pt_sequence, 1)));
       if (check.length > 0) {
-        await db.delete(table).where(eq(table.trip_id, trip_id));
+        await db.delete(table).where(eq(table.trip_id, shapeList[0].trip_id));
       }
+      const valuesToInsert = shapeList.map(shape => ({
+        trip_id: shape.trip_id,
+        pt_sequence: shape.pt_sequence,
+        pt_lat: shape.pt_lat,
+        pt_lon: shape.pt_lon,
+        dist_traveled: shape.dist_traveled,
+      }));
+
       const result = await db
         .insert(table)
-        .values({
-          trip_id: trip_id,
-          pt_sequence: pt_sequence,
-          pt_lat: pt_lat,
-          pt_lon: pt_lon,
-          dist_traveled: dist_traveled,
-        })
+        .values(valuesToInsert)
         .returning();
       return result;
     } catch (error) {

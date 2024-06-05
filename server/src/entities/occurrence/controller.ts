@@ -16,7 +16,7 @@ export class OccurrenceController {
         neighborhoodId,
         latitude,
         longitude,
-        1000,
+        600,
         false,
       );
       res.status(200).json({ result, type: 'SUCCESS' });

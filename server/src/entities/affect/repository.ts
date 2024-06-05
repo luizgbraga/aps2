@@ -6,7 +6,7 @@ import { eq, sql } from 'drizzle-orm';
 import { shapes } from '../shape/schema';
 import { trips } from '../trip/schema';
 import { TripRepository } from '../../entities/trip/repository';
-import { ShapeRepository } from '../../entities/shape/repository';
+import { ShapeColumns, ShapeRepository } from '../../entities/shape/repository';
 import { RouteRepository } from '../../entities/route/repository';
 
 export const EARTH_RADIUS = 6374895;
@@ -273,6 +273,16 @@ export class AffectRepository {
       .innerJoin(sq, eq(sq.trip_id, trips.id));
     return queryResult;
   };
+  static normalizeAffectedRoutes = async (route_ids: string[]) => {
+    route_ids.forEach(async (route_id) => {
+      const trips = await TripRepository.getTrips(route_id);
+      trips.forEach(async (trip) => {
+        await ShapeRepository.normalizeAltShape(trip.id);
+      });
+      await Promise.all(trips);
+    });
+    await Promise.all(route_ids);
+  };
   static updateAffectedRoutes = async (
     occurence_id: string,
     latitude: number,
@@ -310,7 +320,7 @@ export class AffectRepository {
           });
           const newShapesArrayAndDistance = await Promise.all(newShapesArrayAndDistancePromises);
           const newShapesArray = newShapesArrayAndDistance.map((element) => { return element[0]; });
-          const tooLongShapesArray = newShapesArrayAndDistance.filter((element) => element[1] >= 10000);
+          const tooLongShapesArray = newShapesArrayAndDistance.filter((element) => element[1] >= 5000);
 
           const mergedArray = mergeAlternately(partitionedShape, newShapesArray);
           // console.log(mergedArray);
@@ -319,9 +329,14 @@ export class AffectRepository {
           // console.log('array muito longo: ', tooLongShapesArray.length > 0);
           const inactivateRoute = borderPoints.length === 0 || tooLongShapesArray.length > 0 || newShapesArray.length === 0;
           if (!inactivateRoute) {
-            for (let i = 1; i < mergedArray.length; i++) {
-              await ShapeRepository.addNewShape(trip.id, i, mergedArray[i][0], mergedArray[i][1], 0, true);
-            }
+            const shapeInput: ShapeColumns[] = mergedArray.map((point, index) => ({
+              trip_id: trip.id,
+              pt_sequence: index + 1,
+              pt_lat: point[0],
+              pt_lon: point[1],
+              dist_traveled: 0,
+            }));
+            await ShapeRepository.addNewShape(shapeInput, true);
           }
           await AffectRepository.affectNewRoute(
             occurence_id,
