@@ -3,6 +3,7 @@ import { InferSelectModel } from 'drizzle-orm';
 import { integer, serial } from 'drizzle-orm/pg-core';
 import { trips } from '../trip/schema';
 import { doublePrecision } from 'drizzle-orm/pg-core';
+import { boolean } from 'drizzle-orm/pg-core';
 
 export const shapes = pgTable('shapes', {
   id: serial('id').primaryKey(),

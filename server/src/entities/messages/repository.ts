@@ -16,7 +16,7 @@ export class MessagesRepository {
     }
   };
 
-  static all = async () => {
+  all = async () => {
     try {
       const result = await db
         .select()

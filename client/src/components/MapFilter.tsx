@@ -15,7 +15,7 @@ export const MapFilter: React.FC<Props> = (props: Props) => {
     }
     return busNumber + ', ' + busRoute.long_name;
   };
-
+  
   return (
     <Space style={{ width: '100%' }} direction="vertical">
       <Select

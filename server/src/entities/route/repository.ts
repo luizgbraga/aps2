@@ -4,7 +4,7 @@ import { db } from '../../database';
 import { AddNewRouteError, GetAllRoutesError } from './errors';
 
 export class RouteRepository {
-  static getAllRoutes = async () => {
+  getAllRoutes = async () => {
     try {
       const result = await db.select().from(routes);
       if (result.length === 0) {
@@ -15,7 +15,15 @@ export class RouteRepository {
       throw error;
     }
   };
-  static addNewRoute = async (
+  getRoute = async (id : string) => {
+    try {
+      const result = await db.select().from(routes).where(eq(routes.id, id));
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+  addNewRoute = async (
     id: string,
     short_name: string,
     long_name: string,
@@ -45,7 +53,7 @@ export class RouteRepository {
       throw error;
     }
   };
-  static updateRouteActivity = async (
+  updateRouteActivity = async (
     id: string,
     inactive: boolean,
   ) => {

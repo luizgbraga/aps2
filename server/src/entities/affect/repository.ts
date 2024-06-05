@@ -6,12 +6,13 @@ import { eq, sql } from 'drizzle-orm';
 import { shapes } from '../shape/schema';
 import { trips } from '../trip/schema';
 import { TripRepository } from '../../entities/trip/repository';
-import { ShapeRepository } from '../../entities/shape/repository';
+import { ShapeColumns, ShapeRepository } from '../../entities/shape/repository';
 import { RouteRepository } from '../../entities/route/repository';
+import { repositories } from '../factory'
 
 export const EARTH_RADIUS = 6374895;
-const WAYPOINTS_NUM = 2;
-type Point = [number, number];
+const WAYPOINTS_NUM = 1;
+export type Point = [number, number];
 
 function rotate(v: Point, arc: number): Point {
   const cosRad = Math.cos(arc);
@@ -33,10 +34,10 @@ function crossProductZ(origin: Point, destination: Point): number {
 function calculateArc(vector1: Point, vector2: Point, num: number): number {
   const dot = dotProduct(vector1, vector2);
   const cross = crossProductZ(vector1, vector2);
-  return (Math.abs(Math.atan2(cross, dot)) * cross) / Math.abs(cross) / num;
+  return (Math.abs(Math.atan2(cross, dot)) * cross) / Math.abs(cross) / (num + 1);
 }
 
-function calculateWaypoints(
+export function calculateWaypoints(
   origin: Point,
   destination: Point,
   center: Point,
@@ -45,7 +46,9 @@ function calculateWaypoints(
   const waypoints: Point[] = [];
   const v1: Point = [origin[0] - center[0], origin[1] - center[1]];
   const v2: Point = [destination[0] - center[0], destination[1] - center[1]];
+  //console.log(v1, v2, num);
   const arc = calculateArc(v1, v2, num);
+  //console.log(arc);
   let v: Point = rotate(v1, arc);
   for (let index = 0; index < num; index++) {
     const waypoint: Point = [center[0] + v[0], center[1] + v[1]];
@@ -69,24 +72,25 @@ function calculateDistance(point1: Point, point2: Point): number {
     EARTH_RADIUS *
     Math.acos(
       Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.cos(lon2Rad - lon1Rad) +
-        Math.sin(lat1Rad) * Math.sin(lat2Rad),
+      Math.sin(lat1Rad) * Math.sin(lat2Rad),
     )
   );
 }
 
-function calculateBorderPoints(
-  shape: Point[],
-  center: Point,
-  radius: number,
-): [[Point, Point][], Point[][]] {
-  let partitionedShape: Point[][] = [];
-  let currentShape: Point[] = [];
+export function calculateBorderPoints(shape: Point[], center: Point, radius: number): [[Point, Point][], Point[][]] {
+  let partitionedShape: Point[][] = []
+  let currentShape: Point[] = []
   let pairs: [Point, Point][] = [];
   let left: number = 0;
   let right: number = 0;
+  const distArray = shape.map((point) => {
+    return calculateDistance(point, center);
+  }).filter((el) => el <= radius);
+  let str = '';
   for (let index = 0; index < shape.length; index++) {
     const dist = calculateDistance(shape[index], center);
     if (dist > radius) {
+      str = str.concat('1');
       currentShape.push(shape[index]);
       if (left == right) {
         left++;
@@ -94,9 +98,15 @@ function calculateBorderPoints(
         continue;
       }
       pairs.push([shape[left - 1], shape[right]]);
+      right++;
+      left = right;
       continue;
     }
-    if (index == 0 || index == shape.length - 1) return [[], [shape]];
+    str = str.concat('0');
+    if (index == 0 || index == shape.length - 1) {
+      //console.log(str);
+      return [[], [shape]];
+    }
     right++;
     if (currentShape.length !== 0) {
       partitionedShape.push(currentShape);
@@ -106,18 +116,19 @@ function calculateBorderPoints(
   if (currentShape.length !== 0) {
     partitionedShape.push(currentShape);
   }
+  //console.log(str);
   return [pairs, partitionedShape];
 }
 
-function mergeAlternately(arr1: Point[][], arr2: Point[][]): Point[] {
+export function mergeAlternately(arr1: Point[][], arr2: Point[][]): Point[] {
   let result: Point[] = [];
   const maxLength = Math.max(arr1.length, arr2.length);
   for (let i = 0; i < maxLength; i++) {
     if (i < arr1.length) {
-      result.concat(arr1[i]);
+      result = result.concat(arr1[i]);
     }
     if (i < arr2.length) {
-      result.concat(arr2[i]);
+      result = result.concat(arr2[i]);
     }
   }
   return result;
@@ -157,7 +168,7 @@ export class AffectRepository {
         throw new AddNewAffectError('AFFECT NOT ADDED');
       }
       if (inactive) {
-        RouteRepository.updateRouteActivity(route_id, inactive);
+        repositories.route.updateRouteActivity(route_id, inactive);
       }
       return result;
     } catch (error) {
@@ -172,7 +183,7 @@ export class AffectRepository {
     const apikey = process.env.MAPS_API_KEY;
     const requestBody = {
       origin: {
-        via: true,
+        via: false,
         vehicleStopover: false,
         sideOfRoad: false,
         location: {
@@ -183,7 +194,7 @@ export class AffectRepository {
         },
       },
       destination: {
-        via: true,
+        via: false,
         vehicleStopover: false,
         sideOfRoad: false,
         location: {
@@ -206,7 +217,6 @@ export class AffectRepository {
       })),
       travelMode: 'DRIVE',
       polylineEncoding: 'GEO_JSON_LINESTRING',
-      computeAlternativeRoutes: true,
       units: 'METRIC',
     };
 
@@ -228,11 +238,19 @@ export class AffectRepository {
       );
 
       const data = await response.json();
-
-      return data;
+      console.log('resposta maops: ' + JSON.stringify(data));
+      const leg = data.routes[0].legs[0];
+      const dist = leg.distanceMeters;
+      const coordinates: number[][] = leg.polyline.geoJsonLinestring.coordinates;
+      const points = coordinates.map((coordinate) => {
+        const point: Point = [coordinate[1], coordinate[0]];
+        return point;
+      });
+      //console.log(JSON.stringify(data));
+      return [points, dist];
     } catch (error) {
       console.error('Error fetching route:', error);
-      return null;
+      return [[], 99999999];
     }
   };
   queryAffectedRoutes = async (
@@ -257,6 +275,16 @@ export class AffectRepository {
       .innerJoin(sq, eq(sq.trip_id, trips.id));
     return queryResult;
   };
+  normalizeAffectedRoutes = async (route_ids: string[]) => {
+    route_ids.forEach(async (route_id) => {
+      const trips = await repositories.trip.getTrips(route_id);
+      trips.forEach(async (trip) => {
+        await ShapeRepository.normalizeAltShape(trip.id);
+      });
+      await Promise.all(trips);
+    });
+    await Promise.all(route_ids);
+  };
   updateAffectedRoutes = async (
     occurence_id: string,
     latitude: number,
@@ -270,7 +298,8 @@ export class AffectRepository {
         radius,
       );
       queryResult.forEach(async (element) => {
-        const trips = await this.tripsRepository.getTrips(element.route_id);
+        const routeInfo = await repositories.route.getRoute(element.route_id);
+        const trips = await repositories.trip.getTrips(element.route_id);
         const center: Point = [latitude, longitude];
         trips.forEach(async (trip) => {
           const shape = await ShapeRepository.getShape(trip.id);
@@ -297,36 +326,35 @@ export class AffectRepository {
               );
             },
           );
-          const newShapesArrayAndDistance = await Promise.all(
-            newShapesArrayAndDistancePromises,
-          );
-          const newShapesArray = newShapesArrayAndDistance.map((element) => {
-            return element[0];
-          });
-          const tooLongShapesArray = newShapesArrayAndDistance.filter(
-            (element) => element[1] >= 2000,
-          );
-          const mergedArray = mergeAlternately(
-            partitionedShape,
-            newShapesArray,
-          );
-          const inactivateRoute: boolean =
-            borderPoints.length === 0 || tooLongShapesArray.length > 0;
+          const newShapesArrayAndDistance = await Promise.all(newShapesArrayAndDistancePromises);
+          const newShapesArray = newShapesArrayAndDistance.map((element) => { return element[0]; });
+          const tooLongShapesArray = newShapesArrayAndDistance.filter((element) => element[1] >= 5000);
+
+          const mergedArray = mergeAlternately(partitionedShape, newShapesArray);
+          // console.log(mergedArray);
+          // console.log('border points vazio: ', borderPoints.length === 0);
+          // console.log('border points vazio: ', newShapesArray.length === 0);
+          // console.log('array muito longo: ', tooLongShapesArray.length > 0);
+          const inactivateRoute = borderPoints.length === 0 || tooLongShapesArray.length > 0 || newShapesArray.length === 0;
           if (!inactivateRoute) {
-            for (let i = 1; i < mergedArray.length; i++) {
-              ShapeRepository.addNewShape(
-                trip.id,
-                i,
-                mergedArray[i][0],
-                mergedArray[i][1],
-                0,
-                true,
-              );
-            }
+            const shapeInput: ShapeColumns[] = mergedArray.map((point, index) => ({
+              trip_id: trip.id,
+              pt_sequence: index + 1,
+              pt_lat: point[0],
+              pt_lon: point[1],
+              dist_traveled: 0,
+            }));
+            await ShapeRepository.addNewShape(shapeInput, true);
           }
-          this.affectNewRoute(occurence_id, element.route_id, inactivateRoute);
+          await repositories.affect.affectNewRoute(
+            occurence_id,
+            element.route_id,
+            inactivateRoute || routeInfo[0].inactive,
+          );
         });
+        await Promise.all(trips);
       });
+      await Promise.all(queryResult);
       return queryResult;
     } catch (error) {
       throw error;

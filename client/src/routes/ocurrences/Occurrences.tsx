@@ -26,7 +26,9 @@ import { dateDistance } from '../../utils/time';
 import { translateType } from '../../utils/translate';
 
 const Notifications: React.FC = () => {
-  const { result: occurrenceList } = useAsync(() => OccurrenceModel.list());
+  const { result: occurrenceList, refetch: refetchOccurrences } = useAsync(() =>
+    OccurrenceModel.list()
+  );
   const { result: neighborhoods } = useAsync(() => NeighborhoodModel.list());
   const { result: subscriptions, refetch: refetchSubscriptions } = useAsync(
     () => SubscriptionModel.list()
@@ -41,16 +43,20 @@ const Notifications: React.FC = () => {
     neighborhoodToSubscribe.forEach((id) => {
       promises.push(SubscriptionModel.subscribe(id));
     });
-    Promise.all(promises).then(() => {
-      setOpenDrawer(false);
-      refetchSubscriptions();
-    });
+    Promise.all(promises)
+      .then(() => {
+        refetchSubscriptions();
+      })
+      .then(() => refetchOccurrences())
+      .then(() => setNeighborhoodToSubscribe([]));
   };
 
   const unsubscribe = (neighborhoodId: string) => {
-    SubscriptionModel.unsubscribe(neighborhoodId).then(() => {
-      refetchSubscriptions();
-    });
+    SubscriptionModel.unsubscribe(neighborhoodId)
+      .then(() => {
+        refetchSubscriptions();
+      })
+      .then(() => refetchOccurrences());
   };
 
   return (
@@ -145,6 +151,7 @@ const Notifications: React.FC = () => {
                 .toLowerCase()
                 .includes(inputValue.toLowerCase());
             }}
+            value={neighborhoodToSubscribe}
           />
           <Button type="primary" onClick={subscribe}>
             Inscrever-se
