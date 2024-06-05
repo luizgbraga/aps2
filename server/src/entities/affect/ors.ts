@@ -2,9 +2,9 @@ import { EARTH_RADIUS, Point } from './repository';
 
 const baseUrl = 'https://api.openrouteservice.org/v2/directions/driving-car';
 
+const invertPoint = (point: Point): number[] => [point[1], point[0]];
 const buildPolygon = (center: Point, radius: number): Point[] => {
   const dx = 0.4 * ((radius * 360) / (2 * Math.PI * EARTH_RADIUS));
-  console.log('dx: ', dx);
   return [
     [center[0] - dx, center[1] + dx],
     [center[0] + dx, center[1] + dx],
@@ -13,19 +13,13 @@ const buildPolygon = (center: Point, radius: number): Point[] => {
     [center[0] - dx, center[1] + dx],
   ];
 };
-const invertPoint = (point: Point): number[] => [point[1], point[0]];
 
-export const getOSRRoute = async (
-  start: Point,
-  end: Point,
-  center: Point,
-  radius: number,
-): Promise<[Point[], number]> => {
-  const polygon = buildPolygon(center, radius);
-  const object = {
+export const getORSRoute = async (start: Point, end: Point, center: Point, radius: number): Promise<[Point[], number]> => {
+  const polygonToAvoid = buildPolygon(center, radius);
+  const avoidPolygonObject = {
     type: 'Polygon',
     coordinates: [
-      polygon.map((point) => {
+      polygonToAvoid.map((point) => {
         return invertPoint(point);
       }),
     ],
@@ -34,30 +28,25 @@ export const getOSRRoute = async (
     const response = await fetch(baseUrl, {
       method: 'POST',
       headers: {
-        Authorization: process.env.OSR_API_KEY,
+        Authorization: process.env.ORSAPI_KEY,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         coordinates: [invertPoint(start), invertPoint(end)],
         options: {
-          avoid_polygons: object,
+          avoid_polygons: avoidPolygonObject,
         },
       }),
     });
-    console.log(polygon);
-    // if (!response.ok) {
-    //   throw new Error(`Error fetching route: ${response.statusText}`);
-    // }
+    if (!response.ok) {
+      throw new Error(`Error fetching route: ${response.statusText}`);
+    }
+    // console.log(route.routes);
     const route = await response.json();
-    // console.log(JSON.stringify(route));
-    const str = route.routes[0].geometry;
-    return [
-      decodePolyline(str).map((point): Point => [point[0], point[1]]),
-      route.routes[0].summary.distance,
-    ];
+    const encodedPathStr = route.routes[0].geometry;
+    return [decodePolyline(encodedPathStr).map((point) => [point[0], point[1]]), route.routes[0].summary.distance];
   } catch (error) {
-    console.error('gay');
-    // return [[], 9999999];
+    console.error('Error:', error);
   }
 };
 

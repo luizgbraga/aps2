@@ -72,7 +72,7 @@ export const mapController = () => {
                     scale: 3,
                   },
                   offset: '0',
-                  repeat: '10px',
+                  repeat: '16px',
                 },
               ],
             }

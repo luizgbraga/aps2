@@ -8,12 +8,7 @@ const start: Point = [-43.1669676, -22.9546407];
 const end: Point = [-43.1760094, -22.9661137];
 const occurrenceCenter: Point = [-43.1764841, -22.9595605];
 const radiusFromCenter = 200;
-export const getOSRRoute = async (
-  start: Point,
-  end: Point,
-  center: Point,
-  radius: number,
-) => {
+const getOSRRoute = async (start: Point, end: Point, center: Point, radius: number) => {
   const polygonToAvoid = buildPolygon(center, radius);
   const avoidPolygonObject = {
     type: 'Polygon',
@@ -43,12 +38,7 @@ export const getOSRRoute = async (
     // console.log(route.routes);
     const route = await response.json();
     const encodedPathStr = route.routes[0].geometry;
-    return [
-      decodePolyline(encodedPathStr).map(
-        (point): Point => [point[0], point[1]],
-      ),
-      route.routes[0].summary.distance,
-    ];
+    return [decodePolyline(encodedPathStr).map((point): Point => [point[0], point[1]]), route.routes[0].summary.distance];
   } catch (error) {
     console.error('gay:', error);
   }
@@ -101,13 +91,8 @@ const invertPoint = (point: Point): number[] => [point[1], point[0]];
 
 // "MAIN"
 describe('test', () => {
-  let res1, res2;
   (async () => {
-    [res1, res2] = await getOSRRoute(
-      start,
-      end,
-      occurrenceCenter,
-      radiusFromCenter,
-    );
+    let [res1, res2] = await getOSRRoute(start, end, occurrenceCenter, radiusFromCenter);
+    // Execute código que depende de res1 e res2 AQUI DENTRO
   })();
 });
