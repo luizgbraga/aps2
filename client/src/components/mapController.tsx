@@ -94,7 +94,7 @@ export const mapController = () => {
 
   const clearPaths = (
     polylines: {
-      route_id: string | undefined;
+      route_id: string;
       polyline: google.maps.Polyline;
     }[]
   ) => {
