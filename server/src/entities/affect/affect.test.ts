@@ -1,13 +1,102 @@
 import * as fs from 'fs';
 import { describe, expect, it } from '@jest/globals';
-import { AffectRepository, calculateBorderPoints, calculateWaypoints, mergeAlternately, Point } from './repository';
+import {
+  AffectRepository,
+  calculateBorderPoints,
+  calculateWaypoints,
+  mergeAlternately,
+  Point,
+} from './repository';
 import { number } from 'zod';
+const baseUrl = 'https://api.openrouteservice.org/v2/directions/driving-car';
 
-const path = require("path");
-const file = path.join(__dirname, "./", "shape_testcase.txt");
+const start = [-43.23957774439161, -22.931835278090784];
+const end = [-43.176826755427754, -22.95694773990088];
+const avoidAreas = {
+  type: 'Polygon',
+  coordinates: [
+    [
+      [-43.216402999239364, -22.92644995973206],
+      [-43.19873274953352, -22.92961438949576],
+      [-43.196685995576566, -22.964363778883055],
+      [-43.21989572832513, -22.962491442852023],
+      [-43.216402999239364, -22.92644995973206],
+    ],
+  ],
+};
 
-const repository = new AffectRepository();
+const getRoute = async () => {
+  try {
+    const response = await fetch(baseUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        coordinates: [start, end],
+        options: {
+          avoid_polygons: avoidAreas,
+        },
+      }),
+    });
+
+    // if (!response.ok) {
+    //   throw new Error(`Error fetching route: ${response.statusText}`);
+    // }
+
+    const route = await response.json();
+    console.log(route.routes);
+  } catch (error) {
+    console.error('gay');
+  }
+};
+
+const encodedPolyline = 'b{}jCff|fGu@iBa@w@cBoBgAeAqAgAu@_@UOcEsBmD_BoHeE_@U{@i@e@a@QQs@y@q@aAu@mAWa@{A_Ck@_A{@uA{AaCEU?mA@eBL{@J_@\\oAXkAl@}Bf@_Bn@uB|@sCHU|@wCFw@AkAEQAMQe@Wk@g@u@k@s@wCcDOO}B_COSqBgCeAmAWc@Yy@Qq@Kk@Ig@W}AKe@g@sCuAaH_AuCSq@i@eBc@}AYu@cBoEa@cAYq@GKyBcEq@oA[m@o@iAoBmDq@oAWi@Wk@g@_Am@eAQc@wAaCaBsC_@s@m@kAWu@w@qE[yBAGI]g@eBOYMOIEe@q@w@eAKa@Ca@ASDoAtAyFRw@La@rA{EL_ALgABYP_B?g@G{@?U_@}COeAOqBQ{AAYVu@FKLGhEoAXKtBo@XEd@Eh@Av@BpGb@j@?v@CjAExASn@QZKx@c@|@o@|{@wm@t@e@pBsAj@a@z@]`HgCt@SfIqA`@E`Ck@bFy@JC^ElB[h@MdFy@tAWr@QnBa@`AMb@Ix@WbCq@ZEVBLFt@t@hAnAfAr@nBdAf@Nh@cHJMLEp@D`Dh@~@JtAN~BDv@?tCOv@MbAO`@?f@KtBo@xC{@BC@KCQEGMCeARm@BUFcBd@sAXkBZO@QUEUBYTa@dAc@pBoAdAi@fBs@bBy@lA_@x@]~Bu@tIgClA[nA]`F{AjCeAf@Ol@K\\Id@GnBVzEM\\AXEfBu@ROBI?KAQs@gBS[_AYo@eAMU[_@MK_BcAK?GBGNCH?JRRRVdAr@Qn@U^Sb@@FoANIH?F'
+
+function decodePolyline(encoded: any) {
+  let index = 0;
+  const len = encoded.length;
+  let lat = 0;
+  let lng = 0;
+  const coordinates = [];
+
+  while (index < len) {
+    let b;
+    let shift = 0;
+    let result = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    const dlat = (result & 1) != 0 ? ~(result >> 1) : result >> 1;
+    lat += dlat;
+    shift = 0;
+    result = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    const dlng = (result & 1) != 0 ? ~(result >> 1) : result >> 1;
+    lng += dlng;
+
+    coordinates.push([lat * 1e-5, lng * 1e-5]);
+  }
+
+  return coordinates;
+}
+
+// const path = require("path");
+// const file = path.join(__dirname, "./", "shape_testcase.txt");
+
+// const repository = new AffectRepository();
 describe('updateAffectedRoutes', () => {
+  // getRoute();
+  const decodedCoordinates = decodePolyline(encodedPolyline);
+  console.log(decodedCoordinates);
+
   // it('should return the expected array of route_ids', async () => {
   //   const expectedResult = [
   //     { route_id: 'E2310AAA0A' },
@@ -197,13 +286,12 @@ describe('updateAffectedRoutes', () => {
   //     ]
   //   expect(result).toEqual(expected);
   // });
-  it('should return', async () => {  
-    const result = calculateWaypoints([ -22.90345, -43.27037 ], [ -22.89641, -43.28936 ], [ -22.902369267975896, -43.28023255729598 ], 2);
-    console.log(result);
-    expect(true).toEqual(true);
-  });
   // it('should return', async () => {
-    
+  //   const result = calculateWaypoints([ -22.90345, -43.27037 ], [ -22.89641, -43.28936 ], [ -22.902369267975896, -43.28023255729598 ], 2);
+  //   console.log(result);
+  //   expect(true).toEqual(true);
+  // });
+  // it('should return', async () => {
   //   const result = await AffectRepository.getNewWaypointShape(
   //     [-22.88033, -43.47826],
   //     [-22.8803290, -43.4782594],
