@@ -33,7 +33,7 @@ export class SubscriptionController {
   static async list(req: Request, res: Response) {
     try {
       const userId = req.userId;
-      const result = repositories.subscription.list(userId);
+      const result = await repositories.subscription.list(userId);
       res.status(200).json({ result, type: 'SUCCESS' });
     } catch (error) {
       res.status(500).json(error);
